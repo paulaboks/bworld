@@ -20,9 +20,18 @@ async function build_client() {
 	});
 }
 
+async function build() {
+	const now = performance.now();
+	clear_folder();
+	build_assets();
+	await build_client();
+	console.log(`Built in ${(performance.now() - now).toFixed(2)}ms`);
+}
+
 let last_build = 0;
 
 if (import.meta.main) {
+	await build();
 	const watcher = Deno.watchFs(["assets", "client", "common"], { recursive: true });
 	for await (const event of watcher) {
 		const now = performance.now();
@@ -32,9 +41,7 @@ if (import.meta.main) {
 		if (["create", "modify", "rename", "remove"].includes(event.kind)) {
 			last_build = now;
 			console.log("Rebuilding...");
-			clear_folder();
-			build_assets();
-			await build_client();
+			await build();
 		}
 	}
 }
