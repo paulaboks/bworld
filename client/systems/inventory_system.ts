@@ -1,11 +1,16 @@
-import { System, World } from "$/common/ecs/mod.ts";
+import { System } from "$/common/ecs/mod.ts";
 import { point_inside_rec } from "$/common/utils.ts";
 import { SLOT_SIZE } from "$/common/constants.ts";
 import { Container, PlayerInventory } from "$/client/components/inventory.ts";
 import { InputManager } from "$/client/input_manager.ts";
+import { ClientWorld } from "$/client/client_world.ts";
 
 export class InventorySystem extends System {
-	update(world: World, _delta: number): void {
+	update(world: ClientWorld, _delta: number): void {
+		if (world.paused) {
+			return;
+		}
+
 		for (const entity of world.get_entities()) {
 			const player_inventory = entity.get(PlayerInventory);
 

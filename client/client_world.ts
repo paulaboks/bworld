@@ -9,11 +9,17 @@ import { Tilemap } from "$/client/components/tilemap.ts";
 import { AssetManager } from "$/client/assets.ts";
 import { TileEditorSystem } from "$/client/systems/tile_editor_system.ts";
 import { InventorySystem } from "$/client/systems/inventory_system.ts";
+import { UIInteractionSystem } from "$/client/systems/ui_interaction_system.ts";
+import { UIRenderSystem } from "$/client/systems/ui_render_system.ts";
+import { UIButton } from "./components/ui_components.ts";
+import { Position } from "../common/components/position.ts";
+import { open_about } from "./about.ts";
 
 export class ClientWorld extends World {
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
 
+	paused = false;
 	debugging = false;
 
 	constructor(canvas: HTMLCanvasElement) {
@@ -61,6 +67,19 @@ export class ClientWorld extends World {
 		const player = create_player();
 		this.add_entity(player);
 
+		// UI !
+		const unpause_button = new Entity("unpausebutton");
+		unpause_button.add(new Position(canvas.width / 2 - 150, canvas.height / 2 - 80));
+		unpause_button.add(new UIButton("Unpause", 320, 64, () => this.paused = false));
+		this.add_entity(unpause_button);
+
+		const about_button = new Entity("aboutbutton");
+		about_button.add(new Position(canvas.width / 2 - 150, canvas.height / 2 + 80));
+		about_button.add(new UIButton("About", 320, 64, () => open_about()));
+		this.add_entity(about_button);
+
+		// Logic systems
+		this.add_system(new UIInteractionSystem());
 		this.add_system(new InventorySystem());
 		this.add_system(new PlayerControlsSystem(player));
 		this.add_system(new MovementSystem());
@@ -69,5 +88,6 @@ export class ClientWorld extends World {
 		this.add_system(new RenderSystem(this.ctx));
 		this.add_system(new DebugSystem());
 		this.add_system(new TileEditorSystem());
+		this.add_system(new UIRenderSystem());
 	}
 }

@@ -61,6 +61,7 @@ if (!canvas) {
 
 InputManager.initialize(canvas);
 
+AssetManager.instance.load("bworld:assets_text", "/assets/ASSETS.md");
 AssetManager.instance.load("bworld:player", "/assets/sprites/player.png");
 AssetManager.instance.load("bworld:roguelike", "/assets/sprites/roguelike.png");
 AssetManager.instance.load("bworld:tiny_town", "/assets/sprites/tiny_town.png");

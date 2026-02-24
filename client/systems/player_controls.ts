@@ -17,6 +17,10 @@ export class PlayerControlsSystem extends System {
 	}
 
 	update(world: ClientWorld, _delta: number): void {
+		if (world.paused) {
+			return;
+		}
+
 		const velocity = this.player.get(Velocity)!;
 		const controls = this.player.get(PlayerControls)!;
 

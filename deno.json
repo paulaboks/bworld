@@ -15,6 +15,7 @@
 	},
 	"imports": {
 		"$/": "./",
-		"@std/fs": "jsr:@std/fs@^1.0.23"
+		"@std/fs": "jsr:@std/fs@^1.0.23",
+		"marked": "npm:marked@^17.0.3"
 	}
 }
