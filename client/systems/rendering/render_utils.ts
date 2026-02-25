@@ -107,7 +107,7 @@ export function draw_nine_slice(
 export function draw_item(ctx: CanvasRenderingContext2D, item: ItemStack, x: number, y: number) {
 	const sprite_region = get_sprite_region(item.type_id);
 	ctx.drawImage(
-		AssetManager.instance.get("bworld:tiny_town"),
+		AssetManager.instance.get("bworld:textures"),
 		sprite_region.x * 16,
 		sprite_region.y * 16,
 		16,

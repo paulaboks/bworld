@@ -62,9 +62,12 @@ if (!canvas) {
 InputManager.initialize(canvas);
 
 AssetManager.instance.load("bworld:assets_text", "/assets/ASSETS.md");
+
+AssetManager.instance.load("bworld:textures", "/assets/sprites/textures.png");
+AssetManager.instance.load("bworld:textures_info", "/assets/sprites/textures.json");
+
 AssetManager.instance.load("bworld:player", "/assets/sprites/player.png");
 AssetManager.instance.load("bworld:roguelike", "/assets/sprites/roguelike.png");
-AssetManager.instance.load("bworld:tiny_town", "/assets/sprites/tiny_town.png");
 AssetManager.instance.load("bworld:ui", "/assets/sprites/ui.png");
 
 await AssetManager.instance.load_all();

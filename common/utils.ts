@@ -1,4 +1,5 @@
-import { ITEM_SPRITES, SpriteRegion } from "./constants.ts";
+import { AssetManager } from "../client/assets.ts";
+import { SpriteRegion } from "./constants.ts";
 
 export function point_inside_rec(
 	point_x: number,
@@ -14,6 +15,9 @@ export function point_inside_rec(
 		point_y < rec_y + rec_h;
 }
 
+type TexturesInfo = Record<string, { x: number; y: number }>;
+
 export function get_sprite_region(id: string): SpriteRegion {
-	return ITEM_SPRITES[id] ?? { x: 0, y: 0 };
+	const textures_info = AssetManager.instance.get<TexturesInfo>("bworld:textures_info");
+	return textures_info?.[id] ?? { x: 0, y: 0 };
 }

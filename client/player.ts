@@ -32,7 +32,10 @@ export function create_player() {
 	// TODO: actual player ids
 	player.add(new PlayerInventory(player.id));
 	player.get(PlayerInventory)!.container.add_item(new ItemStack("bworld:pickaxe", 1, 1));
-	player.get(PlayerInventory)!.container.add_item(new ItemStack("bworld:bomb", 5));
+	player.get(PlayerInventory)!.container.add_item(new ItemStack("bworld:sword", 1, 1));
+	player.get(PlayerInventory)!.container.add_item(new ItemStack("bworld:axe", 1, 1));
+	player.get(PlayerInventory)!.container.add_item(new ItemStack("bworld:hoe", 1, 1));
+	player.get(PlayerInventory)!.container.add_item(new ItemStack("bworld:watering_can", 1, 1));
 	player.get(PlayerInventory)!.container.add_item(new ItemStack("bworld:bomb", 64));
 	player.add(new Camera(-100, -100));
 	return player;

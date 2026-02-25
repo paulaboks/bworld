@@ -1,4 +1,4 @@
-type Asset = HTMLImageElement | HTMLAudioElement | string;
+type Asset = HTMLImageElement | HTMLAudioElement | string | Record<string, unknown>;
 
 export class AssetManager {
 	static instance = new AssetManager();
@@ -45,6 +45,12 @@ export class AssetManager {
 			const promise = async () => {
 				const resp = await fetch(src);
 				this.assets[key] = await resp.text();
+			};
+			this.loading_promises.push(promise());
+		} else if (src.endsWith(".json")) {
+			const promise = async () => {
+				const resp = await fetch(src);
+				this.assets[key] = await resp.json();
 			};
 			this.loading_promises.push(promise());
 		}

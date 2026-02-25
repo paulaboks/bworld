@@ -31,8 +31,6 @@ license: `free to use with attribution`
 https://butterymilk.itch.io/tiny-wonder-farm-asset-pack
 (https://web.archive.org/web/20260204234306/https://butterymilk.itch.io/tiny-wonder-farm-asset-pack)
 
-file: assets/sprites/player.png
-
 license:
 
 ```
@@ -49,4 +47,34 @@ You are free to use sprites included in the pack in any of your commercial or no
 the sprites and add something new!
 
 You can't resell the sprites, even if changes were made. You cannot use it in any projects related to NFT."
+```
+
+# Farmer's delight
+
+https://github.com/vectorwing/FarmersDelight
+
+License:
+
+```
+MIT License
+
+Copyright (c) 2020 vectorwing
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 ```
