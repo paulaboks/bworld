@@ -101,6 +101,7 @@ export class Inventory extends Component {
 export class PlayerInventory extends Inventory {
 	owner_id: string;
 	holding_item: ItemStack | undefined;
+	hotbar_selected: number = 0;
 
 	constructor(owner_id: string) {
 		const container = new Container(9 * 4);

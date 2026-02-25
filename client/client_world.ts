@@ -64,8 +64,7 @@ export class ClientWorld extends World {
 		);
 		this.add_entity(tilemap);
 
-		const player = create_player();
-		this.add_entity(player);
+		const player = create_player(this);
 
 		// UI !
 		const unpause_button = new Entity("unpausebutton");

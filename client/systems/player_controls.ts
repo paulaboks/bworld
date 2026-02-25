@@ -23,6 +23,7 @@ export class PlayerControlsSystem extends System {
 
 		const velocity = this.player.get(Velocity)!;
 		const controls = this.player.get(PlayerControls)!;
+		const player_inventory = this.player.get(PlayerInventory)!;
 
 		if (InputManager.is_key_down(controls.move_left)) {
 			velocity.vx = -controls.move_speed;
@@ -71,6 +72,13 @@ export class PlayerControlsSystem extends System {
 
 		camera.x = Math.round(position.x);
 		camera.y = Math.round(position.y);
+
+		const scroll = InputManager.get_wheel_delta();
+		if (scroll > 0) {
+			player_inventory.hotbar_selected = Math.min(8, player_inventory.hotbar_selected + 1);
+		} else if (scroll < 0) {
+			player_inventory.hotbar_selected = Math.max(0, player_inventory.hotbar_selected - 1);
+		}
 
 		// --- APPLY BOUNDS ---
 		/*if (camera.bounds) {

@@ -15,7 +15,7 @@ export function point_inside_rec(
 		point_y < rec_y + rec_h;
 }
 
-type TexturesInfo = Record<string, { x: number; y: number }>;
+type TexturesInfo = Record<string, SpriteRegion>;
 
 export function get_sprite_region(id: string): SpriteRegion {
 	const textures_info = AssetManager.instance.get<TexturesInfo>("bworld:textures_info");

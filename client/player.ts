@@ -4,9 +4,11 @@ import { Entity } from "$/common/ecs/mod.ts";
 import { Camera } from "$/client/components/camera.ts";
 import { ItemStack, PlayerInventory } from "$/client/components/inventory.ts";
 import { PlayerControls } from "$/client/components/player_controls.ts";
-import { AnimatedSprite } from "$/client/components/sprite.ts";
+import { AnimatedSprite, Sprite } from "$/client/components/sprite.ts";
+import { ClientWorld } from "./client_world.ts";
+import { AssetManager } from "./assets.ts";
 
-export function create_player() {
+export function create_player(world: ClientWorld) {
 	const player = new Entity("player");
 	player.add(new Position(10, 10));
 	player.add(new Velocity(0, 0));
@@ -38,5 +40,16 @@ export function create_player() {
 	player.get(PlayerInventory)!.container.add_item(new ItemStack("bworld:watering_can", 1, 1));
 	player.get(PlayerInventory)!.container.add_item(new ItemStack("bworld:bomb", 64));
 	player.add(new Camera(-100, -100));
+
+	world.add_entity(player);
+
+	const player_hand = new Entity("playerhand");
+	player_hand.add(new Position(0, 0));
+	// empty sprite
+	player_hand.add(new Sprite(AssetManager.instance.get("bworld:textures"), 0, 0));
+	world.add_entity(player_hand);
+
+	world.add_tag("player", [player, player_hand]);
+
 	return player;
 }
