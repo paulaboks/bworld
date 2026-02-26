@@ -9,10 +9,6 @@ import { Sprite } from "../components/sprite.ts";
 
 export class InventorySystem extends System {
 	update(world: ClientWorld, _delta: number): void {
-		if (world.paused) {
-			return;
-		}
-
 		for (const entity of world.get_entities()) {
 			const player_inventory = entity.get(PlayerInventory);
 

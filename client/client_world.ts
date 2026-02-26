@@ -1,19 +1,14 @@
-import { Entity, World } from "$/common/ecs/mod.ts";
+import { World } from "$/common/ecs/mod.ts";
 import { MovementSystem } from "$/common/systems/movement_system.ts";
 import { RenderSystem } from "$/client/systems/render_system.ts";
 import { PlayerControlsSystem } from "$/client/systems/player_controls.ts";
 import { DebugUI } from "$/client/debug_ui.ts";
 import { DebugSystem } from "$/client/systems/debug_system.ts";
-import { create_player } from "$/client/player.ts";
-import { Tilemap } from "$/client/components/tilemap.ts";
-import { AssetManager } from "$/client/assets.ts";
 import { TileEditorSystem } from "$/client/systems/tile_editor_system.ts";
 import { InventorySystem } from "$/client/systems/inventory_system.ts";
 import { UIInteractionSystem } from "$/client/systems/ui_interaction_system.ts";
 import { UIRenderSystem } from "$/client/systems/ui_render_system.ts";
-import { UIButton } from "./components/ui_components.ts";
-import { Position } from "../common/components/position.ts";
-import { open_about } from "./about.ts";
+import { create_main_menu } from "./main_menu.ts";
 
 export class ClientWorld extends World {
 	canvas: HTMLCanvasElement;
@@ -23,7 +18,11 @@ export class ClientWorld extends World {
 	debugging = false;
 
 	constructor(canvas: HTMLCanvasElement) {
-		super();
+		super("main_menu");
+
+		this.add_state("main_menu");
+		this.add_state("paused");
+		this.add_state("game");
 
 		this.canvas = canvas;
 		const ctx = canvas.getContext("2d");
@@ -52,41 +51,20 @@ export class ClientWorld extends World {
 
 		DebugUI.initialize(this.ctx);
 
-		const tilemap = new Entity("backgroundtiles");
-		tilemap.add(
-			new Tilemap(
-				AssetManager.instance.get("bworld:roguelike"),
-				16,
-				[],
-				2,
-				1,
-			),
-		);
-		this.add_entity(tilemap);
-
-		const player = create_player(this);
-
-		// UI !
-		const unpause_button = new Entity("unpausebutton");
-		unpause_button.add(new Position(canvas.width / 2 - 150, canvas.height / 2 - 80));
-		unpause_button.add(new UIButton("Unpause", 320, 64, () => this.paused = false));
-		this.add_entity(unpause_button);
-
-		const about_button = new Entity("aboutbutton");
-		about_button.add(new Position(canvas.width / 2 - 150, canvas.height / 2 + 80));
-		about_button.add(new UIButton("About", 320, 64, () => open_about()));
-		this.add_entity(about_button);
+		create_main_menu(this);
 
 		// Logic systems
-		this.add_system(new UIInteractionSystem());
-		this.add_system(new InventorySystem());
-		this.add_system(new PlayerControlsSystem(player));
-		this.add_system(new MovementSystem());
+		this.add_system(new UIInteractionSystem(), "main_menu");
+		this.add_system(new UIInteractionSystem(), "paused");
+		this.add_system(new InventorySystem(), "game");
+		this.add_system(new PlayerControlsSystem(), "game");
+		this.add_system(new MovementSystem(), "game");
 
 		// render systems
-		this.add_system(new RenderSystem(this.ctx));
-		this.add_system(new DebugSystem());
-		this.add_system(new TileEditorSystem());
-		this.add_system(new UIRenderSystem());
+		this.add_system(new RenderSystem(this.ctx), "game");
+		this.add_system(new DebugSystem(), "*");
+		this.add_system(new TileEditorSystem(), "game");
+		this.add_system(new UIRenderSystem(), "main_menu");
+		this.add_system(new UIRenderSystem(), "paused");
 	}
 }

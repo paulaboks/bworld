@@ -7,15 +7,6 @@ import { InputManager } from "$/client/input_manager.ts";
 
 export class UIInteractionSystem implements System {
 	update(world: ClientWorld, _delta: number) {
-		// TODO: dont like
-		if (InputManager.is_key_pressed("Escape")) {
-			world.paused = !world.paused;
-		}
-
-		if (!world.paused) {
-			return;
-		}
-
 		const mouse = InputManager.get_mouse_position();
 
 		for (const entity of world.get_entities()) {

@@ -1,4 +1,4 @@
-import { Entity, System } from "$/common/ecs/mod.ts";
+import { System } from "$/common/ecs/mod.ts";
 import { Velocity } from "$/common/components/velocity.ts";
 import { InputManager } from "../input_manager.ts";
 import { AnimatedSprite } from "../components/sprite.ts";
@@ -9,21 +9,15 @@ import { Camera } from "../components/camera.ts";
 import { Position } from "../../common/components/position.ts";
 
 export class PlayerControlsSystem extends System {
-	player: Entity;
-
-	constructor(player: Entity) {
+	constructor() {
 		super();
-		this.player = player;
 	}
 
 	update(world: ClientWorld, _delta: number): void {
-		if (world.paused) {
-			return;
-		}
-
-		const velocity = this.player.get(Velocity)!;
-		const controls = this.player.get(PlayerControls)!;
-		const player_inventory = this.player.get(PlayerInventory)!;
+		const [player] = world.get_tag("player")!;
+		const velocity = player.get(Velocity)!;
+		const controls = player.get(PlayerControls)!;
+		const player_inventory = player.get(PlayerInventory)!;
 
 		if (InputManager.is_key_down(controls.move_left)) {
 			velocity.vx = -controls.move_speed;
@@ -41,7 +35,7 @@ export class PlayerControlsSystem extends System {
 			velocity.vy = 0;
 		}
 
-		const animated_sprite = this.player.get(AnimatedSprite)!;
+		const animated_sprite = player.get(AnimatedSprite)!;
 
 		if (
 			InputManager.is_key_down(controls.move_up) || InputManager.is_key_down(controls.move_down) ||
@@ -59,7 +53,7 @@ export class PlayerControlsSystem extends System {
 		}
 
 		if (InputManager.is_key_pressed(controls.open_inventory)) {
-			const inventory = this.player.get(PlayerInventory)!;
+			const inventory = player.get(PlayerInventory)!;
 			inventory.is_open = !inventory.is_open;
 		}
 
@@ -67,8 +61,8 @@ export class PlayerControlsSystem extends System {
 			world.debugging = !world.debugging;
 		}
 
-		const position = this.player.get(Position)!;
-		const camera = this.player.get(Camera)!;
+		const position = player.get(Position)!;
+		const camera = player.get(Camera)!;
 
 		camera.x = Math.round(position.x);
 		camera.y = Math.round(position.y);

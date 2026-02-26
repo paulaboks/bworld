@@ -12,10 +12,6 @@ export class UIRenderSystem implements System {
 	constructor() {}
 
 	update(world: ClientWorld, _delta: number) {
-		if (!world.paused) {
-			return;
-		}
-
 		const ctx = world.ctx;
 
 		ctx.save();
