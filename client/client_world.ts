@@ -8,7 +8,9 @@ import { TileEditorSystem } from "$/client/systems/tile_editor_system.ts";
 import { InventorySystem } from "$/client/systems/inventory_system.ts";
 import { UIInteractionSystem } from "$/client/systems/ui_interaction_system.ts";
 import { UIRenderSystem } from "$/client/systems/ui_render_system.ts";
+import { CropSystem } from "$/client/systems/crop_system.ts";
 import { create_main_menu } from "./main_menu.ts";
+import { ClickableSystem } from "./systems/clickable_system.ts";
 
 export class ClientWorld extends World {
 	canvas: HTMLCanvasElement;
@@ -56,9 +58,11 @@ export class ClientWorld extends World {
 		// Logic systems
 		this.add_system(new UIInteractionSystem(), "main_menu");
 		this.add_system(new UIInteractionSystem(), "paused");
+		this.add_system(new ClickableSystem(), "game");
 		this.add_system(new InventorySystem(), "game");
 		this.add_system(new PlayerControlsSystem(), "game");
 		this.add_system(new MovementSystem(), "game");
+		this.add_system(new CropSystem(), "game");
 
 		// render systems
 		this.add_system(new RenderSystem(this.ctx), "game");
