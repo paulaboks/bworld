@@ -1,8 +1,9 @@
 import { Component } from "$/common/ecs/mod.ts";
 import { AssetManager } from "$/client/assets.ts";
+import { Texture } from "../renderer.ts";
 
 export class Sprite extends Component {
-	image: HTMLImageElement;
+	image: Texture;
 	width: number;
 	height: number;
 	source_x: number;
@@ -13,7 +14,7 @@ export class Sprite extends Component {
 	flip_y = false;
 
 	constructor(
-		image: HTMLImageElement | string,
+		image: Texture | string,
 		width: number,
 		height: number,
 		source_x = 0,
@@ -23,7 +24,7 @@ export class Sprite extends Component {
 	) {
 		super();
 		if (typeof image === "string") {
-			this.image = AssetManager.instance.get<HTMLImageElement>(image);
+			this.image = AssetManager.instance.get(image);
 		} else {
 			this.image = image;
 		}
@@ -45,7 +46,7 @@ interface AnimatedSpritePiece {
 }
 
 export class AnimatedSprite extends Component {
-	image: HTMLImageElement;
+	image: Texture;
 	width: number;
 	height: number;
 	flip_x = false;
@@ -57,7 +58,7 @@ export class AnimatedSprite extends Component {
 	animation_frame = 0;
 
 	constructor(
-		image: HTMLImageElement | string,
+		image: Texture | string,
 		width: number,
 		height: number,
 		states: Record<string, AnimatedSpritePiece>,
@@ -65,7 +66,7 @@ export class AnimatedSprite extends Component {
 	) {
 		super();
 		if (typeof image === "string") {
-			this.image = AssetManager.instance.get<HTMLImageElement>(image);
+			this.image = AssetManager.instance.get(image);
 		} else {
 			this.image = image;
 		}

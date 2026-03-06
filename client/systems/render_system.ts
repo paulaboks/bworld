@@ -11,17 +11,11 @@ import { render_dimension } from "./rendering/dimension.ts";
 import { render_player_inventory } from "./rendering/player.ts";
 
 export class RenderSystem extends System {
-	ctx: CanvasRenderingContext2D;
-
-	constructor(ctx: CanvasRenderingContext2D) {
+	constructor() {
 		super();
-		this.ctx = ctx;
 	}
 
 	update(world: World, _delta: number): void {
-		this.ctx.save();
-		this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-
 		const camera_entity = world.get_entities().values().find((e) => e.get(Camera)?.active);
 		const camera = camera_entity?.get(Camera);
 
@@ -30,45 +24,29 @@ export class RenderSystem extends System {
 		}
 
 		for (const entity of world.get_entities()) {
-			this.ctx.save();
-			this.ctx.translate(
-				Math.floor(this.ctx.canvas.width / 2),
-				Math.floor(this.ctx.canvas.height / 2),
-			);
-
-			this.ctx.scale(camera.zoom, camera.zoom);
-
-			this.ctx.translate(
-				-Math.floor(camera.x),
-				-Math.floor(camera.y),
-			);
-
 			const position = entity.get(Position);
 			const sprite = entity.get(Sprite);
 
 			if (sprite && position) {
-				render_sprite(this.ctx, sprite, position);
+				render_sprite(sprite, position);
 			}
 
 			const animated_sprite = entity.get(AnimatedSprite);
 
 			if (animated_sprite && position) {
-				render_animated_sprite(this.ctx, animated_sprite, position);
+				render_animated_sprite(animated_sprite, position);
 			}
 
 			const dimension = entity.get(Dimension);
 
 			if (dimension) {
-				render_dimension(this.ctx, dimension, camera);
+				render_dimension(dimension, camera);
 			}
-
-			// Ui
-			this.ctx.restore();
 
 			const player_inventory = entity.get(PlayerInventory);
 
 			if (player_inventory && player_inventory.is_open) {
-				render_player_inventory(this.ctx, player_inventory);
+				render_player_inventory(player_inventory);
 			}
 		}
 	}

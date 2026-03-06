@@ -6,6 +6,7 @@ import { ClickableSprite } from "../components/clickable.ts";
 import { point_inside_rec } from "$/common/utils.ts";
 import { InputManager } from "../input_manager.ts";
 import { Camera, screen_to_world } from "../components/camera.ts";
+import { canvas } from "../renderer.ts";
 
 export class ClickableSystem extends System {
 	update(world: ClientWorld, _delta: number): void {
@@ -18,8 +19,8 @@ export class ClickableSystem extends System {
 			mouse.x,
 			mouse.y,
 			camera,
-			world.canvas.width,
-			world.canvas.height,
+			canvas.width,
+			canvas.height,
 		);
 
 		for (const entity of world.get_entities()) {

@@ -7,6 +7,7 @@ import { UIButton } from "./components/ui_components.ts";
 import { open_about } from "./about.ts";
 import { create_crop_entity, Crop } from "./components/crop.ts";
 import { generate } from "./generation.ts";
+import { canvas } from "./renderer.ts";
 
 export function start_game(world: ClientWorld) {
 	world.state = "game";
@@ -21,12 +22,12 @@ export function start_game(world: ClientWorld) {
 
 	// UI !
 	const unpause_button = new Entity("unpausebutton");
-	unpause_button.add(new Position(world.canvas.width / 2 - 150, world.canvas.height / 2 - 80));
+	unpause_button.add(new Position(canvas.width / 2 - 150, canvas.height / 2 - 80));
 	unpause_button.add(new UIButton("Unpause", 320, 64, () => world.state = "paused"));
 	world.add_entity(unpause_button);
 
 	const about_button = new Entity("aboutbutton");
-	about_button.add(new Position(world.canvas.width / 2 - 150, world.canvas.height / 2 + 80));
+	about_button.add(new Position(canvas.width / 2 - 150, canvas.height / 2 + 80));
 	about_button.add(new UIButton("About", 320, 64, () => open_about()));
 	world.add_entity(about_button);
 

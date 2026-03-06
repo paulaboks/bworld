@@ -2,11 +2,10 @@ import { SLOT_SIZE } from "$/common/constants.ts";
 import { get_sprite_region } from "$/common/utils.ts";
 import { AssetManager } from "$/client/assets.ts";
 import { ItemStack } from "$/client/components/inventory.ts";
-import { draw_text } from "$/client/text_rendering.ts";
+import { draw_text, draw_texture_region, Texture } from "$/client/renderer.ts";
 
 export function draw_nine_slice(
-	ctx: CanvasRenderingContext2D,
-	image: HTMLImageElement,
+	image: Texture,
 	source_x: number,
 	source_y: number,
 	source_width: number,
@@ -27,13 +26,13 @@ export function draw_nine_slice(
 	const dest_center_height = height - top - bottom;
 
 	// top left
-	ctx.drawImage(image, source_x, source_y, left, top, x, y, left, top);
+	draw_texture_region(image, source_x, source_y, left, top, x, y, left, top);
 
 	// top right
-	ctx.drawImage(image, source_x + source_width - right, source_y, right, top, x + width - right, y, right, top);
+	draw_texture_region(image, source_x + source_width - right, source_y, right, top, x + width - right, y, right, top);
 
 	// bottom left
-	ctx.drawImage(
+	draw_texture_region(
 		image,
 		source_x,
 		source_y + source_height - bottom,
@@ -46,7 +45,7 @@ export function draw_nine_slice(
 	);
 
 	// bottom right
-	ctx.drawImage(
+	draw_texture_region(
 		image,
 		source_x + source_width - right,
 		source_y + source_height - bottom,
@@ -59,10 +58,10 @@ export function draw_nine_slice(
 	);
 
 	// top
-	ctx.drawImage(image, source_x + left, source_y, center_width, top, x + left, y, dest_center_width, top);
+	draw_texture_region(image, source_x + left, source_y, center_width, top, x + left, y, dest_center_width, top);
 
 	// bottom
-	ctx.drawImage(
+	draw_texture_region(
 		image,
 		source_x + left,
 		source_y + source_height - bottom,
@@ -75,10 +74,10 @@ export function draw_nine_slice(
 	);
 
 	// left
-	ctx.drawImage(image, source_x, source_y + top, left, center_height, x, y + top, left, dest_center_height);
+	draw_texture_region(image, source_x, source_y + top, left, center_height, x, y + top, left, dest_center_height);
 
 	// right
-	ctx.drawImage(
+	draw_texture_region(
 		image,
 		source_x + source_width - right,
 		source_y + top,
@@ -91,7 +90,7 @@ export function draw_nine_slice(
 	);
 
 	// center !
-	ctx.drawImage(
+	draw_texture_region(
 		image,
 		source_x + left,
 		source_y + top,
@@ -104,9 +103,9 @@ export function draw_nine_slice(
 	);
 }
 
-export function draw_item(ctx: CanvasRenderingContext2D, item: ItemStack, x: number, y: number) {
+export function draw_item(item: ItemStack, x: number, y: number) {
 	const sprite_region = get_sprite_region(item.type_id);
-	ctx.drawImage(
+	draw_texture_region(
 		AssetManager.instance.get("bworld:textures"),
 		sprite_region.x * 16,
 		sprite_region.y * 16,
@@ -119,24 +118,22 @@ export function draw_item(ctx: CanvasRenderingContext2D, item: ItemStack, x: num
 	);
 	if (item.max_amount !== 1) {
 		draw_text(
-			ctx,
 			String(item.amount),
 			x + SLOT_SIZE + 2 - 4,
 			y + SLOT_SIZE + 2 - 4,
-			2,
-			"#3f3f3f",
-			"bottom",
-			"right",
+			//2,
+			//"#3f3f3f",
+			//"bottom",
+			//"right",
 		);
 		draw_text(
-			ctx,
 			String(item.amount),
 			x + SLOT_SIZE - 4,
 			y + SLOT_SIZE - 4,
-			2,
-			"white",
-			"bottom",
-			"right",
+			//2,
+			//"white",
+			//"bottom",
+			//"right",
 		);
 	}
 }

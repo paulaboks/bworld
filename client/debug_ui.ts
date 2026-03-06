@@ -1,6 +1,6 @@
 import { point_inside_rec } from "$/common/utils.ts";
 import { InputManager } from "$/client/input_manager.ts";
-import { draw_text, measure_text } from "$/client/text_rendering.ts";
+//import { draw_text, measure_text } from "$/client/text_rendering.ts";
 
 const HEADER_HEIGHT = 24;
 const RESIZE_SIZE = 12;
@@ -135,7 +135,7 @@ export class DebugUI {
 		this.ctx.fillStyle = "#333";
 		this.ctx.fillRect(win.x, win.y, win.width, HEADER_HEIGHT);
 
-		draw_text(this.ctx, title, win.x + 8, win.y + 4, 2);
+		//draw_text(this.ctx, title, win.x + 8, win.y + 4, 2);
 
 		// resize grip
 		this.ctx.fillStyle = hovering_resize ? "#888" : "#666";
@@ -201,7 +201,7 @@ export class DebugUI {
 	}
 
 	static text(content: string) {
-		draw_text(this.ctx, content, this.cursor_x, this.cursor_y, 2);
+		//draw_text(this.ctx, content, this.cursor_x, this.cursor_y, 2);
 		this.advance(20);
 	}
 
@@ -221,7 +221,7 @@ export class DebugUI {
 		this.ctx.strokeRect(x, y, width, height);
 
 		this.ctx.fillStyle = "white";
-		draw_text(this.ctx, label, x + 6, y + 4, 2);
+		//draw_text(this.ctx, label, x + 6, y + 4, 2);
 
 		this.advance(height + PADDING);
 
@@ -253,7 +253,7 @@ export class DebugUI {
 		}
 
 		this.ctx.fillStyle = "white";
-		draw_text(this.ctx, label, x + size + 6, y, 2);
+		//draw_text(this.ctx, label, x + size + 6, y, 2);
 
 		this.advance(size + PADDING);
 
@@ -295,7 +295,7 @@ export class DebugUI {
 		this.ctx.strokeRect(x, y, width, height);
 
 		this.ctx.fillStyle = "white";
-		draw_text(this.ctx, `${label}: ${value.toFixed(2)}`, x + 5, y + 2, 2);
+		//draw_text(this.ctx, `${label}: ${value.toFixed(2)}`, x + 5, y + 2, 2);
 
 		this.advance(height + PADDING);
 
@@ -414,17 +414,17 @@ export class DebugUI {
 
 		const text_x = x + 6;
 
-		draw_text(this.ctx, state.value, x + 6, y + 4, 2);
+		//draw_text(this.ctx, state.value, x + 6, y + 4, 2);
 
 		// caret !
 		if (is_active && state.show_caret) {
 			const before_text = state.value.substring(0, state.caret);
-			const caret_x = text_x + measure_text(this.ctx, before_text, 2);
+			//const caret_x = text_x + measure_text(this.ctx, before_text, 2);
 
 			this.ctx.strokeStyle = "white";
 			this.ctx.beginPath();
-			this.ctx.moveTo(caret_x, y + 4);
-			this.ctx.lineTo(caret_x, y + height - 4);
+			//this.ctx.moveTo(caret_x, y + 4);
+			//this.ctx.lineTo(caret_x, y + height - 4);
 			this.ctx.stroke();
 		}
 

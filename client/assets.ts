@@ -1,4 +1,6 @@
-type Asset = HTMLImageElement | HTMLAudioElement | string | Record<string, unknown>;
+import { load_texture, Texture } from "./renderer.ts";
+
+type Asset = Texture | HTMLAudioElement | string | Record<string, unknown>;
 
 export class AssetManager {
 	static instance = new AssetManager();
@@ -16,11 +18,13 @@ export class AssetManager {
 		if (src.endsWith(".png")) {
 			const img = new Image();
 			const promise = new Promise<void>((resolve, reject) => {
-				img.onload = () => resolve();
+				img.onload = () => {
+					this.assets[key] = load_texture(img);
+					resolve();
+				};
 				img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
 			});
 			img.src = src;
-			this.assets[key] = img;
 			this.loading_promises.push(promise);
 		} else if (src.endsWith(".ogg")) {
 			const audio = new Audio();

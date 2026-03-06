@@ -1,65 +1,46 @@
 import { Position } from "$/common/components/position.ts";
 import { AnimatedSprite, Sprite } from "$/client/components/sprite.ts";
+import { draw_texture_region } from "../../renderer.ts";
+import { AssetManager } from "../../assets.ts";
 
-export function render_sprite(ctx: CanvasRenderingContext2D, sprite: Sprite, position: Position) {
-	ctx.save();
-
-	ctx.translate(
-		Math.floor(sprite.flip_x ? position.x + sprite.width : position.x),
-		Math.floor(sprite.flip_y ? position.y + sprite.height : position.y),
-	);
-	ctx.scale(
-		sprite.flip_x ? -1 : 1,
-		sprite.flip_y ? -1 : 1,
-	);
-
-	ctx.drawImage(
+export function render_sprite(sprite: Sprite, position: Position) {
+	draw_texture_region(
 		sprite.image,
 		sprite.source_x,
 		sprite.source_y,
 		sprite.source_width,
 		sprite.source_height,
-		0,
-		0,
+		position.x,
+		position.y,
 		sprite.width,
 		sprite.height,
+		sprite.flip_x,
+		sprite.flip_y,
 	);
-	ctx.restore();
 }
 
 export function render_animated_sprite(
-	ctx: CanvasRenderingContext2D,
 	animated_sprite: AnimatedSprite,
 	position: Position,
 ) {
-	ctx.save();
-
 	const current_animation = animated_sprite.states[animated_sprite.current_state];
 	if (!current_animation) {
 		console.error(`Missing animation for state ${animated_sprite.current_state}`);
 		return;
 	}
 
-	ctx.translate(
-		Math.floor(animated_sprite.flip_x ? position.x + animated_sprite.width : position.x),
-		Math.floor(animated_sprite.flip_y ? position.y + animated_sprite.height : position.y),
-	);
-
-	ctx.scale(
-		animated_sprite.flip_x ? -1 : 1,
-		animated_sprite.flip_y ? -1 : 1,
-	);
-
-	ctx.drawImage(
-		animated_sprite.image,
+	draw_texture_region(
+		AssetManager.instance.get("bworld:player"),
 		current_animation.source_x[animated_sprite.animation_frame],
 		current_animation.source_y[animated_sprite.animation_frame],
 		current_animation.source_width,
 		current_animation.source_height,
-		0,
-		0,
+		position.x,
+		position.y,
 		animated_sprite.width,
 		animated_sprite.height,
+		animated_sprite.flip_x,
+		animated_sprite.flip_y,
 	);
 
 	animated_sprite.timer += 1;
@@ -71,6 +52,4 @@ export function render_animated_sprite(
 			animated_sprite.animation_frame = 0;
 		}
 	}
-
-	ctx.restore();
 }

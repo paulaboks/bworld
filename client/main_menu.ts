@@ -4,10 +4,9 @@ import { ClientWorld } from "./client_world.ts";
 import { UIButton } from "./components/ui_components.ts";
 import { open_about } from "./about.ts";
 import { start_game } from "./game.ts";
+import { canvas } from "./renderer.ts";
 
 export function create_main_menu(world: ClientWorld) {
-	const canvas = world.canvas;
-
 	const play_button = new Entity("play");
 	play_button.add(new Position(canvas.width / 2 - 150, canvas.height / 2 - 80));
 	play_button.add(new UIButton("Play", 320, 64, () => start_game(world)));

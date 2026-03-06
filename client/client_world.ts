@@ -10,49 +10,30 @@ import { UIRenderSystem } from "$/client/systems/ui_render_system.ts";
 import { CropSystem } from "$/client/systems/crop_system.ts";
 import { create_main_menu } from "./main_menu.ts";
 import { ClickableSystem } from "./systems/clickable_system.ts";
+import { start_game } from "./game.ts";
+import { canvas, resize_canvas } from "./renderer.ts";
 
 export class ClientWorld extends World {
-	canvas: HTMLCanvasElement;
-	ctx: CanvasRenderingContext2D;
-
 	paused = false;
 	debugging = false;
 
-	constructor(canvas: HTMLCanvasElement) {
-		super("main_menu");
+	constructor() {
+		super("game");
 
 		this.add_state("main_menu");
 		this.add_state("paused");
 		this.add_state("game");
 
-		this.canvas = canvas;
-		const ctx = canvas.getContext("2d");
-		if (!ctx) {
-			throw new Error("Could not get CanvasRenderingContext2D");
-		}
-		this.ctx = ctx;
-		ctx.imageSmoothingEnabled = false;
-
-		const resize = () => {
-			canvas.width = self.innerWidth;
-			canvas.height = self.innerHeight;
-
-			canvas.style.width = canvas.width + "px";
-			canvas.style.height = canvas.height + "px";
-
-			this.ctx.imageSmoothingEnabled = false;
-		};
-
-		self.addEventListener("resize", resize);
-		resize();
+		self.addEventListener("resize", resize_canvas);
+		resize_canvas();
 
 		canvas.addEventListener("contextmenu", function (event) {
 			event.preventDefault();
 		});
 
-		DebugUI.initialize(this.ctx);
+		//DebugUI.initialize(this.ctx);
 
-		create_main_menu(this);
+		start_game(this);
 
 		// Logic systems
 		this.add_system(new UIInteractionSystem(), "main_menu");
@@ -64,7 +45,7 @@ export class ClientWorld extends World {
 		this.add_system(new CropSystem(), "game");
 
 		// render systems
-		this.add_system(new RenderSystem(this.ctx), "game");
+		this.add_system(new RenderSystem(), "game");
 		this.add_system(new DebugSystem(), "*");
 		this.add_system(new UIRenderSystem(), "main_menu");
 		this.add_system(new UIRenderSystem(), "paused");

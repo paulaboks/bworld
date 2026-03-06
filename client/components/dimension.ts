@@ -1,5 +1,6 @@
 import { Component } from "$/common/ecs/mod.ts";
 import { AssetManager } from "../assets.ts";
+import { Texture } from "../renderer.ts";
 
 interface Tile {
 	x: number;
@@ -9,7 +10,7 @@ interface Tile {
 }
 
 export class Dimension extends Component {
-	image: HTMLImageElement;
+	image: Texture;
 	tiles: Tile[];
 
 	constructor(tiles: Tile[]) {

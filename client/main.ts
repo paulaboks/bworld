@@ -1,6 +1,7 @@
 import { AssetManager } from "./assets.ts";
 import { ClientWorld } from "./client_world.ts";
 import { InputManager } from "./input_manager.ts";
+import { begin_drawing, end_drawing, init_window } from "./renderer.ts";
 
 export class ClientLoop {
 	running = false;
@@ -34,9 +35,9 @@ export class ClientLoop {
 
 		const delta = (time - this.last_time) / 1000;
 
-		const ctx = this.world.ctx;
-		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+		begin_drawing();
 		this.world.update(delta);
+		end_drawing();
 
 		this.frame_count += 1;
 		const now = performance.now();
@@ -59,6 +60,8 @@ if (!canvas) {
 	throw Error("Canvas was not found");
 }
 
+init_window(canvas);
+
 InputManager.initialize(canvas);
 
 AssetManager.instance.load("bworld:assets_text", "/assets/ASSETS.md");
@@ -72,7 +75,7 @@ AssetManager.instance.load("bworld:ui", "/assets/sprites/ui.png");
 
 await AssetManager.instance.load_all();
 
-const client_world = new ClientWorld(canvas);
+const client_world = new ClientWorld();
 
 const loop = new ClientLoop(client_world);
 loop.start();
