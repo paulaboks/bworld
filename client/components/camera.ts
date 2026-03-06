@@ -5,6 +5,9 @@ export class Camera extends Component {
 	x: number;
 	y: number;
 	zoom: number;
+	rotation = 0;
+	offset_x = 0;
+	offset_y = 0;
 
 	constructor(x = 0, y = 0, zoom = 1) {
 		super();

@@ -7,6 +7,7 @@ import { PlayerControls } from "../components/player_controls.ts";
 import { PlayerInventory } from "../components/inventory.ts";
 import { Camera } from "../components/camera.ts";
 import { Position } from "../../common/components/position.ts";
+import { canvas } from "../renderer.ts";
 
 export class PlayerControlsSystem extends System {
 	constructor() {
@@ -66,6 +67,8 @@ export class PlayerControlsSystem extends System {
 
 		camera.x = Math.round(position.x);
 		camera.y = Math.round(position.y);
+		camera.offset_x = Math.floor(canvas.width / 2);
+		camera.offset_y = Math.floor(canvas.height / 2);
 
 		const scroll = InputManager.get_wheel_delta();
 		if (scroll > 0) {
@@ -73,18 +76,5 @@ export class PlayerControlsSystem extends System {
 		} else if (scroll < 0) {
 			player_inventory.hotbar_selected = Math.max(0, player_inventory.hotbar_selected - 1);
 		}
-
-		// --- APPLY BOUNDS ---
-		/*if (camera.bounds) {
-			camera.x = Math.max(
-				camera.bounds.min_x,
-				Math.min(camera.x, camera.bounds.max_x),
-			);
-
-			camera.y = Math.max(
-				camera.bounds.min_y,
-				Math.min(camera.y, camera.bounds.max_y),
-			);
-		}*/
 	}
 }

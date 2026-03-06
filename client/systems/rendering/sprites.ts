@@ -1,9 +1,12 @@
 import { Position } from "$/common/components/position.ts";
 import { AnimatedSprite, Sprite } from "$/client/components/sprite.ts";
-import { draw_texture_region } from "../../renderer.ts";
-import { AssetManager } from "../../assets.ts";
+import { draw_texture_region } from "$/client/renderer.ts";
+import { Camera } from "$/client/components/camera.ts";
 
-export function render_sprite(sprite: Sprite, position: Position) {
+// TODO: camera scale
+// TODO: only render if inside screen
+
+export function render_sprite(sprite: Sprite, position: Position, _camera: Camera) {
 	draw_texture_region(
 		sprite.image,
 		sprite.source_x,
@@ -22,6 +25,7 @@ export function render_sprite(sprite: Sprite, position: Position) {
 export function render_animated_sprite(
 	animated_sprite: AnimatedSprite,
 	position: Position,
+	_camera: Camera,
 ) {
 	const current_animation = animated_sprite.states[animated_sprite.current_state];
 	if (!current_animation) {
@@ -30,7 +34,7 @@ export function render_animated_sprite(
 	}
 
 	draw_texture_region(
-		AssetManager.instance.get("bworld:player"),
+		animated_sprite.image,
 		current_animation.source_x[animated_sprite.animation_frame],
 		current_animation.source_y[animated_sprite.animation_frame],
 		current_animation.source_width,

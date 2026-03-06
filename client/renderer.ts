@@ -1,3 +1,5 @@
+import { Camera } from "./components/camera.ts";
+
 const MAX_SPRITES = 10000;
 const VERTS_PER_SPRITE = 6;
 const FLOATS_PER_VERT = 4;
@@ -7,9 +9,19 @@ export let canvas: HTMLCanvasElement;
 let program: WebGLProgram;
 let buffer: WebGLBuffer;
 
+const default_camera = new Camera();
+let camera: Camera = default_camera;
+
+let camera_pos_loc: WebGLUniformLocation | null;
+let camera_zoom_loc: WebGLUniformLocation | null;
+let camera_rot_loc: WebGLUniformLocation | null;
+let camera_offset_loc: WebGLUniformLocation | null;
+
 const vertex_data = new Float32Array(MAX_SPRITES * VERTS_PER_SPRITE * FLOATS_PER_VERT);
 let vert_index = 0;
 
+let pos_loc: GLint;
+let uv_loc: GLint;
 let resolution_loc: WebGLUniformLocation | null;
 let _texture_loc: WebGLUniformLocation | null;
 
@@ -22,18 +34,46 @@ const glyphs: Record<string, { u0: number; v0: number; u1: number; v1: number }>
 const vertex_src = `
 attribute vec2 aPos;
 attribute vec2 aUV;
+
 varying vec2 vUV;
+
 uniform vec2 uResolution;
 
+uniform vec2 uCameraPos;
+uniform float uCameraZoom;
+uniform float uCameraRot;
+uniform vec2 uCameraOffset;
+
 void main(){
-  vec2 zero = aPos / uResolution;
+
+  // world → camera space
+  vec2 pos = aPos - uCameraPos;
+
+  // rotation
+  float c = cos(uCameraRot);
+  float s = sin(uCameraRot);
+  pos = vec2(
+    pos.x * c - pos.y * s,
+    pos.x * s + pos.y * c
+  );
+
+  // zoom
+  pos *= uCameraZoom;
+
+  // screen offset (center camera)
+  pos += uCameraOffset;
+
+  // convert to clip space
+  vec2 zero = pos / uResolution;
   vec2 clip = zero * 2.0 - 1.0;
-  gl_Position = vec4(clip * vec2(1,-1),0,1);
+
+  gl_Position = vec4(clip * vec2(1.0,-1.0),0.0,1.0);
+
   vUV = aUV;
 }
 `;
 
-const fragmentSrc = `
+const fragment_src = `
 precision mediump float;
 varying vec2 vUV;
 uniform sampler2D uTex;
@@ -60,7 +100,7 @@ export function init_window(canvas_element: HTMLCanvasElement) {
 
 	gl = ctx;
 
-	program = create_program(vertex_src, fragmentSrc);
+	program = create_program(vertex_src, fragment_src);
 
 	buffer = gl.createBuffer()!;
 
@@ -68,16 +108,21 @@ export function init_window(canvas_element: HTMLCanvasElement) {
 
 	const stride = FLOATS_PER_VERT * 4;
 
-	const pos_loc = gl.getAttribLocation(program, "aPos");
+	pos_loc = gl.getAttribLocation(program, "aPos");
 	gl.enableVertexAttribArray(pos_loc);
 	gl.vertexAttribPointer(pos_loc, 2, gl.FLOAT, false, stride, 0);
 
-	const uv_loc = gl.getAttribLocation(program, "aUV");
+	uv_loc = gl.getAttribLocation(program, "aUV");
 	gl.enableVertexAttribArray(uv_loc);
 	gl.vertexAttribPointer(uv_loc, 2, gl.FLOAT, false, stride, 8);
 
 	resolution_loc = gl.getUniformLocation(program, "uResolution");
 	_texture_loc = gl.getUniformLocation(program, "uTex");
+
+	camera_pos_loc = gl.getUniformLocation(program, "uCameraPos");
+	camera_zoom_loc = gl.getUniformLocation(program, "uCameraZoom");
+	camera_rot_loc = gl.getUniformLocation(program, "uCameraRot");
+	camera_offset_loc = gl.getUniformLocation(program, "uCameraOffset");
 
 	gl.useProgram(program);
 	gl.uniform2f(resolution_loc, canvas.width, canvas.height);
@@ -250,12 +295,17 @@ function flush_batch() {
 
 	gl.useProgram(program);
 
-	const posLoc = gl.getAttribLocation(program, "aPos");
-	const uvLoc = gl.getAttribLocation(program, "aUV");
-	gl.enableVertexAttribArray(posLoc);
-	gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 16, 0);
-	gl.enableVertexAttribArray(uvLoc);
-	gl.vertexAttribPointer(uvLoc, 2, gl.FLOAT, false, 16, 8);
+	//const posLoc = gl.getAttribLocation(program, "aPos");
+	//const uvLoc = gl.getAttribLocation(program, "aUV");
+	gl.enableVertexAttribArray(pos_loc);
+	gl.vertexAttribPointer(pos_loc, 2, gl.FLOAT, false, 16, 0);
+	gl.enableVertexAttribArray(uv_loc);
+	gl.vertexAttribPointer(uv_loc, 2, gl.FLOAT, false, 16, 8);
+
+	gl.uniform2f(camera_pos_loc, Math.floor(camera.x), Math.floor(camera.y));
+	gl.uniform1f(camera_zoom_loc, camera.zoom);
+	gl.uniform1f(camera_rot_loc, camera.rotation);
+	gl.uniform2f(camera_offset_loc, camera.offset_x, camera.offset_y);
 
 	gl.bindTexture(gl.TEXTURE_2D, current_texture);
 	gl.drawArrays(gl.TRIANGLES, 0, vert_index / 4);
@@ -355,4 +405,13 @@ export function resize_canvas() {
 		gl.useProgram(program);
 		gl.uniform2f(resolution_loc, width, height);
 	}
+}
+
+export function begin_mode_2d(new_camera: Camera) {
+	camera = new_camera;
+}
+
+export function end_mode_2d() {
+	flush_batch();
+	camera = default_camera;
 }

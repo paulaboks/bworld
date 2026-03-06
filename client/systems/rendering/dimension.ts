@@ -2,10 +2,10 @@ import { get_sprite_region } from "$/common/utils.ts";
 import { Dimension } from "$/client/components/dimension.ts";
 import { TEXTURE_SIZE, TILE_SIZE } from "$/common/constants.ts";
 import { Camera, world_to_screen } from "$/client/components/camera.ts";
-import { canvas, draw_texture_region } from "../../renderer.ts";
+import { canvas, draw_texture_region } from "$/client/renderer.ts";
 
-export function render_dimension(tilemap: Dimension, camera: Camera) {
-	for (const tile of tilemap.tiles) {
+export function render_dimension(dimension: Dimension, camera: Camera) {
+	for (const tile of dimension.tiles) {
 		const region = get_sprite_region(tile.id);
 
 		const x = tile.x * TILE_SIZE;
@@ -20,7 +20,7 @@ export function render_dimension(tilemap: Dimension, camera: Camera) {
 		}
 
 		draw_texture_region(
-			tilemap.image,
+			dimension.image,
 			region.x * TEXTURE_SIZE,
 			region.y * TEXTURE_SIZE,
 			TEXTURE_SIZE,
