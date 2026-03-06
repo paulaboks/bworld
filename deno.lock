@@ -2,6 +2,7 @@
   "version": "5",
   "specifiers": {
     "jsr:@gfx/canvas-wasm@~0.4.2": "0.4.2",
+    "jsr:@paulaboks/rng@^0.0.2": "0.0.2",
     "jsr:@std/encoding@1.0.5": "1.0.5",
     "jsr:@std/fs@^1.0.23": "1.0.23",
     "jsr:@std/internal@^1.0.12": "1.0.12",
@@ -14,6 +15,9 @@
       "dependencies": [
         "jsr:@std/encoding"
       ]
+    },
+    "@paulaboks/rng@0.0.2": {
+      "integrity": "9b4833c80f09f2b6455f3d477977caaab0aac1b04a89970166a2c5169ab4687d"
     },
     "@std/encoding@1.0.5": {
       "integrity": "ecf363d4fc25bd85bd915ff6733a7e79b67e0e7806334af15f4645c569fefc04"
@@ -44,6 +48,7 @@
   "workspace": {
     "dependencies": [
       "jsr:@gfx/canvas-wasm@~0.4.2",
+      "jsr:@paulaboks/rng@^0.0.2",
       "jsr:@std/fs@^1.0.23",
       "npm:marked@^17.0.3"
     ]

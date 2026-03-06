@@ -1,28 +1,21 @@
 import { Entity } from "$/common/ecs/mod.ts";
 import { Position } from "$/common/components/position.ts";
 import { ClientWorld } from "./client_world.ts";
-import { Tilemap } from "./components/tilemap.ts";
-import { AssetManager } from "./assets.ts";
+import { Dimension } from "./components/dimension.ts";
 import { create_player } from "./player.ts";
 import { UIButton } from "./components/ui_components.ts";
 import { open_about } from "./about.ts";
 import { create_crop_entity, Crop } from "./components/crop.ts";
+import { generate } from "./generation.ts";
 
 export function start_game(world: ClientWorld) {
 	world.state = "game";
 	world.clear_entities();
 
-	const tilemap = new Entity("backgroundtiles");
-	tilemap.add(
-		new Tilemap(
-			AssetManager.instance.get("bworld:roguelike"),
-			16,
-			[],
-			2,
-			1,
-		),
-	);
-	world.add_entity(tilemap);
+	const dimension = new Entity("dimension");
+	dimension.add(new Dimension([]));
+	world.add_entity(dimension);
+	generate(dimension.get(Dimension)!, 100, 100);
 
 	create_player(world);
 

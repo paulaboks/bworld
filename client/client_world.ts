@@ -4,7 +4,6 @@ import { RenderSystem } from "$/client/systems/render_system.ts";
 import { PlayerControlsSystem } from "$/client/systems/player_controls.ts";
 import { DebugUI } from "$/client/debug_ui.ts";
 import { DebugSystem } from "$/client/systems/debug_system.ts";
-import { TileEditorSystem } from "$/client/systems/tile_editor_system.ts";
 import { InventorySystem } from "$/client/systems/inventory_system.ts";
 import { UIInteractionSystem } from "$/client/systems/ui_interaction_system.ts";
 import { UIRenderSystem } from "$/client/systems/ui_render_system.ts";
@@ -67,7 +66,6 @@ export class ClientWorld extends World {
 		// render systems
 		this.add_system(new RenderSystem(this.ctx), "game");
 		this.add_system(new DebugSystem(), "*");
-		this.add_system(new TileEditorSystem(), "game");
 		this.add_system(new UIRenderSystem(), "main_menu");
 		this.add_system(new UIRenderSystem(), "paused");
 	}

@@ -2,12 +2,12 @@ import { System } from "$/common/ecs/mod.ts";
 import { World } from "$/common/ecs/world.ts";
 import { Position } from "$/common/components/position.ts";
 import { AnimatedSprite, Sprite } from "$/client/components/sprite.ts";
-import { Tilemap } from "$/client/components/tilemap.ts";
+import { Dimension } from "../components/dimension.ts";
 import { PlayerInventory } from "$/client/components/inventory.ts";
 import { Camera } from "$/client/components/camera.ts";
 
 import { render_animated_sprite, render_sprite } from "./rendering/sprites.ts";
-import { render_tilemap } from "./rendering/tilemap.ts";
+import { render_dimension } from "./rendering/dimension.ts";
 import { render_player_inventory } from "./rendering/player.ts";
 
 export class RenderSystem extends System {
@@ -56,10 +56,10 @@ export class RenderSystem extends System {
 				render_animated_sprite(this.ctx, animated_sprite, position);
 			}
 
-			const tilemap = entity.get(Tilemap);
+			const dimension = entity.get(Dimension);
 
-			if (tilemap) {
-				render_tilemap(this.ctx, tilemap);
+			if (dimension) {
+				render_dimension(this.ctx, dimension, camera);
 			}
 
 			// Ui

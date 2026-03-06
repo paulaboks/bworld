@@ -16,6 +16,7 @@
 	"imports": {
 		"$/": "./",
 		"@gfx/canvas-wasm": "jsr:@gfx/canvas-wasm@^0.4.2",
+		"@paulaboks/rng": "jsr:@paulaboks/rng@^0.0.2",
 		"@std/fs": "jsr:@std/fs@^1.0.23",
 		"marked": "npm:marked@^17.0.3"
 	}
