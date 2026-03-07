@@ -51,14 +51,13 @@ export class DimensionLogicSystem extends System {
 			}
 
 			const distance_to_player = distance_point_rectangle(
+				player_position.x + (72 / 2),
+				player_position.y + (72 / 2),
 				tile.x * TILE_SIZE,
 				tile.y * TILE_SIZE,
-				player_position.x,
-				player_position.y,
-				72,
-				72,
+				TILE_SIZE,
+				TILE_SIZE,
 			);
-			console.log(distance_to_player);
 			if (distance_to_player > TILE_SIZE * 2) {
 				return;
 			}
