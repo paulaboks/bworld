@@ -21,3 +21,18 @@ export function get_sprite_region(id: string): SpriteRegion {
 	const textures_info = AssetManager.instance.get<TexturesInfo>("bworld:textures_info");
 	return textures_info?.[id] ?? { x: 0, y: 0 };
 }
+
+export function distance_point_rectangle(px: number, py: number, sqx: number, sqy: number, sqw: number, sqh: number) {
+	const x0 = sqx;
+	const y0 = sqy;
+	const x1 = sqx + sqw;
+	const y1 = sqy + sqh;
+
+	const cx = Math.max(x0, Math.min(px, x1));
+	const cy = Math.max(y0, Math.min(py, y1));
+
+	const dx = px - cx;
+	const dy = py - cy;
+
+	return Math.sqrt(dx * dx + dy * dy);
+}

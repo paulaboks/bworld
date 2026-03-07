@@ -6,6 +6,8 @@ import { InputManager } from "../input_manager.ts";
 import { canvas } from "../renderer.ts";
 import { TICK_DELTA, TILE_SIZE } from "$/common/constants.ts";
 import { EverythingRegistry, TileRegistry } from "$/common/everything_registry.ts";
+import { Position } from "$/common/components/position.ts";
+import { distance_point_rectangle } from "../../common/utils.ts";
 
 export class DimensionLogicSystem extends System {
 	update(world: ClientWorld, delta: number): void {
@@ -23,6 +25,7 @@ export class DimensionLogicSystem extends System {
 		}
 
 		const [player] = world.get_tag("player")!;
+		const player_position = player.get(Position)!;
 		const camera = player.get(Camera)!;
 
 		const mouse = InputManager.get_mouse_position();
@@ -44,6 +47,19 @@ export class DimensionLogicSystem extends System {
 			const tile_info = EverythingRegistry.get<TileRegistry>("tiles", tile.id);
 
 			if (!tile_info) {
+				return;
+			}
+
+			const distance_to_player = distance_point_rectangle(
+				tile.x * TILE_SIZE,
+				tile.y * TILE_SIZE,
+				player_position.x,
+				player_position.y,
+				72,
+				72,
+			);
+			console.log(distance_to_player);
+			if (distance_to_player > TILE_SIZE * 2) {
 				return;
 			}
 
