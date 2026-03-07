@@ -2,7 +2,6 @@ import { World } from "$/common/ecs/mod.ts";
 import { MovementSystem } from "$/common/systems/movement_system.ts";
 import { RenderSystem } from "$/client/systems/render_system.ts";
 import { PlayerControlsSystem } from "$/client/systems/player_controls.ts";
-import { DebugUI } from "$/client/debug_ui.ts";
 import { DebugSystem } from "$/client/systems/debug_system.ts";
 import { InventorySystem } from "$/client/systems/inventory_system.ts";
 import { UIInteractionSystem } from "$/client/systems/ui_interaction_system.ts";
@@ -34,8 +33,6 @@ export class ClientWorld extends World {
 			event.preventDefault();
 		});
 
-		//DebugUI.initialize(this.ctx);
-
 		start_game(this);
 
 		// Logic systems
@@ -49,7 +46,7 @@ export class ClientWorld extends World {
 
 		// render systems
 		this.add_system(new RenderSystem(), "game");
-		this.add_system(new DebugSystem(), "*");
+		this.add_system(new DebugSystem(), "game");
 		this.add_system(new UIRenderSystem(), "main_menu");
 		this.add_system(new UIRenderSystem(), "paused");
 	}

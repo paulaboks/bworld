@@ -12,9 +12,6 @@ export class DebugSystem extends System {
 			return;
 		}
 
-		DebugUI.ctx.save();
-		DebugUI.ctx.resetTransform();
-
 		DebugUI.begin("Entities", 10, 10, 300);
 
 		for (const entity of world.get_entities()) {
@@ -28,7 +25,6 @@ export class DebugSystem extends System {
 		}
 
 		DebugUI.end();
-		DebugUI.ctx.restore();
 	}
 
 	// deno-lint-ignore no-explicit-any
@@ -52,6 +48,8 @@ export class DebugSystem extends System {
 					key,
 					component[key],
 				);
+			} else if (Array.isArray(component[key])) {
+				DebugUI.text(`${key}: ${JSON.stringify(component[key].slice(0, 10))}`);
 			} else {
 				DebugUI.text(`${key}: ${JSON.stringify(component[key])}`);
 			}

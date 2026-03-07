@@ -1,6 +1,6 @@
 import { point_inside_rec } from "$/common/utils.ts";
 import { InputManager } from "$/client/input_manager.ts";
-//import { draw_text, measure_text } from "$/client/text_rendering.ts";
+import { begin_clip, draw_rect, draw_rect_stroke, draw_text, end_clip, measure_text } from "./renderer.ts";
 
 const HEADER_HEIGHT = 24;
 const RESIZE_SIZE = 12;
@@ -28,8 +28,6 @@ interface TextInputState {
 }
 
 export class DebugUI {
-	static ctx: CanvasRenderingContext2D;
-
 	static windows = new Map<string, WindowState>();
 	static current_window: WindowState | undefined = undefined;
 
@@ -42,10 +40,6 @@ export class DebugUI {
 	static cursor_x = 0;
 	static cursor_y = 0;
 	static content_width = 0;
-
-	static initialize(ctx: CanvasRenderingContext2D) {
-		this.ctx = ctx;
-	}
 
 	static begin(title: string, x: number, y: number, width = 300, height = 300) {
 		let win = this.windows.get(title);
@@ -122,39 +116,33 @@ export class DebugUI {
 		win.scroll_y = Math.max(0, Math.min(win.scroll_y, max_scroll));
 
 		// render
-		this.ctx.save();
+		draw_rect(win.x, win.y, win.width, win.height, [25 / 255, 25 / 255, 25 / 255, 0.95]);
 
-		// transparent background
-		this.ctx.fillStyle = "rgba(25,25,25,0.95)";
-		this.ctx.fillRect(win.x, win.y, win.width, win.height);
+		draw_rect_stroke(win.x, win.y, win.width, win.height, [170 / 255, 170 / 255, 170 / 255, 1]);
 
-		this.ctx.strokeStyle = "#aaa";
-		this.ctx.strokeRect(win.x, win.y, win.width, win.height);
+		draw_rect(win.x, win.y, win.width, HEADER_HEIGHT, [0x33 / 255, 0x33 / 255, 0x33 / 255, 1]);
 
-		// header and title
-		this.ctx.fillStyle = "#333";
-		this.ctx.fillRect(win.x, win.y, win.width, HEADER_HEIGHT);
-
-		//draw_text(this.ctx, title, win.x + 8, win.y + 4, 2);
+		draw_text(title, win.x + 8, win.y + 4);
 
 		// resize grip
-		this.ctx.fillStyle = hovering_resize ? "#888" : "#666";
-		this.ctx.fillRect(
+		draw_rect(
 			win.x + win.width - RESIZE_SIZE,
 			win.y + win.height - RESIZE_SIZE,
 			RESIZE_SIZE,
 			RESIZE_SIZE,
+			hovering_resize ? [88 / 255, 88 / 255, 88 / 255, 1] : [66 / 255, 66 / 255, 66 / 255, 1],
 		);
 
 		// clip it !
-		this.ctx.beginPath();
-		this.ctx.rect(
-			win.x,
-			win.y + HEADER_HEIGHT,
-			win.width,
-			win.height - HEADER_HEIGHT,
-		);
-		this.ctx.clip();
+		begin_clip(win.x, win.y + HEADER_HEIGHT, win.width, win.height - HEADER_HEIGHT);
+		// this.ctx.beginPath();
+		// this.ctx.rect(
+		// 	win.x,
+		// 	win.y + HEADER_HEIGHT,
+		// 	win.width,
+		// 	win.height - HEADER_HEIGHT,
+		// );
+		// this.ctx.clip();
 
 		// move cursor_x to match the windows x and add some padding
 		// same idea for cursor_y but with scrolling
@@ -176,9 +164,9 @@ export class DebugUI {
 
 		this.#draw_scrollbar();
 
-		this.ctx.restore();
-
 		this.current_window = undefined;
+
+		end_clip();
 	}
 
 	static advance(height: number) {
@@ -191,17 +179,13 @@ export class DebugUI {
 	}
 
 	static separator() {
-		this.ctx.strokeStyle = "#555";
-		this.ctx.beginPath();
-		this.ctx.moveTo(this.cursor_x, this.cursor_y);
-		this.ctx.lineTo(this.cursor_x + this.content_width, this.cursor_y);
-		this.ctx.stroke();
+		draw_rect(this.cursor_x, this.cursor_y, this.content_width, 1, [55 / 255, 55 / 255, 55 / 255, 1]);
 
 		this.cursor_y += PADDING * 2;
 	}
 
 	static text(content: string) {
-		//draw_text(this.ctx, content, this.cursor_x, this.cursor_y, 2);
+		draw_text(content, this.cursor_x, this.cursor_y);
 		this.advance(20);
 	}
 
@@ -214,14 +198,10 @@ export class DebugUI {
 		const mouse = InputManager.get_mouse_position();
 		const hovered = point_inside_rec(mouse.x, mouse.y, x, y, width, height);
 
-		this.ctx.fillStyle = hovered ? "#666" : "#444";
-		this.ctx.fillRect(x, y, width, height);
+		draw_rect(x, y, width, height, hovered ? [66 / 255, 66 / 255, 66 / 255, 1] : [44 / 255, 44 / 255, 44 / 255, 1]);
+		draw_rect_stroke(x, y, width, height);
 
-		this.ctx.strokeStyle = "white";
-		this.ctx.strokeRect(x, y, width, height);
-
-		this.ctx.fillStyle = "white";
-		//draw_text(this.ctx, label, x + 6, y + 4, 2);
+		draw_text(label, x + 6, y + 4);
 
 		this.advance(height + PADDING);
 
@@ -242,18 +222,14 @@ export class DebugUI {
 		const mouse = InputManager.get_mouse_position();
 		const hovered = point_inside_rec(mouse.x, mouse.y, x, y, size, size);
 
-		this.ctx.fillStyle = "#222";
-		this.ctx.fillRect(x, y, size, size);
-		this.ctx.strokeStyle = "white";
-		this.ctx.strokeRect(x, y, size, size);
+		draw_rect(x, y, size, size, [22 / 255, 22 / 255, 22 / 22, 1]);
+		draw_rect_stroke(x, y, size, size);
 
 		if (value) {
-			this.ctx.fillStyle = "white";
-			this.ctx.fillRect(x + 4, y + 4, size - 8, size - 8);
+			draw_rect(x + 4, y + 4, size - 8, size - 8);
 		}
 
-		this.ctx.fillStyle = "white";
-		//draw_text(this.ctx, label, x + size + 6, y, 2);
+		draw_text(label, x + size + 6, y);
 
 		this.advance(size + PADDING);
 
@@ -284,18 +260,14 @@ export class DebugUI {
 			value = min + (max - min) * Math.min(Math.max(t, 0), 1);
 		}
 
-		this.ctx.fillStyle = "#333";
-		this.ctx.fillRect(x, y, width, height);
+		draw_rect(x, y, width, height, [0x33 / 255, 0x33 / 255, 0x33 / 255, 1]);
 
 		const percent = (value - min) / (max - min);
-		this.ctx.fillStyle = "#0a84ff";
-		this.ctx.fillRect(x, y, width * percent, height);
+		draw_rect(x, y, width * percent, height, [10 / 255, 132 / 255, 255 / 255, 1]);
 
-		this.ctx.strokeStyle = "white";
-		this.ctx.strokeRect(x, y, width, height);
+		draw_rect_stroke(x, y, width, height);
 
-		this.ctx.fillStyle = "white";
-		//draw_text(this.ctx, `${label}: ${value.toFixed(2)}`, x + 5, y + 2, 2);
+		draw_text(`${label}: ${value.toFixed(2)}`, x + 5, y + 2);
 
 		this.advance(height + PADDING);
 
@@ -308,14 +280,11 @@ export class DebugUI {
 		const y = this.cursor_y;
 		const width = this.content_width;
 
-		this.ctx.fillStyle = "#333";
-		this.ctx.fillRect(x, y, width, height);
+		draw_rect(x, y, width, height, [0x33 / 255, 0x33 / 255, 0x33 / 255, 1]);
 
-		this.ctx.fillStyle = "#366992";
-		this.ctx.fillRect(x, y, width * value, height);
+		draw_rect(x, y, width * value, height, [54 / 255, 105 / 255, 146 / 255, 1]);
 
-		this.ctx.strokeStyle = "white";
-		this.ctx.strokeRect(x, y, width, height);
+		draw_rect_stroke(x, y, width, height);
 
 		this.advance(height + PADDING);
 	}
@@ -405,27 +374,33 @@ export class DebugUI {
 		}
 
 		// draw box
-		this.ctx.fillStyle = is_active ? "#555" : "#333";
-		this.ctx.fillRect(x, y, width, height);
+		draw_rect(
+			x,
+			y,
+			width,
+			height,
+			is_active ? [55 / 255, 55 / 255, 55 / 255, 1] : [0x33 / 255, 0x33 / 255, 0x33 / 255, 1],
+		);
 
 		// highlight
-		this.ctx.strokeStyle = is_active ? "#0a84ff" : "#aaa";
-		this.ctx.strokeRect(x, y, width, height);
+		draw_rect_stroke(
+			x,
+			y,
+			width,
+			height,
+			is_active ? [10 / 255, 132 / 255, 1, 1] : [0xaa / 255, 0xaa / 255, 0xaa / 255, 1],
+		);
 
 		const text_x = x + 6;
 
-		//draw_text(this.ctx, state.value, x + 6, y + 4, 2);
+		draw_text(state.value, x + 6, y + 4);
 
 		// caret !
 		if (is_active && state.show_caret) {
 			const before_text = state.value.substring(0, state.caret);
-			//const caret_x = text_x + measure_text(this.ctx, before_text, 2);
+			const caret_x = text_x + measure_text(before_text);
 
-			this.ctx.strokeStyle = "white";
-			this.ctx.beginPath();
-			//this.ctx.moveTo(caret_x, y + 4);
-			//this.ctx.lineTo(caret_x, y + height - 4);
-			this.ctx.stroke();
+			draw_rect(caret_x, y + 4, 1, height - 4);
 		}
 
 		this.cursor_y += height + PADDING;
@@ -464,24 +439,22 @@ export class DebugUI {
 			return;
 		}
 
-		const scrollbarWidth = 6;
-		const x = win.x + win.width - scrollbarWidth - 2;
+		const scrollbar_width = 6;
+		const x = win.x + win.width - scrollbar_width - 2;
 		const y = win.y + HEADER_HEIGHT;
 		const h = content_visible_height - 24;
 
 		const ratio = content_visible_height / win.content_height;
-		const thumbHeight = h * ratio;
+		const thumb_height = h * ratio;
 
-		const maxScroll = win.content_height - content_visible_height;
-		const thumbY = y + (win.scroll_y / maxScroll) * (h - thumbHeight);
+		const max_scroll = win.content_height - content_visible_height;
+		const thumb_y = y + (win.scroll_y / max_scroll) * (h - thumb_height);
 
 		// track
-		this.ctx.fillStyle = "#222";
-		this.ctx.fillRect(x, y, scrollbarWidth, h);
+		draw_rect(x, y, scrollbar_width, h, [0x22 / 255, 0x22 / 255, 0x22 / 255, 1]);
 
 		// thumb
-		this.ctx.fillStyle = "#888";
-		this.ctx.fillRect(x, thumbY, scrollbarWidth, thumbHeight);
+		draw_rect(x, thumb_y, scrollbar_width, thumb_height, [0x88 / 255, 0x88 / 255, 0x88 / 255, 1]);
 	}
 
 	static #handle_text_editing(state: TextInputState) {

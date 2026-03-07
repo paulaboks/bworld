@@ -27,6 +27,7 @@ let resolution_loc: WebGLUniformLocation | null;
 let _texture_loc: WebGLUniformLocation | null;
 
 let current_texture: WebGLTexture | null = null;
+let white_tex: WebGLTexture | null = null;
 
 const vertex_src = `
 attribute vec2 aPos;
@@ -134,6 +135,8 @@ export function init_window(canvas_element: HTMLCanvasElement) {
 
 	gl.enable(gl.BLEND);
 	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+	create_white_texture();
 }
 
 function create_shader(type: number, src: string): WebGLShader {
@@ -315,6 +318,39 @@ function push_quad(
 	}
 }
 
+export function draw_rect(
+	x: number,
+	y: number,
+	w: number,
+	h: number,
+	color: [number, number, number, number] = [1, 1, 1, 1],
+) {
+	if (current_texture !== white_tex) {
+		flush_batch();
+		current_texture = white_tex;
+	}
+
+	push_quad(x, y, w, h, 0, 0, 1, 1, color[0], color[1], color[2], color[3]);
+}
+
+export function draw_rect_stroke(
+	x: number,
+	y: number,
+	w: number,
+	h: number,
+	color: [number, number, number, number] = [1, 1, 1, 1],
+	thickness: number = 1,
+) {
+	// top
+	draw_rect(x, y, w, thickness, color);
+	// bottom
+	draw_rect(x, y + h - thickness, w, thickness, color);
+	// left
+	draw_rect(x, y, thickness, h, color);
+	// right
+	draw_rect(x + w - thickness, y, thickness, h, color);
+}
+
 export function resize_canvas() {
 	const width = self.innerWidth;
 	const height = self.innerHeight;
@@ -339,6 +375,32 @@ export function begin_mode_2d(new_camera: Camera) {
 export function end_mode_2d() {
 	flush_batch();
 	camera = default_camera;
+}
+
+function create_white_texture() {
+	const tex = gl.createTexture();
+	gl.bindTexture(gl.TEXTURE_2D, tex);
+	const white_pixel = new Uint8Array([255, 255, 255, 255]);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, white_pixel);
+
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+	white_tex = tex;
+}
+
+export function begin_clip(x: number, y: number, width: number, height: number) {
+	gl.enable(gl.SCISSOR_TEST);
+
+	const flipped_y = canvas.height - (y + height);
+
+	gl.scissor(x, flipped_y, width, height);
+}
+
+export function end_clip() {
+	gl.disable(gl.SCISSOR_TEST);
 }
 
 // font stuff
@@ -451,4 +513,17 @@ export function draw_text(str: string, x: number, y: number, scale: number = 1, 
 
 		x += glyph.xadvance * scale;
 	}
+}
+
+export function measure_text(str: string, scale: number = 1) {
+	let x = 0;
+	for (const ch of str) {
+		const glyph = font_fnt.chars[ch.charCodeAt(0)];
+		if (!glyph) {
+			continue;
+		}
+
+		x += glyph.xadvance * scale;
+	}
+	return x;
 }
