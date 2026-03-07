@@ -17,10 +17,13 @@ export class EverythingRegistry {
 	}
 }
 
-export interface TileRegistry {
-	texture_id: string;
+export interface TileRegistry<T = unknown | undefined> {
+	texture_id: string | ((tile: Tile<T>) => string);
 	has_collision: boolean;
 
-	on_click?(world: ClientWorld, tile: Tile): void;
-	on_interact?(world: ClientWorld, tile: Tile): void;
+	on_create?(world: ClientWorld, tile: Tile<T>): void;
+	on_click?(world: ClientWorld, tile: Tile<T>): void;
+	on_interact?(world: ClientWorld, tile: Tile<T>): void;
+	on_tick?(world: ClientWorld, tile: Tile<T>, tick_delta: number): void;
+	on_second?(world: ClientWorld, tile: Tile<T>, second_delta: number): void;
 }

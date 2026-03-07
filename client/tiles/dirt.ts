@@ -70,7 +70,19 @@ EverythingRegistry.register<TileRegistry>("tiles", "bworld:hoed_watered_dirt", {
 		}
 
 		if (item.type_id === "bworld:tomato_seeds") {
-			world.dimension.tiles.push({ x: tile.x, y: tile.y, id: "bworld:tomato_seeds" });
+			world.dimension.add_tile(world, { x: tile.x, y: tile.y, id: "bworld:tomato_crop", tickable: true });
+			item.amount -= 1;
+			player_inventory.container.set_item(player_inventory.hotbar_selected, item);
+		} else if (item.type_id === "bworld:potato_seeds") {
+			world.dimension.add_tile(world, { x: tile.x, y: tile.y, id: "bworld:potato_crop", tickable: true });
+			item.amount -= 1;
+			player_inventory.container.set_item(player_inventory.hotbar_selected, item);
+		} else if (item.type_id === "bworld:pumpkin_seeds") {
+			world.dimension.add_tile(world, { x: tile.x, y: tile.y, id: "bworld:pumpkin_crop", tickable: true });
+			item.amount -= 1;
+			player_inventory.container.set_item(player_inventory.hotbar_selected, item);
+		} else if (item.type_id === "bworld:carrot_seeds") {
+			world.dimension.add_tile(world, { x: tile.x, y: tile.y, id: "bworld:carrot_crop", tickable: true });
 			item.amount -= 1;
 			player_inventory.container.set_item(player_inventory.hotbar_selected, item);
 		}

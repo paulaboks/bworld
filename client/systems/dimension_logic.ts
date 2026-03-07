@@ -4,13 +4,23 @@ import { Dimension } from "../components/dimension.ts";
 import { Camera, screen_to_world } from "../components/camera.ts";
 import { InputManager } from "../input_manager.ts";
 import { canvas } from "../renderer.ts";
-import { TILE_SIZE } from "$/common/constants.ts";
+import { TICK_DELTA, TILE_SIZE } from "$/common/constants.ts";
 import { EverythingRegistry, TileRegistry } from "$/common/everything_registry.ts";
 
 export class DimensionLogicSystem extends System {
-	update(world: ClientWorld, _delta: number): void {
+	update(world: ClientWorld, delta: number): void {
 		const dimension_entity = world.get_entities().values().find((ent) => ent.get(Dimension));
 		const dimension = dimension_entity!.get(Dimension)!;
+
+		dimension.second_timer += delta;
+		dimension.tick_timer += delta;
+
+		if (dimension.second_timer >= 1) {
+			this.handle_second(world, dimension);
+		}
+		if (dimension.tick_timer >= TICK_DELTA) {
+			this.handle_tick(world, dimension);
+		}
 
 		const [player] = world.get_tag("player")!;
 		const camera = player.get(Camera)!;
@@ -48,32 +58,26 @@ export class DimensionLogicSystem extends System {
 				}
 			}
 		}
-
-		/*for (const tile of dimension.tiles) {
-			const tile_info = EverythingRegistry.get<TileRegistry>("tiles", tile.id);
-			if (!tile_info) {
-				continue;
+	}
+	handle_second(world: ClientWorld, dimension: Dimension) {
+		const tickables = dimension.tiles.filter((t) => t.tickable);
+		for (const tickable of tickables) {
+			const tile_info = EverythingRegistry.get<TileRegistry>("tiles", tickable.id);
+			if (tile_info && tile_info.on_second) {
+				tile_info.on_second(world, tickable, dimension.second_timer);
 			}
+		}
+		dimension.second_timer = 0;
+	}
 
-			if (tile_info.on_interact || tile_info.on_click) {
-				console.log(tile_info);
-				const hovered = point_inside_rec(
-					world_mouse.x,
-					world_mouse.y,
-					tile.x * TILE_SIZE,
-					tile.y * TILE_SIZE,
-					TILE_SIZE,
-					TILE_SIZE,
-				);
-				if (tile_info.on_interact && hovered && InputManager.is_mouse_pressed(2)) {
-					InputManager.consume_mouse(2);
-					tile_info.on_interact(world, tile);
-				}
-				if (tile_info.on_click && hovered && InputManager.is_mouse_pressed(0)) {
-					InputManager.consume_mouse(0);
-					tile_info.on_click(world, tile);
-				}
+	handle_tick(world: ClientWorld, dimension: Dimension) {
+		const tickables = dimension.tiles.filter((t) => t.tickable);
+		for (const tickable of tickables) {
+			const tile_info = EverythingRegistry.get<TileRegistry>("tiles", tickable.id);
+			if (tile_info && tile_info.on_tick) {
+				tile_info.on_tick(world, tickable, dimension.tick_timer);
 			}
-		}*/
+		}
+		dimension.tick_timer = 0;
 	}
 }

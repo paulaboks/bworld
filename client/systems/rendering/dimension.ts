@@ -3,11 +3,10 @@ import { Dimension } from "$/client/components/dimension.ts";
 import { TEXTURE_SIZE, TILE_SIZE } from "$/common/constants.ts";
 import { Camera, world_to_screen } from "$/client/components/camera.ts";
 import { canvas, draw_texture_region } from "$/client/renderer.ts";
+import { EverythingRegistry, TileRegistry } from "$/common/everything_registry.ts";
 
 export function render_dimension(dimension: Dimension, camera: Camera) {
 	for (const tile of dimension.tiles) {
-		const region = get_sprite_region(tile.id);
-
 		const x = tile.x * TILE_SIZE;
 		const y = tile.y * TILE_SIZE;
 
@@ -18,6 +17,18 @@ export function render_dimension(dimension: Dimension, camera: Camera) {
 		) {
 			continue;
 		}
+
+		let texture_id = tile.id;
+		const tile_info = EverythingRegistry.get<TileRegistry>("tiles", tile.id);
+		if (tile_info?.texture_id) {
+			if (typeof tile_info.texture_id === "string") {
+				texture_id = tile_info.texture_id;
+			} else {
+				texture_id = tile_info.texture_id(tile);
+			}
+		}
+
+		const region = get_sprite_region(texture_id);
 
 		draw_texture_region(
 			dimension.image,
