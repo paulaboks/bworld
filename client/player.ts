@@ -10,7 +10,7 @@ import { AssetManager } from "./assets.ts";
 
 export function create_player(world: ClientWorld) {
 	const player = new Entity("player");
-	player.add(new Position(10, 10));
+	player.add(new Position(1440, 700));
 	player.add(new Velocity(0, 0));
 	player.add(
 		new AnimatedSprite("bworld:player", 72, 72, {
