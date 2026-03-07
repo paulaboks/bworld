@@ -12,10 +12,14 @@ import { create_main_menu } from "./main_menu.ts";
 import { ClickableSystem } from "./systems/clickable_system.ts";
 import { start_game } from "./game.ts";
 import { canvas, resize_canvas } from "./renderer.ts";
+import { DimensionLogicSystem } from "./systems/dimension_logic.ts";
+import { Dimension } from "./components/dimension.ts";
 
 export class ClientWorld extends World {
 	paused = false;
 	debugging = false;
+
+	dimension!: Dimension;
 
 	constructor() {
 		super("game");
@@ -43,6 +47,7 @@ export class ClientWorld extends World {
 		this.add_system(new PlayerControlsSystem(), "game");
 		this.add_system(new MovementSystem(), "game");
 		this.add_system(new CropSystem(), "game");
+		this.add_system(new DimensionLogicSystem(), "game");
 
 		// render systems
 		this.add_system(new RenderSystem(), "game");

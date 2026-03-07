@@ -1,7 +1,11 @@
+import { EverythingRegistry } from "../common/everything_registry.ts";
 import { AssetManager } from "./assets.ts";
 import { ClientWorld } from "./client_world.ts";
 import { InputManager } from "./input_manager.ts";
 import { begin_drawing, end_drawing, init_window } from "./renderer.ts";
+
+EverythingRegistry.add_registry("tiles");
+await import("./tiles/mod.ts");
 
 export class ClientLoop {
 	running = false;

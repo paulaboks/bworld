@@ -25,6 +25,9 @@ export class ContainerSlot {
 	}
 
 	set_item(item_stack: ItemStack | undefined) {
+		if ((item_stack?.amount ?? 0) <= 0) {
+			item_stack = undefined;
+		}
 		this.#item_stack = item_stack;
 	}
 
@@ -57,7 +60,18 @@ export class Container {
 	}
 
 	add_item(item_stack: ItemStack) {
-		// TODO: merge stacks
+		for (const slot of this.#slots.filter((slot) => slot.has_item())) {
+			const slot_item = slot.get_item()!;
+			if (slot_item.type_id === item_stack.type_id) {
+				const missing = slot_item.max_amount - slot_item.amount;
+				const adding = Math.min(missing, item_stack.amount);
+				slot_item.amount += adding;
+				item_stack.amount -= adding;
+				if (item_stack.amount === 0) {
+					return;
+				}
+			}
+		}
 		for (const slot of this.#slots) {
 			if (!slot.has_item()) {
 				slot.set_item(item_stack);
@@ -74,6 +88,10 @@ export class Container {
 
 	get_slot(slot: number): ContainerSlot {
 		return this.#slots[slot];
+	}
+
+	set_item(slot: number, item: ItemStack) {
+		this.#slots[slot].set_item(item);
 	}
 }
 

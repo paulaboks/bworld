@@ -5,7 +5,6 @@ import { Dimension } from "./components/dimension.ts";
 import { create_player } from "./player.ts";
 import { UIButton } from "./components/ui_components.ts";
 import { open_about } from "./about.ts";
-import { create_crop_entity, Crop } from "./components/crop.ts";
 import { generate } from "./generation.ts";
 import { canvas } from "./renderer.ts";
 
@@ -14,7 +13,8 @@ export function start_game(world: ClientWorld) {
 	world.clear_entities();
 
 	const dimension = new Entity("dimension");
-	dimension.add(new Dimension([]));
+	world.dimension = new Dimension([]);
+	dimension.add(world.dimension);
 	world.add_entity(dimension);
 	generate(dimension.get(Dimension)!, 100, 100);
 
@@ -30,25 +30,4 @@ export function start_game(world: ClientWorld) {
 	about_button.add(new Position(canvas.width / 2 - 150, canvas.height / 2 + 80));
 	about_button.add(new UIButton("About", 320, 64, () => open_about()));
 	world.add_entity(about_button);
-
-	world.add_entity(create_crop_entity(
-		0,
-		0,
-		new Crop("bworld:potato"),
-	));
-	world.add_entity(create_crop_entity(
-		32,
-		0,
-		new Crop("bworld:carrot"),
-	));
-	world.add_entity(create_crop_entity(
-		0,
-		32,
-		new Crop("bworld:pumpkin"),
-	));
-	world.add_entity(create_crop_entity(
-		32,
-		32,
-		new Crop("bworld:tomato"),
-	));
 }

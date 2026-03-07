@@ -2,7 +2,7 @@ import { Component } from "$/common/ecs/mod.ts";
 import { AssetManager } from "../assets.ts";
 import { Texture } from "../renderer.ts";
 
-interface Tile {
+export interface Tile {
 	x: number;
 	y: number;
 	id: string;

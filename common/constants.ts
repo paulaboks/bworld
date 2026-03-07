@@ -1,5 +1,5 @@
 export const TEXTURE_SIZE = 16;
-export const TILE_SIZE = 32;
+export const TILE_SIZE = 48;
 
 export const SLOT_SIZE = 18 * 3;
 
