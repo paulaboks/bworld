@@ -2,7 +2,7 @@ import { EverythingRegistry } from "../common/everything_registry.ts";
 import { AssetManager } from "./assets.ts";
 import { ClientWorld } from "./client_world.ts";
 import { InputManager } from "./input_manager.ts";
-import { begin_drawing, end_drawing, init_window } from "./renderer.ts";
+import { begin_drawing, end_drawing, init_font, init_window } from "./renderer.ts";
 
 EverythingRegistry.add_registry("tiles");
 await import("./tiles/mod.ts");
@@ -77,7 +77,12 @@ AssetManager.instance.load("bworld:player", "/assets/sprites/player.png");
 AssetManager.instance.load("bworld:roguelike", "/assets/sprites/roguelike.png");
 AssetManager.instance.load("bworld:ui", "/assets/sprites/ui.png");
 
+AssetManager.instance.load("bworld:m6x11", "/assets/fonts/m6x11.png");
+AssetManager.instance.load("bworld:m6x11_fnt", "/assets/fonts/m6x11.fnt");
+
 await AssetManager.instance.load_all();
+
+init_font();
 
 const client_world = new ClientWorld();
 

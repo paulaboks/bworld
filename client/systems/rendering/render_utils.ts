@@ -119,21 +119,16 @@ export function draw_item(item: ItemStack, x: number, y: number) {
 	if (item.max_amount !== 1) {
 		draw_text(
 			String(item.amount),
-			x + SLOT_SIZE + 2 - 4,
-			y + SLOT_SIZE + 2 - 4,
-			//2,
-			//"#3f3f3f",
-			//"bottom",
-			//"right",
+			x + SLOT_SIZE + 2 - 11 * 2,
+			y + SLOT_SIZE + 2 - 11 * 2,
+			1,
+			[63 / 255, 63 / 255, 63 / 255],
 		);
 		draw_text(
 			String(item.amount),
-			x + SLOT_SIZE - 4,
-			y + SLOT_SIZE - 4,
-			//2,
-			//"white",
-			//"bottom",
-			//"right",
+			x + SLOT_SIZE - 11 * 2,
+			y + SLOT_SIZE - 11 * 2,
+			1,
 		);
 	}
 }

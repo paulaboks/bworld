@@ -45,7 +45,7 @@ export class AssetManager {
 			audio.load();
 			this.assets[key] = audio;
 			this.loading_promises.push(promise);
-		} else if (src.endsWith(".txt") || src.endsWith(".md")) {
+		} else if (src.endsWith(".txt") || src.endsWith(".md") || src.endsWith(".fnt")) {
 			const promise = async () => {
 				const resp = await fetch(src);
 				this.assets[key] = await resp.text();

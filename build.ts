@@ -8,8 +8,38 @@ function clear_folder() {
 	Deno.mkdir(BUILD_FOLDER);
 }
 
-function build_fonts() {
-	copy(`assets/fonts`, `${BUILD_FOLDER}/assets/fonts`);
+async function build_fonts() {
+	// i used https://fonts.varg.dev/ to build the font, its confusing
+	const canvas_size = 256;
+
+	const font = await loadImage("assets/fonts/m6x11.png");
+	const canvas = createCanvas(canvas_size, canvas_size);
+	const ctx = canvas.getContext("2d");
+
+	ctx.drawImage(font, 0, 0);
+	const image_data = ctx.getImageData(0, 0, canvas_size, canvas_size);
+	const data = image_data.data;
+	for (let i = 0; i < data.length; i += 4) {
+		const r = data[i];
+		const g = data[i + 1];
+		const b = data[i + 2];
+
+		if (r === 0 && g === 0 && b === 0) {
+			// black pixel, alpha = 0
+			data[i + 3] = 0;
+		} else {
+			// force white white
+			data[i] = 255;
+			data[i + 1] = 255;
+			data[i + 2] = 255;
+			data[i + 3] = 255;
+		}
+	}
+	ctx.putImageData(image_data, 0, 0);
+
+	Deno.mkdir(`${BUILD_FOLDER}/assets/fonts`);
+	Deno.writeFileSync(`${BUILD_FOLDER}/assets/fonts/m6x11.png`, canvas.toBuffer());
+	copy("assets/fonts/m6x11.fnt", `${BUILD_FOLDER}/assets/fonts/m6x11.fnt`);
 }
 
 function next_power_of_two(value: number): number {
@@ -96,11 +126,15 @@ async function build_client() {
 }
 
 async function build() {
-	const now = performance.now();
-	clear_folder();
-	await build_assets();
-	await build_client();
-	console.log(`Built in ${(performance.now() - now).toFixed(2)}ms`);
+	try {
+		const now = performance.now();
+		clear_folder();
+		await build_assets();
+		await build_client();
+		console.log(`Built in ${(performance.now() - now).toFixed(2)}ms`);
+	} catch (e) {
+		console.log(e);
+	}
 }
 
 let last_build = 0;
