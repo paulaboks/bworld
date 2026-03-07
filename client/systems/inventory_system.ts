@@ -5,7 +5,7 @@ import { Container, PlayerInventory } from "$/client/components/inventory.ts";
 import { InputManager } from "$/client/input_manager.ts";
 import { ClientWorld } from "$/client/client_world.ts";
 import { Position } from "../../common/components/position.ts";
-import { Sprite } from "../components/sprite.ts";
+import { AnimatedSprite, Sprite } from "../components/sprite.ts";
 
 export class InventorySystem extends System {
 	update(world: ClientWorld, _delta: number): void {
@@ -150,16 +150,18 @@ export class InventorySystem extends System {
 		const [player, player_hand] = world.get_tag("player")!;
 
 		const player_position = player.get(Position);
+		const player_sprite = player.get(AnimatedSprite);
 		const hand_position = player_hand.get(Position);
 		const hand_sprite = player_hand.get(Sprite);
 
-		if (!player_position || !hand_position || !hand_sprite) {
+		if (!player_position || !hand_position || !hand_sprite || !player_sprite) {
 			return;
 		}
 
 		// sync position
-		hand_position.x = player_position.x;
-		hand_position.y = player_position.y;
+		hand_position.x = player_position.x + (player_sprite.flip_x ? 34 : 4);
+		hand_position.y = player_position.y + 34;
+		hand_sprite.flip_x = player_sprite.flip_x;
 
 		const maybe_item = player_inventory.container.get_item(player_inventory.hotbar_selected);
 		if (maybe_item) {
