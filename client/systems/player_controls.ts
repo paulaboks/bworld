@@ -70,11 +70,33 @@ export class PlayerControlsSystem extends System {
 		camera.offset_x = Math.floor(canvas.width / 2);
 		camera.offset_y = Math.floor(canvas.height / 2);
 
-		const scroll = InputManager.get_wheel_delta();
-		if (scroll > 0) {
-			player_inventory.hotbar_selected = Math.min(8, player_inventory.hotbar_selected + 1);
-		} else if (scroll < 0) {
-			player_inventory.hotbar_selected = Math.max(0, player_inventory.hotbar_selected - 1);
+		if (!player_inventory.is_open) {
+			const scroll = InputManager.get_wheel_delta();
+			if (scroll > 0) {
+				player_inventory.hotbar_selected = Math.min(8, player_inventory.hotbar_selected + 1);
+			} else if (scroll < 0) {
+				player_inventory.hotbar_selected = Math.max(0, player_inventory.hotbar_selected - 1);
+			}
+
+			if (InputManager.is_key_pressed(controls.hotbar_1)) {
+				player_inventory.hotbar_selected = 0;
+			} else if (InputManager.is_key_pressed(controls.hotbar_2)) {
+				player_inventory.hotbar_selected = 1;
+			} else if (InputManager.is_key_pressed(controls.hotbar_3)) {
+				player_inventory.hotbar_selected = 2;
+			} else if (InputManager.is_key_pressed(controls.hotbar_4)) {
+				player_inventory.hotbar_selected = 3;
+			} else if (InputManager.is_key_pressed(controls.hotbar_5)) {
+				player_inventory.hotbar_selected = 4;
+			} else if (InputManager.is_key_pressed(controls.hotbar_6)) {
+				player_inventory.hotbar_selected = 5;
+			} else if (InputManager.is_key_pressed(controls.hotbar_7)) {
+				player_inventory.hotbar_selected = 6;
+			} else if (InputManager.is_key_pressed(controls.hotbar_8)) {
+				player_inventory.hotbar_selected = 7;
+			} else if (InputManager.is_key_pressed(controls.hotbar_9)) {
+				player_inventory.hotbar_selected = 8;
+			}
 		}
 	}
 }

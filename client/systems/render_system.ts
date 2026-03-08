@@ -8,7 +8,7 @@ import { Camera } from "$/client/components/camera.ts";
 
 import { render_animated_sprite, render_sprite } from "./rendering/sprites.ts";
 import { render_dimension } from "./rendering/dimension.ts";
-import { render_player_inventory } from "./rendering/player.ts";
+import { render_player_hotbar, render_player_inventory } from "./rendering/player.ts";
 import { begin_mode_2d, end_mode_2d } from "../renderer.ts";
 
 export class RenderSystem extends System {
@@ -52,8 +52,11 @@ export class RenderSystem extends System {
 		for (const entity of world.get_entities()) {
 			const player_inventory = entity.get(PlayerInventory);
 
-			if (player_inventory && player_inventory.is_open) {
-				render_player_inventory(player_inventory);
+			if (player_inventory) {
+				render_player_hotbar(player_inventory);
+				if (player_inventory.is_open) {
+					render_player_inventory(player_inventory);
+				}
 			}
 		}
 	}
