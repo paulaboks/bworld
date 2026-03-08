@@ -6,6 +6,7 @@ import { InputManager } from "$/client/input_manager.ts";
 import { ClientWorld } from "$/client/client_world.ts";
 import { Position } from "../../common/components/position.ts";
 import { AnimatedSprite, Sprite } from "../components/sprite.ts";
+import { canvas } from "../renderer.ts";
 
 export class InventorySystem extends System {
 	update(world: ClientWorld, _delta: number): void {
@@ -20,13 +21,19 @@ export class InventorySystem extends System {
 	}
 
 	handle_interaction(player_inventory: PlayerInventory) {
+		const inventory_width = 10 * 2 + SLOT_SIZE * 9;
+		const inventory_height = 10 * 2 + SLOT_SIZE * 4;
+
+		const offset_x = canvas.width / 2 - (inventory_width / 2);
+		const offset_y = canvas.height / 2 - (inventory_height / 2);
+
 		player_inventory.hovering_slot = -1;
 		const container = player_inventory.container;
 		if (player_inventory.is_open) {
 			for (const [index, slot] of player_inventory.layout.slots.entries()) {
 				const mouse = InputManager.get_mouse_position();
-				const slot_x = slot.x + player_inventory.layout.offset_x;
-				const slot_y = slot.y + player_inventory.layout.offset_y;
+				const slot_x = slot.x + player_inventory.layout.offset_x + offset_x;
+				const slot_y = slot.y + player_inventory.layout.offset_y + offset_y;
 				const hovering = point_inside_rec(mouse.x, mouse.y, slot_x, slot_y, SLOT_SIZE, SLOT_SIZE);
 				if (hovering) {
 					player_inventory.hovering_slot = index;

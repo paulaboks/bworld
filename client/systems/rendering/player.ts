@@ -3,14 +3,22 @@ import { AssetManager } from "$/client/assets.ts";
 import { PlayerInventory } from "$/client/components/inventory.ts";
 import { InputManager } from "$/client/input_manager.ts";
 import { draw_item, draw_nine_slice } from "./render_utils.ts";
-import { canvas, draw_text, measure_text, Texture } from "$/client/renderer.ts";
+import { canvas, draw_rect, draw_text, measure_text, Texture } from "$/client/renderer.ts";
 import { EverythingRegistry, ItemRegistry } from "$/common/everything_registry.ts";
 
 const PADDING = 10;
 
 export function render_player_inventory(player_inventory: PlayerInventory) {
+	draw_rect(0, 0, canvas.width, canvas.height, [0, 0, 0, 0.8]);
+
 	const ui = AssetManager.instance.get<Texture>("bworld:ui");
 	const layout = player_inventory.layout.slots;
+
+	const inventory_width = PADDING * 2 + SLOT_SIZE * 9;
+	const inventory_height = PADDING * 2 + SLOT_SIZE * 4;
+
+	const offset_x = canvas.width / 2 - (inventory_width / 2);
+	const offset_y = canvas.height / 2 - (inventory_height / 2);
 
 	draw_nine_slice(
 		ui,
@@ -22,10 +30,10 @@ export function render_player_inventory(player_inventory: PlayerInventory) {
 		4,
 		4,
 		4,
-		0,
-		0,
-		PADDING * 2 + SLOT_SIZE * 9,
-		PADDING * 2 + SLOT_SIZE * 4,
+		offset_x,
+		offset_y,
+		inventory_width,
+		inventory_height,
 	);
 
 	for (const [index, slot] of layout.entries()) {
@@ -41,8 +49,8 @@ export function render_player_inventory(player_inventory: PlayerInventory) {
 			4,
 			4,
 			4,
-			x,
-			y,
+			offset_x + x,
+			offset_y + y,
 			SLOT_SIZE,
 			SLOT_SIZE,
 		);
@@ -52,7 +60,7 @@ export function render_player_inventory(player_inventory: PlayerInventory) {
 		const y = slot.y + PADDING;
 		const item = player_inventory.container.get_item(index);
 		if (item) {
-			draw_item(item, x, y);
+			draw_item(item, offset_x + x, offset_y + y);
 		}
 	}
 
