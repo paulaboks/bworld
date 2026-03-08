@@ -238,6 +238,10 @@ export function draw_texture_region(
 	dh: number,
 	flip_x = false,
 	flip_y = false,
+	r = 1,
+	g = 1,
+	b = 1,
+	a = 1,
 ) {
 	if (current_texture !== texture.tex) {
 		flush_batch();
@@ -256,7 +260,7 @@ export function draw_texture_region(
 		[v0, v1] = [v1, v0];
 	}
 
-	push_quad(dx, dy, dw, dh, u0, v0, u1, v1);
+	push_quad(dx, dy, dw, dh, u0, v0, u1, v1, r, g, b, a);
 }
 
 function flush_batch() {
@@ -522,7 +526,6 @@ export function measure_text(str: string, scale: number = 1) {
 		if (!glyph) {
 			continue;
 		}
-
 		x += glyph.xadvance * scale;
 	}
 	return x;

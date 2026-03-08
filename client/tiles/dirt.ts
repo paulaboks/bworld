@@ -1,5 +1,6 @@
 import { EverythingRegistry, TileRegistry } from "$/common/everything_registry.ts";
 import { PlayerInventory } from "../components/inventory.ts";
+import { WateringCanData } from "../items/watering_can.ts";
 
 EverythingRegistry.register<TileRegistry>("tiles", "bworld:dirt", {
 	texture_id: "bworld:dirt",
@@ -40,7 +41,11 @@ EverythingRegistry.register<TileRegistry>("tiles", "bworld:hoed_dirt", {
 		}
 
 		if (item.type_id === "bworld:watering_can") {
-			tile.id = "bworld:hoed_watered_dirt";
+			const data = item.data as WateringCanData;
+			if (data.water > 0) {
+				tile.id = "bworld:hoed_watered_dirt";
+				data.water -= 1;
+			}
 		}
 	},
 });

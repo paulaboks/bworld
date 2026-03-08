@@ -1,15 +1,22 @@
 import { Component } from "$/common/ecs/mod.ts";
 import { SLOT_SIZE } from "$/common/constants.ts";
+import { EverythingRegistry, ItemRegistry } from "$/common/everything_registry.ts";
 
-export class ItemStack {
+export class ItemStack<T = unknown | undefined> {
 	type_id: string;
 	amount: number;
 	max_amount: number;
+	data?: T;
 
 	constructor(type_id: string | string, amount: number = 1, max_amount: number = 64) {
 		this.type_id = type_id;
 		this.amount = amount;
 		this.max_amount = max_amount;
+		this.data = undefined;
+		const item_info = EverythingRegistry.get<ItemRegistry>("items", type_id);
+		if (item_info?.on_create) {
+			item_info.on_create(this);
+		}
 	}
 
 	clone(): ItemStack {

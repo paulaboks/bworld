@@ -18,6 +18,7 @@ export function draw_nine_slice(
 	y: number,
 	width: number,
 	height: number,
+	color = [1, 1, 1, 1],
 ) {
 	const center_width = source_width - left - right;
 	const center_height = source_height - top - bottom;
@@ -26,10 +27,42 @@ export function draw_nine_slice(
 	const dest_center_height = height - top - bottom;
 
 	// top left
-	draw_texture_region(image, source_x, source_y, left, top, x, y, left, top);
+	draw_texture_region(
+		image,
+		source_x,
+		source_y,
+		left,
+		top,
+		x,
+		y,
+		left,
+		top,
+		false,
+		false,
+		color[0],
+		color[1],
+		color[2],
+		color[3],
+	);
 
 	// top right
-	draw_texture_region(image, source_x + source_width - right, source_y, right, top, x + width - right, y, right, top);
+	draw_texture_region(
+		image,
+		source_x + source_width - right,
+		source_y,
+		right,
+		top,
+		x + width - right,
+		y,
+		right,
+		top,
+		false,
+		false,
+		color[0],
+		color[1],
+		color[2],
+		color[3],
+	);
 
 	// bottom left
 	draw_texture_region(
@@ -42,6 +75,12 @@ export function draw_nine_slice(
 		y + height - bottom,
 		left,
 		bottom,
+		false,
+		false,
+		color[0],
+		color[1],
+		color[2],
+		color[3],
 	);
 
 	// bottom right
@@ -55,10 +94,32 @@ export function draw_nine_slice(
 		y + height - bottom,
 		right,
 		bottom,
+		false,
+		false,
+		color[0],
+		color[1],
+		color[2],
+		color[3],
 	);
 
 	// top
-	draw_texture_region(image, source_x + left, source_y, center_width, top, x + left, y, dest_center_width, top);
+	draw_texture_region(
+		image,
+		source_x + left,
+		source_y,
+		center_width,
+		top,
+		x + left,
+		y,
+		dest_center_width,
+		top,
+		false,
+		false,
+		color[0],
+		color[1],
+		color[2],
+		color[3],
+	);
 
 	// bottom
 	draw_texture_region(
@@ -71,10 +132,32 @@ export function draw_nine_slice(
 		y + height - bottom,
 		dest_center_width,
 		bottom,
+		false,
+		false,
+		color[0],
+		color[1],
+		color[2],
+		color[3],
 	);
 
 	// left
-	draw_texture_region(image, source_x, source_y + top, left, center_height, x, y + top, left, dest_center_height);
+	draw_texture_region(
+		image,
+		source_x,
+		source_y + top,
+		left,
+		center_height,
+		x,
+		y + top,
+		left,
+		dest_center_height,
+		false,
+		false,
+		color[0],
+		color[1],
+		color[2],
+		color[3],
+	);
 
 	// right
 	draw_texture_region(
@@ -87,6 +170,12 @@ export function draw_nine_slice(
 		y + top,
 		right,
 		dest_center_height,
+		false,
+		false,
+		color[0],
+		color[1],
+		color[2],
+		color[3],
 	);
 
 	// center !
@@ -100,6 +189,12 @@ export function draw_nine_slice(
 		y + top,
 		dest_center_width,
 		dest_center_height,
+		false,
+		false,
+		color[0],
+		color[1],
+		color[2],
+		color[3],
 	);
 }
 

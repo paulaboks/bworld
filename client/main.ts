@@ -6,6 +6,8 @@ import { begin_drawing, end_drawing, init_font, init_window } from "./renderer.t
 
 EverythingRegistry.add_registry("tiles");
 await import("./tiles/mod.ts");
+EverythingRegistry.add_registry("items");
+await import("./items/mod.ts");
 
 export class ClientLoop {
 	running = false;

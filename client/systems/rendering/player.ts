@@ -3,7 +3,8 @@ import { AssetManager } from "$/client/assets.ts";
 import { PlayerInventory } from "$/client/components/inventory.ts";
 import { InputManager } from "$/client/input_manager.ts";
 import { draw_item, draw_nine_slice } from "./render_utils.ts";
-import { canvas, Texture } from "$/client/renderer.ts";
+import { canvas, draw_text, measure_text, Texture } from "$/client/renderer.ts";
+import { EverythingRegistry, ItemRegistry } from "$/common/everything_registry.ts";
 
 const PADDING = 10;
 
@@ -55,9 +56,40 @@ export function render_player_inventory(player_inventory: PlayerInventory) {
 		}
 	}
 
+	const mouse = InputManager.get_mouse_position();
+
 	if (player_inventory.holding_item) {
-		const mouse = InputManager.get_mouse_position();
 		draw_item(player_inventory.holding_item, mouse.x, mouse.y);
+	}
+
+	if (player_inventory.hovering_slot !== -1) {
+		const item = player_inventory.container.get_item(player_inventory.hovering_slot);
+		if (item) {
+			const item_info = EverythingRegistry.get<ItemRegistry>("items", item.type_id);
+			const item_name = item.type_id;
+			const box_width = measure_text(item_name, 2) + 4 * 3;
+			const lines = item_info?.get_lore ? 2 : 1;
+			draw_nine_slice(
+				ui,
+				16 * 11,
+				0,
+				16,
+				16,
+				4,
+				4,
+				4,
+				4,
+				mouse.x + 4,
+				mouse.y,
+				box_width,
+				32 * lines + 4 * (lines + 2),
+				[1, 1, 1, 0.8],
+			);
+			draw_text(item_name, mouse.x + 4, mouse.y, 2);
+			if (item_info?.get_lore) {
+				draw_text(item_info.get_lore(item), mouse.x + 4, mouse.y + 32, 2);
+			}
+		}
 	}
 }
 
