@@ -88,14 +88,14 @@ export class Container {
 	}
 
 	get_item(slot: number): ItemStack | undefined {
-		return this.#slots[slot].get_item();
+		return this.#slots[slot]?.get_item();
 	}
 
 	get_slot(slot: number): ContainerSlot {
 		return this.#slots[slot];
 	}
 
-	set_item(slot: number, item: ItemStack) {
+	set_item(slot: number, item: ItemStack | undefined) {
 		this.#slots[slot].set_item(item);
 	}
 }

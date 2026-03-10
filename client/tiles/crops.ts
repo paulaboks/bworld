@@ -10,7 +10,6 @@ interface CropsRegistry {
 	regrowable: boolean;
 }
 
-EverythingRegistry.add_registry("crops");
 EverythingRegistry.register<CropsRegistry>("crops", "bworld:carrot", {
 	total_stages: 5,
 	time_to_grow: [60, 60 * 3, 60 * 3, 60 * 3],

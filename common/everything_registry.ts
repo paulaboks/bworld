@@ -3,18 +3,14 @@ import { Tile } from "../client/components/dimension.ts";
 import { ItemStack } from "../client/inventory.ts";
 
 export class EverythingRegistry {
-	static #registries = new Map<string, Map<string, unknown>>();
-
-	static add_registry(name: string) {
-		this.#registries.set(name, new Map());
-	}
+	static #registries = new Map<string, unknown>();
 
 	static register<T>(registry_name: string, key: string, value: T) {
-		this.#registries.get(registry_name)?.set(key, value);
+		this.#registries.set(`${registry_name}__${key}`, value);
 	}
 
 	static get<T>(registry_name: string, key: string): T {
-		return this.#registries.get(registry_name)?.get(key) as T;
+		return this.#registries.get(`${registry_name}__${key}`) as T;
 	}
 }
 

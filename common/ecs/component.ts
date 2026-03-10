@@ -1,7 +1,3 @@
-import { EverythingRegistry } from "../everything_registry.ts";
-
-EverythingRegistry.add_registry("components");
-
 export abstract class Component {
 	__component = true;
 }

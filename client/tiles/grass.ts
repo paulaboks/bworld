@@ -8,9 +8,11 @@ EverythingRegistry.register<TileRegistry>("tiles", "bworld:grass", {
 	on_interact(world, tile) {
 		const [player] = world.get_tag("player")!;
 		const player_inventory = player.get(PlayerComponent)!.player_inventory;
-		const maybe_item = player_inventory.container.get_item(player_inventory.hotbar_selected);
-		if (maybe_item && maybe_item.type_id === "bworld:hoe") {
+		const item = player_inventory.container.get_item(player_inventory.hotbar_selected);
+		if (item?.type_id === "bworld:hoe") {
 			tile.id = "bworld:hoed_dirt";
+		} else if (item?.type_id === "bworld:chest") {
+			world.dimension.add_tile(world, { x: tile.x, y: tile.y, id: "bworld:chest" });
 		}
 	},
 });
