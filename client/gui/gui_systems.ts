@@ -7,9 +7,7 @@ export class GuiRenderSystem extends System {
 		const [player] = world.get_tag("player")!;
 		const player_component = player.get(PlayerComponent)!;
 
-		for (const screen of player_component.screens) {
-			screen.on_render();
-		}
+		player_component.screens.at(-1)?.on_render();
 	}
 }
 
@@ -18,8 +16,6 @@ export class GuiTickSystem extends System {
 		const [player] = world.get_tag("player")!;
 		const player_component = player.get(PlayerComponent)!;
 
-		for (const screen of player_component.screens) {
-			screen.on_tick(delta);
-		}
+		player_component.screens.at(-1)?.on_tick(delta);
 	}
 }
