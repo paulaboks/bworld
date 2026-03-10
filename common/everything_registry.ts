@@ -1,6 +1,6 @@
 import { ClientWorld } from "../client/client_world.ts";
 import { Tile } from "../client/components/dimension.ts";
-import { ItemStack } from "../client/components/inventory.ts";
+import { ItemStack } from "../client/inventory.ts";
 
 export class EverythingRegistry {
 	static #registries = new Map<string, Map<string, unknown>>();

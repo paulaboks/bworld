@@ -4,10 +4,11 @@ import { InputManager } from "../input_manager.ts";
 import { AnimatedSprite } from "../components/sprite.ts";
 import { ClientWorld } from "../client_world.ts";
 import { PlayerControls } from "../components/player_controls.ts";
-import { PlayerInventory } from "../components/inventory.ts";
 import { Camera } from "../components/camera.ts";
 import { Position } from "../../common/components/position.ts";
 import { canvas } from "../renderer.ts";
+import { PlayerComponent } from "../player.ts";
+import { GuiPlayerInventory } from "../gui/gui_player_inventory.ts";
 
 export class PlayerControlsSystem extends System {
 	constructor() {
@@ -18,7 +19,7 @@ export class PlayerControlsSystem extends System {
 		const [player] = world.get_tag("player")!;
 		const velocity = player.get(Velocity)!;
 		const controls = player.get(PlayerControls)!;
-		const player_inventory = player.get(PlayerInventory)!;
+		const player_component = player.get(PlayerComponent)!;
 
 		if (InputManager.is_key_down(controls.move_left)) {
 			velocity.vx = -controls.move_speed;
@@ -54,8 +55,11 @@ export class PlayerControlsSystem extends System {
 		}
 
 		if (InputManager.is_key_pressed(controls.open_inventory)) {
-			const inventory = player.get(PlayerInventory)!;
-			inventory.is_open = !inventory.is_open;
+			if (player_component.screens.length === 0) {
+				player_component.screens.push(new GuiPlayerInventory(player_component.player_inventory));
+			} else {
+				player_component.pop_screen();
+			}
 		}
 
 		if (InputManager.is_key_pressed(controls.open_debug)) {
@@ -70,7 +74,8 @@ export class PlayerControlsSystem extends System {
 		camera.offset_x = Math.floor(canvas.width / 2);
 		camera.offset_y = Math.floor(canvas.height / 2);
 
-		if (!player_inventory.is_open) {
+		if (player_component.screens.length === 0) {
+			const player_inventory = player_component.player_inventory;
 			const scroll = InputManager.get_wheel_delta();
 			if (scroll > 0) {
 				player_inventory.hotbar_selected = Math.min(8, player_inventory.hotbar_selected + 1);

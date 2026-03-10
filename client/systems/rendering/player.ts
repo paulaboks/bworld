@@ -1,105 +1,10 @@
 import { SLOT_SIZE } from "$/common/constants.ts";
 import { AssetManager } from "$/client/assets.ts";
-import { PlayerInventory } from "$/client/components/inventory.ts";
-import { InputManager } from "$/client/input_manager.ts";
+import { PlayerInventory } from "../../inventory.ts";
 import { draw_item, draw_nine_slice } from "./render_utils.ts";
-import { canvas, draw_rect, draw_text, measure_text, Texture } from "$/client/renderer.ts";
-import { EverythingRegistry, ItemRegistry } from "$/common/everything_registry.ts";
+import { canvas, Texture } from "$/client/renderer.ts";
 
 const PADDING = 10;
-
-export function render_player_inventory(player_inventory: PlayerInventory) {
-	draw_rect(0, 0, canvas.width, canvas.height, [0, 0, 0, 0.8]);
-
-	const ui = AssetManager.instance.get<Texture>("bworld:ui");
-	const layout = player_inventory.layout.slots;
-
-	const inventory_width = PADDING * 2 + SLOT_SIZE * 9;
-	const inventory_height = PADDING * 2 + SLOT_SIZE * 4;
-
-	const offset_x = canvas.width / 2 - (inventory_width / 2);
-	const offset_y = canvas.height / 2 - (inventory_height / 2);
-
-	draw_nine_slice(
-		ui,
-		160,
-		0,
-		16,
-		16,
-		4,
-		4,
-		4,
-		4,
-		offset_x,
-		offset_y,
-		inventory_width,
-		inventory_height,
-	);
-
-	for (const [index, slot] of layout.entries()) {
-		const x = slot.x + PADDING;
-		const y = slot.y + PADDING;
-		draw_nine_slice(
-			ui,
-			player_inventory.hovering_slot === index ? 19 * 16 : 160 + 32,
-			player_inventory.hovering_slot === index ? 16 : 0,
-			16,
-			16,
-			4,
-			4,
-			4,
-			4,
-			offset_x + x,
-			offset_y + y,
-			SLOT_SIZE,
-			SLOT_SIZE,
-		);
-	}
-	for (const [index, slot] of layout.entries()) {
-		const x = slot.x + PADDING;
-		const y = slot.y + PADDING;
-		const item = player_inventory.container.get_item(index);
-		if (item) {
-			draw_item(item, offset_x + x, offset_y + y);
-		}
-	}
-
-	const mouse = InputManager.get_mouse_position();
-
-	if (player_inventory.holding_item) {
-		draw_item(player_inventory.holding_item, mouse.x, mouse.y);
-	}
-
-	if (player_inventory.hovering_slot !== -1) {
-		const item = player_inventory.container.get_item(player_inventory.hovering_slot);
-		if (item) {
-			const item_info = EverythingRegistry.get<ItemRegistry>("items", item.type_id);
-			const item_name = item.type_id;
-			const box_width = measure_text(item_name, 2) + 4 * 3;
-			const lines = item_info?.get_lore ? 2 : 1;
-			draw_nine_slice(
-				ui,
-				16 * 11,
-				0,
-				16,
-				16,
-				4,
-				4,
-				4,
-				4,
-				mouse.x + 4,
-				mouse.y,
-				box_width,
-				32 * lines + 4 * (lines + 2),
-				[1, 1, 1, 0.8],
-			);
-			draw_text(item_name, mouse.x + 4, mouse.y, 2);
-			if (item_info?.get_lore) {
-				draw_text(item_info.get_lore(item), mouse.x + 4, mouse.y + 32, 2);
-			}
-		}
-	}
-}
 
 export function render_player_hotbar(player_inventory: PlayerInventory) {
 	const ui = AssetManager.instance.get<Texture>("bworld:ui");

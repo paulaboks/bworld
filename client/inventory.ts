@@ -1,5 +1,3 @@
-import { Component } from "$/common/ecs/mod.ts";
-import { SLOT_SIZE } from "$/common/constants.ts";
 import { EverythingRegistry, ItemRegistry } from "$/common/everything_registry.ts";
 
 export class ItemStack<T = unknown | undefined> {
@@ -108,18 +106,13 @@ export interface ContainerLayout {
 	offset_y: number;
 }
 
-export class Inventory extends Component {
+export class Inventory {
 	container: Container;
-
-	is_open: boolean = false;
-	layout: ContainerLayout;
 
 	hovering_slot: number = -1;
 
-	constructor(container: Container, layout: ContainerLayout) {
-		super();
+	constructor(container: Container) {
 		this.container = container;
-		this.layout = layout;
 	}
 }
 
@@ -130,18 +123,7 @@ export class PlayerInventory extends Inventory {
 
 	constructor(owner_id: string) {
 		const container = new Container(9 * 4);
-		const layout: ContainerLayout = {
-			slots: [],
-			offset_x: 10,
-			offset_y: 10,
-		};
-
-		for (let row = 0; row < 4; row += 1) {
-			for (let column = 0; column < 9; column += 1) {
-				layout.slots.push({ type: "*", x: column * SLOT_SIZE, y: row * SLOT_SIZE });
-			}
-		}
-		super(container, layout);
+		super(container);
 		this.owner_id = owner_id;
 	}
 }

@@ -1,12 +1,25 @@
 import { Position } from "$/common/components/position.ts";
 import { Velocity } from "$/common/components/velocity.ts";
-import { Entity } from "$/common/ecs/mod.ts";
+import { Component, Entity } from "$/common/ecs/mod.ts";
 import { Camera } from "$/client/components/camera.ts";
-import { ItemStack, PlayerInventory } from "$/client/components/inventory.ts";
+import { ItemStack, PlayerInventory } from "./inventory.ts";
 import { PlayerControls } from "$/client/components/player_controls.ts";
 import { AnimatedSprite, Sprite } from "$/client/components/sprite.ts";
 import { ClientWorld } from "./client_world.ts";
 import { AssetManager } from "./assets.ts";
+import { GuiScreen } from "./gui/gui_screen.ts";
+
+export class PlayerComponent extends Component {
+	player_inventory = new PlayerInventory("");
+	screens: GuiScreen[] = [];
+
+	pop_screen() {
+		const screen = this.screens.pop();
+		if (screen) {
+			screen.on_close();
+		}
+	}
+}
 
 export function create_player(world: ClientWorld) {
 	const player = new Entity("player");
@@ -31,18 +44,19 @@ export function create_player(world: ClientWorld) {
 		}, "idle"),
 	);
 	player.add(new PlayerControls());
-	// TODO: actual player ids
-	player.add(new PlayerInventory(player.id));
-	player.get(PlayerInventory)!.container.add_item(new ItemStack("bworld:pickaxe", 1, 1));
-	player.get(PlayerInventory)!.container.add_item(new ItemStack("bworld:hoe", 1, 1));
-	player.get(PlayerInventory)!.container.add_item(new ItemStack("bworld:watering_can", 1, 1));
-	player.get(PlayerInventory)!.container.add_item(new ItemStack("bworld:axe", 1, 1));
+
+	player.add(new PlayerComponent());
+	const player_inventory = player.get(PlayerComponent)!.player_inventory;
+	player_inventory.container.add_item(new ItemStack("bworld:pickaxe", 1, 1));
+	player_inventory.container.add_item(new ItemStack("bworld:hoe", 1, 1));
+	player_inventory.container.add_item(new ItemStack("bworld:watering_can", 1, 1));
+	player_inventory.container.add_item(new ItemStack("bworld:axe", 1, 1));
 	// player.get(PlayerInventory)!.container.add_item(new ItemStack("bworld:sword", 1, 1));
 	// player.get(PlayerInventory)!.container.add_item(new ItemStack("bworld:bomb", 64));
-	player.get(PlayerInventory)!.container.add_item(new ItemStack("bworld:tomato_seeds", 64));
-	player.get(PlayerInventory)!.container.add_item(new ItemStack("bworld:potato_seeds", 64));
-	player.get(PlayerInventory)!.container.add_item(new ItemStack("bworld:pumpkin_seeds", 64));
-	player.get(PlayerInventory)!.container.add_item(new ItemStack("bworld:carrot_seeds", 64));
+	player_inventory.container.add_item(new ItemStack("bworld:tomato_seeds", 64));
+	player_inventory.container.add_item(new ItemStack("bworld:potato_seeds", 64));
+	player_inventory.container.add_item(new ItemStack("bworld:pumpkin_seeds", 64));
+	player_inventory.container.add_item(new ItemStack("bworld:carrot_seeds", 64));
 	player.add(new Camera(-100, -100));
 
 	world.add_entity(player);

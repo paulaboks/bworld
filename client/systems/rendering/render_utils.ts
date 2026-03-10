@@ -1,7 +1,7 @@
 import { SLOT_SIZE } from "$/common/constants.ts";
 import { get_sprite_region } from "$/common/utils.ts";
 import { AssetManager } from "$/client/assets.ts";
-import { ItemStack } from "$/client/components/inventory.ts";
+import { ItemStack } from "../../inventory.ts";
 import { draw_text, draw_texture_region, Texture } from "$/client/renderer.ts";
 
 export function draw_nine_slice(

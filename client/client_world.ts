@@ -3,7 +3,6 @@ import { MovementSystem } from "$/common/systems/movement_system.ts";
 import { RenderSystem } from "$/client/systems/render_system.ts";
 import { PlayerControlsSystem } from "$/client/systems/player_controls.ts";
 import { DebugSystem } from "$/client/systems/debug_system.ts";
-import { InventorySystem } from "$/client/systems/inventory_system.ts";
 import { UIInteractionSystem } from "$/client/systems/ui_interaction_system.ts";
 import { UIRenderSystem } from "$/client/systems/ui_render_system.ts";
 import { create_main_menu } from "./main_menu.ts";
@@ -12,6 +11,7 @@ import { start_game } from "./game.ts";
 import { canvas, resize_canvas } from "./renderer.ts";
 import { DimensionLogicSystem } from "./systems/dimension_logic.ts";
 import { Dimension } from "./components/dimension.ts";
+import { GuiRenderSystem, GuiTickSystem } from "./gui/gui_systems.ts";
 
 export class ClientWorld extends World {
 	paused = false;
@@ -39,13 +39,14 @@ export class ClientWorld extends World {
 		this.add_system(new UIInteractionSystem(), "main_menu");
 		this.add_system(new UIInteractionSystem(), "paused");
 		this.add_system(new ClickableSystem(), "game");
-		this.add_system(new InventorySystem(), "game");
 		this.add_system(new PlayerControlsSystem(), "game");
 		this.add_system(new MovementSystem(), "game");
 		this.add_system(new DimensionLogicSystem(), "game");
+		this.add_system(new GuiTickSystem(), "game");
 
 		// render systems
 		this.add_system(new RenderSystem(), "game");
+		this.add_system(new GuiRenderSystem(), "game");
 		this.add_system(new DebugSystem(), "game");
 		this.add_system(new UIRenderSystem(), "main_menu");
 		this.add_system(new UIRenderSystem(), "paused");

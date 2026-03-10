@@ -1,5 +1,6 @@
 import { EverythingRegistry, TileRegistry } from "$/common/everything_registry.ts";
-import { ItemStack, PlayerInventory } from "../components/inventory.ts";
+import { ItemStack } from "../inventory.ts";
+import { PlayerComponent } from "../player.ts";
 
 interface CropsRegistry {
 	total_stages: number;
@@ -84,7 +85,7 @@ function create_crop_tile(crop_id: string) {
 		},
 		on_click(world, tile) {
 			const [player] = world.get_tag("player")!;
-			const player_inventory = player.get(PlayerInventory)!;
+			const player_inventory = player.get(PlayerComponent)!.player_inventory;
 			const item = player_inventory.container.get_item(player_inventory.hotbar_selected);
 			if (!item) {
 				return;
@@ -99,7 +100,7 @@ function create_crop_tile(crop_id: string) {
 				return;
 			}
 			const [player] = world.get_tag("player")!;
-			const player_inventory = player.get(PlayerInventory)!;
+			const player_inventory = player.get(PlayerComponent)!.player_inventory;
 			player_inventory.container.add_item(new ItemStack(crop_info.item_drop));
 			if (crop_info.regrowable) {
 				tile.data!.current_stage -= 1;

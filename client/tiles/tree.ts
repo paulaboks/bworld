@@ -1,5 +1,6 @@
 import { EverythingRegistry, TileRegistry } from "$/common/everything_registry.ts";
-import { ItemStack, PlayerInventory } from "../components/inventory.ts";
+import { ItemStack } from "../inventory.ts";
+import { PlayerComponent } from "../player.ts";
 
 EverythingRegistry.register<TileRegistry>("tiles", "bworld:tree", {
 	texture_id: "bworld:tree",
@@ -7,7 +8,7 @@ EverythingRegistry.register<TileRegistry>("tiles", "bworld:tree", {
 
 	on_click(world, tile) {
 		const [player] = world.get_tag("player")!;
-		const player_inventory = player.get(PlayerInventory)!;
+		const player_inventory = player.get(PlayerComponent)!.player_inventory;
 		const maybe_item = player_inventory.container.get_item(player_inventory.hotbar_selected);
 		if (maybe_item && maybe_item.type_id === "bworld:axe") {
 			tile.id = "bworld:grass";

@@ -3,13 +3,13 @@ import { World } from "$/common/ecs/world.ts";
 import { Position } from "$/common/components/position.ts";
 import { AnimatedSprite, Sprite } from "$/client/components/sprite.ts";
 import { Dimension } from "../components/dimension.ts";
-import { PlayerInventory } from "$/client/components/inventory.ts";
 import { Camera } from "$/client/components/camera.ts";
 
 import { render_animated_sprite, render_sprite } from "./rendering/sprites.ts";
 import { render_dimension } from "./rendering/dimension.ts";
-import { render_player_hotbar, render_player_inventory } from "./rendering/player.ts";
+import { render_player_hotbar } from "./rendering/player.ts";
 import { begin_mode_2d, end_mode_2d } from "../renderer.ts";
+import { PlayerComponent } from "../player.ts";
 
 export class RenderSystem extends System {
 	constructor() {
@@ -50,13 +50,10 @@ export class RenderSystem extends System {
 		end_mode_2d();
 
 		for (const entity of world.get_entities()) {
-			const player_inventory = entity.get(PlayerInventory);
+			const player_component = entity.get(PlayerComponent);
 
-			if (player_inventory) {
-				render_player_hotbar(player_inventory);
-				if (player_inventory.is_open) {
-					render_player_inventory(player_inventory);
-				}
+			if (player_component) {
+				render_player_hotbar(player_component.player_inventory);
 			}
 		}
 	}
