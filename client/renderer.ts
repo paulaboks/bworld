@@ -285,7 +285,7 @@ function flush_batch() {
 	gl.uniform2f(camera_offset_loc, camera.offset_x, camera.offset_y);
 
 	gl.bindTexture(gl.TEXTURE_2D, current_texture);
-	gl.drawArrays(gl.TRIANGLES, 0, vert_index / 4);
+	gl.drawArrays(gl.TRIANGLES, 0, vert_index / 8);
 	vert_index = 0;
 }
 
