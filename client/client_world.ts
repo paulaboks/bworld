@@ -38,11 +38,11 @@ export class ClientWorld extends World {
 		// Logic systems
 		this.add_system(new UIInteractionSystem(), "main_menu");
 		this.add_system(new UIInteractionSystem(), "paused");
+		this.add_system(new GuiTickSystem(), "game");
 		this.add_system(new ClickableSystem(), "game");
 		this.add_system(new PlayerControlsSystem(), "game");
 		this.add_system(new MovementSystem(), "game");
 		this.add_system(new DimensionLogicSystem(), "game");
-		this.add_system(new GuiTickSystem(), "game");
 
 		// render systems
 		this.add_system(new RenderSystem(), "game");

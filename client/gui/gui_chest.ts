@@ -9,7 +9,7 @@ const PADDING = 10;
 
 export class GuiChest extends GuiScreen {
 	override inventory_width = PADDING * 2 + SLOT_SIZE * 9;
-	override inventory_height = PADDING * 3 + SLOT_SIZE * 7;
+	override inventory_height = PADDING * 4 + SLOT_SIZE * 7;
 
 	constructor(inventory: Inventory, player_inventory: PlayerInventory) {
 		super(inventory, player_inventory, undefined);
