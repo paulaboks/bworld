@@ -25,7 +25,7 @@ export class GuiChest extends GuiScreen {
 				this.slots.push(
 					new Slot(
 						this.inventory,
-						l + i * 9 + 9,
+						l + i * 9,
 						chest_x + l * SLOT_SIZE,
 						chest_y + i * SLOT_SIZE,
 					),
