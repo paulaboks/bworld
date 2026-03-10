@@ -53,10 +53,11 @@ export function create_player(world: ClientWorld) {
 	player_inventory.container.add_item(new ItemStack("bworld:axe", 1, 1));
 	// player.get(PlayerInventory)!.container.add_item(new ItemStack("bworld:sword", 1, 1));
 	// player.get(PlayerInventory)!.container.add_item(new ItemStack("bworld:bomb", 64));
-	player_inventory.container.add_item(new ItemStack("bworld:tomato_seeds", 64));
-	player_inventory.container.add_item(new ItemStack("bworld:potato_seeds", 64));
-	player_inventory.container.add_item(new ItemStack("bworld:pumpkin_seeds", 64));
-	player_inventory.container.add_item(new ItemStack("bworld:carrot_seeds", 64));
+	// player_inventory.container.add_item(new ItemStack("bworld:tomato_seeds", 64));
+	// player_inventory.container.add_item(new ItemStack("bworld:potato_seeds", 64));
+	// player_inventory.container.add_item(new ItemStack("bworld:pumpkin_seeds", 64));
+	// player_inventory.container.add_item(new ItemStack("bworld:carrot_seeds", 64));
+	player_inventory.container.add_item(new ItemStack("bworld:furnace", 1));
 	player.add(new Camera(-100, -100));
 
 	world.add_entity(player);

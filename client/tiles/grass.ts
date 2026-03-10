@@ -13,6 +13,8 @@ EverythingRegistry.register<TileRegistry>("tiles", "bworld:grass", {
 			tile.id = "bworld:hoed_dirt";
 		} else if (item?.type_id === "bworld:chest") {
 			world.dimension.add_tile(world, { x: tile.x, y: tile.y, id: "bworld:chest" });
+		} else if (item?.type_id === "bworld:furnace") {
+			world.dimension.add_tile(world, { x: tile.x, y: tile.y, id: "bworld:furnace", tickable: true });
 		}
 	},
 });

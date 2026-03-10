@@ -4,3 +4,4 @@ import "./tree.ts";
 import "./crops.ts";
 import "./water.ts";
 import "./chest.ts";
+import "./furnace.ts";
