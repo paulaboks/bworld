@@ -6,7 +6,7 @@ import { create_player } from "./player.ts";
 import { UIButton } from "./components/ui_components.ts";
 import { open_about } from "./about.ts";
 import { generate } from "./generation.ts";
-import { canvas } from "./renderer.ts";
+import { canvas } from "./renderer/mod.ts";
 
 export function start_game(world: ClientWorld) {
 	world.state = "game";

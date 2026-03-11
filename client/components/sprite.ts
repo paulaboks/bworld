@@ -1,6 +1,6 @@
 import { Component } from "$/common/ecs/mod.ts";
 import { AssetManager } from "$/client/assets.ts";
-import { Texture } from "../renderer.ts";
+import { Texture } from "../renderer/mod.ts";
 
 export class Sprite extends Component {
 	image: Texture;

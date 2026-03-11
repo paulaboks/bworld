@@ -2,7 +2,7 @@ import { Component } from "$/common/ecs/mod.ts";
 import { EverythingRegistry, TileRegistry } from "$/common/everything_registry.ts";
 import { AssetManager } from "../assets.ts";
 import { ClientWorld } from "../client_world.ts";
-import { Texture } from "../renderer.ts";
+import { Texture } from "../renderer/mod.ts";
 
 export interface Tile<T = unknown> {
 	x: number;

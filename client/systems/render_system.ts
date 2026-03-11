@@ -8,7 +8,7 @@ import { Camera } from "$/client/components/camera.ts";
 import { render_animated_sprite, render_sprite } from "./rendering/sprites.ts";
 import { render_dimension } from "./rendering/dimension.ts";
 import { render_player_hotbar } from "./rendering/player.ts";
-import { begin_mode_2d, end_mode_2d } from "../renderer.ts";
+import { begin_mode_2d, end_mode_2d } from "../renderer/mod.ts";
 import { PlayerComponent } from "../player.ts";
 
 export class RenderSystem extends System {

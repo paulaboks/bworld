@@ -1,4 +1,4 @@
-import { load_texture, Texture } from "./renderer.ts";
+import { load_texture, Texture } from "./renderer/mod.ts";
 
 type Asset = Texture | HTMLAudioElement | string | Record<string, unknown>;
 

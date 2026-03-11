@@ -6,7 +6,7 @@ import { ClientWorld } from "../client_world.ts";
 import { PlayerControls } from "../components/player_controls.ts";
 import { Camera } from "../components/camera.ts";
 import { Position } from "../../common/components/position.ts";
-import { canvas } from "../renderer.ts";
+import { canvas } from "../renderer/mod.ts";
 import { PlayerComponent } from "../player.ts";
 import { GuiPlayerInventory } from "../gui/gui_player_inventory.ts";
 

@@ -2,7 +2,7 @@ import { SLOT_SIZE } from "$/common/constants.ts";
 import { AssetManager } from "$/client/assets.ts";
 import { PlayerInventory } from "../../inventory.ts";
 import { draw_item, draw_nine_slice } from "./render_utils.ts";
-import { canvas, Texture } from "$/client/renderer.ts";
+import { canvas, Texture } from "$/client/renderer/mod.ts";
 
 const PADDING = 10;
 

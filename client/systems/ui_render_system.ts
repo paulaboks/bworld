@@ -4,7 +4,7 @@ import { ClientWorld } from "$/client/client_world.ts";
 import { UIButton } from "$/client/components/ui_components.ts";
 import { draw_nine_slice } from "./rendering/render_utils.ts";
 import { AssetManager } from "../assets.ts";
-import { draw_text, Texture } from "../renderer.ts";
+import { draw_text, Texture } from "../renderer/mod.ts";
 
 const SCALE = 4;
 

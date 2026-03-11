@@ -2,7 +2,7 @@ import { get_sprite_region } from "$/common/utils.ts";
 import { Dimension } from "$/client/components/dimension.ts";
 import { TEXTURE_SIZE, TILE_SIZE } from "$/common/constants.ts";
 import { Camera, world_to_screen } from "$/client/components/camera.ts";
-import { canvas, draw_texture_region } from "$/client/renderer.ts";
+import { canvas, draw_texture_region } from "$/client/renderer/mod.ts";
 import { EverythingRegistry, TileRegistry } from "$/common/everything_registry.ts";
 
 export function render_dimension(dimension: Dimension, camera: Camera) {

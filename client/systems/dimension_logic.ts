@@ -3,7 +3,7 @@ import { ClientWorld } from "../client_world.ts";
 import { Dimension } from "../components/dimension.ts";
 import { Camera, screen_to_world } from "../components/camera.ts";
 import { InputManager } from "../input_manager.ts";
-import { canvas } from "../renderer.ts";
+import { canvas } from "../renderer/mod.ts";
 import { TICK_DELTA, TILE_SIZE } from "$/common/constants.ts";
 import { EverythingRegistry, TileRegistry } from "$/common/everything_registry.ts";
 import { Position } from "$/common/components/position.ts";

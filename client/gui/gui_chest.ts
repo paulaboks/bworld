@@ -1,6 +1,6 @@
 import { Inventory, PlayerInventory } from "../inventory.ts";
 import { add_player_hotbar, add_player_inventory, GuiScreen, Slot } from "./gui_screen.ts";
-import { canvas, draw_rect, Texture } from "$/client/renderer.ts";
+import { canvas, draw_rect, Texture } from "$/client/renderer/mod.ts";
 import { AssetManager } from "../assets.ts";
 import { SLOT_SIZE } from "../../common/constants.ts";
 import { draw_nine_slice } from "../systems/rendering/render_utils.ts";

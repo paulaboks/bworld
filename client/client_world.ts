@@ -8,7 +8,7 @@ import { UIRenderSystem } from "$/client/systems/ui_render_system.ts";
 import { create_main_menu } from "./main_menu.ts";
 import { ClickableSystem } from "./systems/clickable_system.ts";
 import { start_game } from "./game.ts";
-import { canvas, resize_canvas } from "./renderer.ts";
+import { canvas, resize_canvas } from "./renderer/mod.ts";
 import { DimensionLogicSystem } from "./systems/dimension_logic.ts";
 import { Dimension } from "./components/dimension.ts";
 import { GuiRenderSystem, GuiTickSystem } from "./gui/gui_systems.ts";

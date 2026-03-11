@@ -1,6 +1,6 @@
 import { Position } from "$/common/components/position.ts";
 import { AnimatedSprite, Sprite } from "$/client/components/sprite.ts";
-import { draw_texture_region } from "$/client/renderer.ts";
+import { draw_texture_region } from "$/client/renderer/mod.ts";
 import { Camera } from "$/client/components/camera.ts";
 
 // TODO: camera scale

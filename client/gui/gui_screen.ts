@@ -3,7 +3,7 @@ import { point_inside_rec } from "../../common/utils.ts";
 import { AssetManager } from "../assets.ts";
 import { InputManager } from "../input_manager.ts";
 import { Inventory, ItemStack, PlayerInventory } from "../inventory.ts";
-import { canvas, Texture } from "../renderer.ts";
+import { canvas, Texture } from "../renderer/mod.ts";
 import { draw_item, draw_nine_slice } from "../systems/rendering/render_utils.ts";
 
 export class Slot {

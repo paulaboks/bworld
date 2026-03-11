@@ -1,6 +1,6 @@
 import { point_inside_rec } from "$/common/utils.ts";
 import { InputManager } from "$/client/input_manager.ts";
-import { begin_clip, draw_rect, draw_rect_stroke, draw_text, end_clip, measure_text } from "./renderer.ts";
+import { begin_clip, draw_rect, draw_rect_stroke, draw_text, end_clip, measure_text } from "./renderer/mod.ts";
 
 const HEADER_HEIGHT = 24;
 const RESIZE_SIZE = 12;
