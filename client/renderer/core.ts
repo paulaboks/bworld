@@ -1,33 +1,21 @@
 import { Camera } from "../components/camera.ts";
-import { mat4_mul, mat4_perspective, mat4_view } from "./math.ts";
+import { mat4 } from "gl-matrix";
+
+export let gl: WebGLRenderingContext;
+export let canvas: HTMLCanvasElement;
 
 const MAX_SPRITES = 10000;
 const VERTS_PER_SPRITE = 6;
 const FLOATS_PER_VERT = 9;
 
-export let gl: WebGLRenderingContext;
-export let canvas: HTMLCanvasElement;
 let program: WebGLProgram;
 let buffer: WebGLBuffer;
-
-// const default_camera = new Camera();
-// let camera: Camera = default_camera;
-//
-// let camera_pos_loc: WebGLUniformLocation | null;
-// let camera_zoom_loc: WebGLUniformLocation | null;
-// let camera_rot_loc: WebGLUniformLocation | null;
-// let camera_offset_loc: WebGLUniformLocation | null;
-
-export const projection = new Float32Array(16);
-export const view = new Float32Array(16);
-export const mvp_matrix = new Float32Array(16);
 
 const vertex_data = new Float32Array(MAX_SPRITES * VERTS_PER_SPRITE * FLOATS_PER_VERT);
 let vert_index = 0;
 
 let pos_loc: GLint;
 let uv_loc: GLint;
-let resolution_loc: WebGLUniformLocation | null;
 let texture_loc: WebGLUniformLocation | null;
 let mvp_loc: WebGLUniformLocation | null;
 let col_diffuse_loc: WebGLUniformLocation | null;
@@ -35,22 +23,14 @@ let col_diffuse_loc: WebGLUniformLocation | null;
 let current_texture: WebGLTexture | null = null;
 export let white_tex: WebGLTexture | null = null;
 
-export const camera = {
-	x: 3,
-	y: 3,
-	z: 3,
-
-	pitch: 0,
-	yaw: 0,
-	roll: 0,
-
-	fov: Math.PI / 3,
-	near: 0.1,
-	far: 1000,
-};
-
 let mode3d = false;
-let active_camera = camera;
+
+let camera: Camera | undefined;
+
+const ortho = mat4.create();
+const proj = mat4.create();
+const view = mat4.create();
+const mvp = mat4.create();
 
 const vertex_src = `#version 300 es
 precision mediump float;
@@ -121,15 +101,13 @@ export function init_window(canvas_element: HTMLCanvasElement) {
 	gl.enable(gl.BLEND);
 	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-	gl.disable(gl.CULL_FACE);
-
 	create_white_texture();
-
-	update_mvp(canvas.width, canvas.height);
 }
 
 export function begin_drawing() {
 	update_2d_mvp();
+	gl.depthFunc(gl.LEQUAL);
+	gl.clearDepth(1.0);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	vert_index = 0;
 }
@@ -138,49 +116,35 @@ export function end_drawing() {
 	flush_batch();
 }
 
-export const ortho_matrix = new Float32Array(16);
-
-export function update_2d_mvp() {
+function update_2d_mvp() {
 	const w = canvas.width;
 	const h = canvas.height;
-	const l = 0, r = w, t = 0, b = h, n = -1, f = 1;
 
-	ortho_matrix[0] = 2 / (r - l);
-	ortho_matrix[1] = 0;
-	ortho_matrix[2] = 0;
-	ortho_matrix[3] = 0;
+	const l = 0;
+	const r = w;
+	const t = 0;
+	const b = h;
+	const n = -1;
+	const f = 1;
 
-	ortho_matrix[4] = 0;
-	ortho_matrix[5] = 2 / (t - b);
-	ortho_matrix[6] = 0;
-	ortho_matrix[7] = 0;
-
-	ortho_matrix[8] = 0;
-	ortho_matrix[9] = 0;
-	ortho_matrix[10] = -2 / (f - n);
-	ortho_matrix[11] = 0;
-
-	ortho_matrix[12] = -(r + l) / (r - l);
-	ortho_matrix[13] = -(t + b) / (t - b);
-	ortho_matrix[14] = -(f + n) / (f - n);
-	ortho_matrix[15] = 1;
+	mat4.ortho(ortho, l, r, b, t, n, f);
 }
 
-export function begin_mode_2d(new_camera: Camera) {
-	mode3d = false;
+//export function begin_mode_2d(new_camera: Camera) {
+//	mode3d = false;
+//
+//	gl.disable(gl.DEPTH_TEST);
+//
+//	vert_index = 0;
+//
+//	update_2d_mvp();
+//	gl.uniformMatrix4fv(mvp_loc, false, ortho_matrix);
+//}
 
-	gl.disable(gl.DEPTH_TEST);
-
-	vert_index = 0;
-
-	update_2d_mvp();
-	gl.uniformMatrix4fv(mvp_loc, false, ortho_matrix);
-}
-
-export function end_mode_2d() {
-	flush_batch();
-	// camera = default_camera;
-}
+// export function end_mode_2d() {
+// 	flush_batch();
+// 	// camera = default_camera;
+// }
 
 export function begin_clip(x: number, y: number, width: number, height: number) {
 	gl.enable(gl.SCISSOR_TEST);
@@ -192,6 +156,28 @@ export function begin_clip(x: number, y: number, width: number, height: number) 
 
 export function end_clip() {
 	gl.disable(gl.SCISSOR_TEST);
+}
+
+export function begin_mode_3d(new_camera: Camera) {
+	flush_batch();
+
+	mode3d = true;
+	camera = new_camera;
+
+	gl.enable(gl.DEPTH_TEST);
+
+	update_camera();
+}
+
+export function end_mode_3d() {
+	if (!mode3d) {
+		return;
+	}
+
+	flush_batch();
+
+	mode3d = false;
+	gl.disable(gl.DEPTH_TEST);
 }
 
 export function clear_background(r: number, g: number, b: number, a = 1) {
@@ -208,9 +194,9 @@ export function flush_batch() {
 	gl.bufferData(gl.ARRAY_BUFFER, vertex_data.subarray(0, vert_index), gl.STREAM_DRAW);
 
 	if (mode3d) {
-		gl.uniformMatrix4fv(mvp_loc, false, mvp_matrix);
+		gl.uniformMatrix4fv(mvp_loc, false, mvp);
 	} else {
-		gl.uniformMatrix4fv(mvp_loc, false, ortho_matrix);
+		gl.uniformMatrix4fv(mvp_loc, false, ortho);
 	}
 
 	gl.uniform4f(col_diffuse_loc, 1, 1, 1, 1);
@@ -222,6 +208,44 @@ export function flush_batch() {
 	gl.drawArrays(gl.TRIANGLES, 0, vert_index / FLOATS_PER_VERT);
 
 	vert_index = 0;
+}
+
+export function resize_canvas() {
+	const width = self.innerWidth;
+	const height = self.innerHeight;
+
+	if (canvas.width !== width || canvas.height !== height) {
+		canvas.width = width;
+		canvas.height = height;
+		canvas.style.width = canvas.width + "px";
+		canvas.style.height = canvas.height + "px";
+
+		gl.viewport(0, 0, width, height);
+
+		gl.useProgram(program);
+	}
+}
+
+export function get_current_texture(): WebGLTexture | null {
+	return current_texture;
+}
+
+export function set_current_texture(texture: WebGLTexture) {
+	current_texture = texture;
+}
+
+export function push_vertex(px: number, py: number, pz: number, u: number, vv: number, r = 1, g = 1, b = 1, a = 1) {
+	let i = vert_index;
+	vertex_data[i++] = px;
+	vertex_data[i++] = py;
+	vertex_data[i++] = pz;
+	vertex_data[i++] = u;
+	vertex_data[i++] = vv;
+	vertex_data[i++] = r;
+	vertex_data[i++] = g;
+	vertex_data[i++] = b;
+	vertex_data[i++] = a;
+	vert_index = i;
 }
 
 export function push_quad(
@@ -241,97 +265,41 @@ export function push_quad(
 	const x2 = dx + dw;
 	const y2 = dy + dh;
 
-	let i = vert_index;
-
 	// triangle 1
-	vertex_data[i++] = dx;
-	vertex_data[i++] = dy;
-	vertex_data[i++] = 0;
-	vertex_data[i++] = u0;
-	vertex_data[i++] = v0;
-	vertex_data[i++] = r;
-	vertex_data[i++] = g;
-	vertex_data[i++] = b;
-	vertex_data[i++] = a;
-
-	vertex_data[i++] = x2;
-	vertex_data[i++] = dy;
-	vertex_data[i++] = 0;
-	vertex_data[i++] = u1;
-	vertex_data[i++] = v0;
-	vertex_data[i++] = r;
-	vertex_data[i++] = g;
-	vertex_data[i++] = b;
-	vertex_data[i++] = a;
-
-	vertex_data[i++] = dx;
-	vertex_data[i++] = y2;
-	vertex_data[i++] = 0;
-	vertex_data[i++] = u0;
-	vertex_data[i++] = v1;
-	vertex_data[i++] = r;
-	vertex_data[i++] = g;
-	vertex_data[i++] = b;
-	vertex_data[i++] = a;
+	push_vertex(dx, dy, 0, u0, v0, r, g, b, a);
+	push_vertex(x2, dy, 0, u1, v0, r, g, b, a);
+	push_vertex(dx, y2, 0, u0, v1, r, g, b, a);
 
 	// triangle 2
-	vertex_data[i++] = x2;
-	vertex_data[i++] = dy;
-	vertex_data[i++] = 0;
-	vertex_data[i++] = u1;
-	vertex_data[i++] = v0;
-	vertex_data[i++] = r;
-	vertex_data[i++] = g;
-	vertex_data[i++] = b;
-	vertex_data[i++] = a;
-
-	vertex_data[i++] = x2;
-	vertex_data[i++] = y2;
-	vertex_data[i++] = 0;
-	vertex_data[i++] = u1;
-	vertex_data[i++] = v1;
-	vertex_data[i++] = r;
-	vertex_data[i++] = g;
-	vertex_data[i++] = b;
-	vertex_data[i++] = a;
-
-	vertex_data[i++] = dx;
-	vertex_data[i++] = y2;
-	vertex_data[i++] = 0;
-	vertex_data[i++] = u0;
-	vertex_data[i++] = v1;
-	vertex_data[i++] = r;
-	vertex_data[i++] = g;
-	vertex_data[i++] = b;
-	vertex_data[i++] = a;
-
-	vert_index = i;
+	push_vertex(x2, dy, 0, u1, v0, r, g, b, a);
+	push_vertex(x2, y2, 0, u1, v1, r, g, b, a);
+	push_vertex(dx, y2, 0, u0, v1, r, g, b, a);
 }
 
-export function resize_canvas() {
-	const width = self.innerWidth;
-	const height = self.innerHeight;
+// internal
 
-	if (canvas.width !== width || canvas.height !== height) {
-		canvas.width = width;
-		canvas.height = height;
-		canvas.style.width = canvas.width + "px";
-		canvas.style.height = canvas.height + "px";
-
-		gl.viewport(0, 0, width, height);
-
-		gl.useProgram(program);
-		// gl.uniform2f(resolution_loc, width, height);
-		update_mvp(canvas.width, canvas.height);
+function update_camera() {
+	if (!camera) {
+		return;
 	}
-}
 
-export function get_current_texture(): WebGLTexture | null {
-	return current_texture;
-}
+	mat4.perspective(
+		proj,
+		camera.fov,
+		canvas.width / canvas.height,
+		camera.near,
+		camera.far,
+	);
 
-export function set_current_texture(texture: WebGLTexture) {
-	current_texture = texture;
+	mat4.identity(view);
+
+	mat4.rotateZ(view, view, -camera.roll);
+	mat4.rotateX(view, view, -camera.pitch);
+	mat4.rotateY(view, view, -camera.yaw);
+
+	mat4.translate(view, view, [-camera.x, -camera.y, -camera.z]);
+
+	mat4.multiply(mvp, proj, view);
 }
 
 function compile_shader(type: number, src: string) {
@@ -377,152 +345,4 @@ function create_white_texture() {
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
 	white_tex = tex;
-}
-
-function update_mvp(width: number, height: number) {
-	const l = 0;
-	const r = width;
-	const b = height;
-	const t = 0;
-	const n = -1;
-	const f = 1;
-
-	mvp_matrix[0] = 2 / (r - l);
-	mvp_matrix[1] = 0;
-	mvp_matrix[2] = 0;
-	mvp_matrix[3] = 0;
-
-	mvp_matrix[4] = 0;
-	mvp_matrix[5] = 2 / (t - b);
-	mvp_matrix[6] = 0;
-	mvp_matrix[7] = 0;
-
-	mvp_matrix[8] = 0;
-	mvp_matrix[9] = 0;
-	mvp_matrix[10] = -2 / (f - n);
-	mvp_matrix[11] = 0;
-
-	mvp_matrix[12] = -(r + l) / (r - l);
-	mvp_matrix[13] = -(t + b) / (t - b);
-	mvp_matrix[14] = -(f + n) / (f - n);
-	mvp_matrix[15] = 1;
-}
-
-export function push_cube(
-	x: number,
-	y: number,
-	z: number,
-	w: number,
-	h: number,
-	d: number,
-	r = 1,
-	g = 1,
-	b = 1,
-	a = 1,
-) {
-	set_current_texture(white_tex!);
-
-	const x2 = x + w;
-	const y2 = y + h;
-	const z2 = z + d;
-
-	const u0 = 0, v0 = 0;
-	const u1 = 1, v1 = 1;
-
-	let i = vert_index;
-
-	function v(px: number, py: number, pz: number, u: number, vv: number) {
-		vertex_data[i++] = px;
-		vertex_data[i++] = py;
-		vertex_data[i++] = pz;
-		vertex_data[i++] = u;
-		vertex_data[i++] = vv;
-		vertex_data[i++] = r;
-		vertex_data[i++] = g;
-		vertex_data[i++] = b;
-		vertex_data[i++] = a;
-	}
-
-	v(x, y, z2, u0, v0);
-	v(x2, y, z2, u1, v0);
-	v(x, y2, z2, u0, v1);
-	v(x2, y, z2, u1, v0);
-	v(x2, y2, z2, u1, v1);
-	v(x, y2, z2, u0, v1);
-
-	v(x2, y, z, u0, v0);
-	v(x, y, z, u1, v0);
-	v(x2, y2, z, u0, v1);
-	v(x, y, z, u1, v0);
-	v(x, y2, z, u1, v1);
-	v(x2, y2, z, u0, v1);
-
-	v(x, y, z, u0, v0);
-	v(x, y, z2, u1, v0);
-	v(x, y2, z, u0, v1);
-	v(x, y, z2, u1, v0);
-	v(x, y2, z2, u1, v1);
-	v(x, y2, z, u0, v1);
-
-	v(x2, y, z2, u0, v0);
-	v(x2, y, z, u1, v0);
-	v(x2, y2, z2, u0, v1);
-	v(x2, y, z, u1, v0);
-	v(x2, y2, z, u1, v1);
-	v(x2, y2, z2, u0, v1);
-
-	v(x, y2, z2, u0, v0);
-	v(x2, y2, z2, u1, v0);
-	v(x, y2, z, u0, v1);
-	v(x2, y2, z2, u1, v0);
-	v(x2, y2, z, u1, v1);
-	v(x, y2, z, u0, v1);
-
-	v(x, y, z, u0, v0);
-	v(x2, y, z, u1, v0);
-	v(x, y, z2, u0, v1);
-	v(x2, y, z, u1, v0);
-	v(x2, y, z2, u1, v1);
-	v(x, y, z2, u0, v1);
-
-	vert_index = i;
-}
-
-export function begin_mode_3d() {
-	flush_batch();
-
-	mode3d = true;
-	active_camera = camera;
-
-	gl.enable(gl.DEPTH_TEST);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-	vert_index = 0;
-
-	update_camera();
-}
-
-export function end_mode_3d() {
-	if (!mode3d) {
-		return;
-	}
-
-	flush_batch();
-
-	mode3d = false;
-	gl.disable(gl.DEPTH_TEST);
-}
-
-export function update_camera() {
-	mat4_perspective(
-		projection,
-		camera.fov,
-		canvas.width / canvas.height,
-		camera.near,
-		camera.far,
-	);
-
-	mat4_view(view);
-
-	mat4_mul(mvp_matrix, projection, view);
 }

@@ -11,7 +11,7 @@ import { distance_point_rectangle } from "../../common/utils.ts";
 
 export class DimensionLogicSystem extends System {
 	update(world: ClientWorld, delta: number): void {
-		const dimension_entity = world.get_entities().values().find((ent) => ent.get(Dimension));
+		/*const dimension_entity = world.get_entities().values().find((ent) => ent.get(Dimension));
 		const dimension = dimension_entity!.get(Dimension)!;
 
 		dimension.second_timer += delta;
@@ -72,7 +72,7 @@ export class DimensionLogicSystem extends System {
 					tile_info.on_click(world, tile);
 				}
 			}
-		}
+		}*/
 	}
 	handle_second(world: ClientWorld, dimension: Dimension) {
 		const tickables = dimension.tiles.filter((t) => t.tickable);

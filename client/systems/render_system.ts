@@ -8,9 +8,8 @@ import { Camera } from "$/client/components/camera.ts";
 import { render_animated_sprite, render_sprite } from "./rendering/sprites.ts";
 import { render_dimension } from "./rendering/dimension.ts";
 import { render_player_hotbar } from "./rendering/player.ts";
-import { begin_mode_2d, end_mode_2d } from "../renderer/mod.ts";
 import { PlayerComponent } from "../player.ts";
-import { begin_mode_3d, end_mode_3d, push_cube } from "../renderer/core.ts";
+import { begin_mode_3d, end_mode_3d } from "../renderer/core.ts";
 
 export class RenderSystem extends System {
 	constructor() {
@@ -18,83 +17,42 @@ export class RenderSystem extends System {
 	}
 
 	update(world: World, _delta: number): void {
-		/*const camera_entity = world.get_entities().values().find((e) => e.get(Camera)?.active);
+		const camera_entity = world.get_entities().values().find((e) => e.get(Camera));
 		const camera = camera_entity?.get(Camera);
 
 		if (!camera) {
 			return;
 		}
 
-		begin_mode_2d(camera);
+		begin_mode_3d(camera);
 
 		for (const entity of world.get_entities()) {
-			const position = entity.get(Position);
-			const sprite = entity.get(Sprite);
-
-			if (sprite && position) {
-				render_sprite(sprite, position, camera);
-			}
-
-			const animated_sprite = entity.get(AnimatedSprite);
-
-			if (animated_sprite && position) {
-				render_animated_sprite(animated_sprite, position, camera);
-			}
-
 			const dimension = entity.get(Dimension);
 
 			if (dimension) {
-				render_dimension(dimension, camera);
+				render_dimension(dimension /*, camera*/);
 			}
 		}
 
-		end_mode_2d();
+		end_mode_3d();
 
 		for (const entity of world.get_entities()) {
-			const player_component = entity.get(PlayerComponent);
+			const position = entity.get(Position);
 
+			const sprite = entity.get(Sprite);
+			if (position && sprite) {
+				render_sprite(sprite, position);
+			}
+
+			const animated_sprite = entity.get(AnimatedSprite);
+			if (position && animated_sprite) {
+				render_animated_sprite(animated_sprite, position);
+			}
+
+			const player_component = entity.get(PlayerComponent);
 			if (player_component) {
 				render_player_hotbar(player_component.player_inventory);
 			}
-		}*/
-
-		begin_mode_3d();
-		push_cube(
-			-0.5,
-			-0.5,
-			-0.5,
-			1,
-			1,
-			1,
-			1,
-			0,
-			0,
-			1,
-		);
-		push_cube(
-			0.5,
-			0.5,
-			0.5,
-			1,
-			1,
-			1,
-			1,
-			0,
-			0,
-			1,
-		);
-		push_cube(
-			0,
-			0,
-			0,
-			1,
-			1,
-			1,
-			1,
-			0,
-			0,
-			1,
-		);
-		end_mode_3d();
+		}
 	}
 }

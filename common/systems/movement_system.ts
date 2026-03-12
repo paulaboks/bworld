@@ -11,8 +11,7 @@ export class MovementSystem extends System {
 			if (position && velocity) {
 				position.x += velocity.vx * delta;
 				position.y += velocity.vy * delta;
-				position.x = Math.round(position.x);
-				position.y = Math.round(position.y);
+				position.z += velocity.vz * delta;
 			}
 		}
 	}

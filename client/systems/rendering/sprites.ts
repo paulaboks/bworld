@@ -1,12 +1,8 @@
 import { Position } from "$/common/components/position.ts";
 import { AnimatedSprite, Sprite } from "$/client/components/sprite.ts";
 import { draw_texture_region } from "$/client/renderer/mod.ts";
-import { Camera } from "$/client/components/camera.ts";
 
-// TODO: camera scale
-// TODO: only render if inside screen
-
-export function render_sprite(sprite: Sprite, position: Position, _camera: Camera) {
+export function render_sprite(sprite: Sprite, position: Position) {
 	draw_texture_region(
 		sprite.image,
 		sprite.source_x,
@@ -25,7 +21,6 @@ export function render_sprite(sprite: Sprite, position: Position, _camera: Camer
 export function render_animated_sprite(
 	animated_sprite: AnimatedSprite,
 	position: Position,
-	_camera: Camera,
 ) {
 	const current_animation = animated_sprite.states[animated_sprite.current_state];
 	if (!current_animation) {

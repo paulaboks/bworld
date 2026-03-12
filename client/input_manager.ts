@@ -1,3 +1,5 @@
+import { canvas } from "./renderer/core.ts";
+
 export type KeyCode =
 	// letters
 	| "KeyA"
@@ -89,9 +91,16 @@ export class InputManager {
 
 	static typed_characters = new Set<string>();
 
+	static pointer_lock_flag = false;
+	static mouse_grab_timer = 0;
+	static mouse_ungrab_timer = 0;
+	static mouse_ungrab_timeout = -1;
+	static pointer_lock_waiting = false;
+
 	static initialize(canvas: HTMLCanvasElement) {
 		self.addEventListener("keydown", (e) => {
 			e.preventDefault();
+			e.stopPropagation();
 			if (!this.keys_down.has(e.code)) {
 				this.keys_pressed.add(e.code);
 			}
@@ -103,12 +112,18 @@ export class InputManager {
 
 		self.addEventListener("keyup", (e) => {
 			e.preventDefault();
+			e.stopPropagation();
 			this.keys_down.delete(e.code);
 			this.keys_released.add(e.code);
 		});
 
 		self.addEventListener("mousedown", (e) => {
 			e.preventDefault();
+			e.stopPropagation();
+			if (!document.hasFocus() && document.pointerLockElement !== canvas) {
+				this.set_mouse_grabbed(true);
+				return;
+			}
 			if (!this.mouse_buttons_down.has(e.button)) {
 				this.mouse_buttons_pressed.add(e.button);
 			}
@@ -121,21 +136,43 @@ export class InputManager {
 			this.mouse_buttons_released.add(e.button);
 		});
 
-		self.addEventListener("mousemove", (e) => {
-			e.preventDefault();
-			const rect = canvas.getBoundingClientRect();
-			const new_x = e.clientX - rect.left;
-			const new_y = e.clientY - rect.top;
-
-			this.mouse_delta_x += new_x - this.mouse_x;
-			this.mouse_delta_y += new_y - this.mouse_y;
-
-			this.mouse_x = new_x;
-			this.mouse_y = new_y;
-		});
-
 		self.addEventListener("wheel", (e) => {
 			this.wheel_delta += e.deltaY;
+		});
+
+		document.addEventListener("mousemove", (e) => {
+			e.preventDefault();
+			if (document.pointerLockElement) {
+				this.mouse_delta_x += e.movementX;
+				this.mouse_delta_y += e.movementY;
+			} else {
+				const rect = canvas.getBoundingClientRect();
+				const new_x = e.clientX - rect.left;
+				const new_y = e.clientY - rect.top;
+
+				this.mouse_delta_x += new_x - this.mouse_x;
+				this.mouse_delta_y += new_y - this.mouse_y;
+
+				this.mouse_x = new_x;
+				this.mouse_y = new_y;
+			}
+		});
+
+		document.addEventListener("pointerlockchange", () => {
+			self.setTimeout(() => {
+				const grab = document.pointerLockElement === canvas;
+				if (!grab) {
+					if (this.pointer_lock_flag) {
+						this.mouse_ungrab_timer = performance.now();
+					}
+				}
+				this.pointer_lock_flag = grab;
+			}, 60);
+			this.pointer_lock_waiting = false;
+		});
+
+		document.addEventListener("pointerlockerror", () => {
+			this.pointer_lock_waiting = false;
 		});
 	}
 
@@ -196,5 +233,48 @@ export class InputManager {
 		this.wheel_delta = 0;
 		this.typed_characters.clear();
 		this.mouse_buttons_consumed.clear();
+	}
+
+	static async set_mouse_grabbed(grab: boolean) {
+		this.pointer_lock_flag = grab;
+		const t = performance.now();
+		this.mouse_grab_timer = t;
+		if (grab) {
+			this.mouse_x = -1;
+			this.mouse_y = -1;
+			this.pointer_lock_waiting = true;
+			try {
+				await canvas.requestPointerLock();
+			} catch (_) { /* */ }
+			if (this.mouse_ungrab_timeout !== -1) {
+				self.clearTimeout(this.mouse_ungrab_timeout);
+			}
+			this.mouse_ungrab_timeout = -1;
+			if (t - this.mouse_ungrab_timer < 3000) {
+				this.mouse_ungrab_timeout = self.setTimeout(async () => {
+					try {
+						await canvas.requestPointerLock();
+					} catch (_) { /* */ }
+				}, 3100 - (t - this.mouse_ungrab_timer));
+			}
+		} else {
+			if (this.mouse_ungrab_timeout !== -1) self.clearTimeout(this.mouse_ungrab_timeout);
+			this.mouse_ungrab_timeout = -1;
+			if (!this.pointer_lock_waiting) {
+				document.exitPointerLock();
+			}
+		}
+	}
+
+	static is_mouse_grabbed() {
+		return document.hasFocus() && document.pointerLockElement === canvas;
+	}
+
+	static toggle_fullscreen() {
+		if (!document.fullscreenElement) {
+			canvas.requestFullscreen();
+		} else {
+			document.exitFullscreen();
+		}
 	}
 }

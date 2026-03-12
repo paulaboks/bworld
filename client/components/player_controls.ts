@@ -2,11 +2,11 @@ import { Component } from "$/common/ecs/mod.ts";
 import { KeyCode } from "$/client/input_manager.ts";
 
 export class PlayerControls extends Component {
-	move_speed: number = 100;
+	move_speed: number = 5;
 
 	// Keys
-	move_up: KeyCode = "KeyW";
-	move_down: KeyCode = "KeyS";
+	move_forward: KeyCode = "KeyW";
+	move_backwards: KeyCode = "KeyS";
 	move_left: KeyCode = "KeyA";
 	move_right: KeyCode = "KeyD";
 

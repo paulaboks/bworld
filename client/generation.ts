@@ -8,13 +8,13 @@ export function generate(dimension: Dimension, width: number, height: number, se
 
 	const scale = 0.05;
 
-	for (let y = 0; y < height; y++) {
+	for (let z = 0; z < height; z++) {
 		for (let x = 0; x < width; x++) {
 			// multi-octave terrain
 			const nx = x * scale;
-			const ny = y * scale;
+			const nz = z * scale;
 
-			let h = height_noise(nx, ny) * 1 + height_noise(nx * 2, ny * 2) * 0.5 + height_noise(nx * 4, ny * 4) * 0.25;
+			let h = height_noise(nx, nz) * 1 + height_noise(nx * 2, nz * 2) * 0.5 + height_noise(nx * 4, nz * 4) * 0.25;
 
 			h /= 1.75; // normalize
 
@@ -28,10 +28,10 @@ export function generate(dimension: Dimension, width: number, height: number, se
 				id = "bworld:grass";
 			}
 
-			dimension.tiles.push({ x, y, id });
+			dimension.tiles.push({ x, z, id, y: 0 });
 
 			// tree placement
-			if (id === "bworld:grass") {
+			/*if (id === "bworld:grass") {
 				const t = tree_noise(x * 0.12, y * 0.12);
 
 				if (t > 0.65) {
@@ -41,7 +41,7 @@ export function generate(dimension: Dimension, width: number, height: number, se
 						id: "bworld:tree",
 					});
 				}
-			}
+			}*/
 		}
 	}
 }

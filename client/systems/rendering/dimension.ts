@@ -1,23 +1,11 @@
 import { get_sprite_region } from "$/common/utils.ts";
 import { Dimension } from "$/client/components/dimension.ts";
-import { TEXTURE_SIZE, TILE_SIZE } from "$/common/constants.ts";
-import { Camera, world_to_screen } from "$/client/components/camera.ts";
-import { canvas, draw_texture_region } from "$/client/renderer/mod.ts";
+import { TEXTURE_SIZE } from "$/common/constants.ts";
 import { EverythingRegistry, TileRegistry } from "$/common/everything_registry.ts";
+import { push_cube } from "$/client/renderer/mod.ts";
 
-export function render_dimension(dimension: Dimension, camera: Camera) {
+export function render_dimension(dimension: Dimension /*, camera: Camera*/) {
 	for (const tile of dimension.tiles) {
-		const x = tile.x * TILE_SIZE;
-		const y = tile.y * TILE_SIZE;
-
-		const screen_position = world_to_screen(x, y, camera, canvas.width, canvas.height);
-		if (
-			screen_position.x + TILE_SIZE < 0 || screen_position.x > canvas.width ||
-			screen_position.y + TILE_SIZE < 0 || screen_position.y > canvas.height
-		) {
-			continue;
-		}
-
 		let texture_id = tile.id;
 		const tile_info = EverythingRegistry.get<TileRegistry>("tiles", tile.id);
 		if (tile_info?.texture_id) {
@@ -30,16 +18,18 @@ export function render_dimension(dimension: Dimension, camera: Camera) {
 
 		const region = get_sprite_region(texture_id);
 
-		draw_texture_region(
+		push_cube(
 			dimension.image,
+			tile.x,
+			tile.y,
+			tile.z,
+			1,
+			1,
+			1,
 			region.x * TEXTURE_SIZE,
 			region.y * TEXTURE_SIZE,
 			TEXTURE_SIZE,
 			TEXTURE_SIZE,
-			x,
-			y,
-			TILE_SIZE,
-			TILE_SIZE,
 		);
 	}
 }

@@ -7,6 +7,7 @@ import { Texture } from "../renderer/mod.ts";
 export interface Tile<T = unknown> {
 	x: number;
 	y: number;
+	z: number;
 	id: string;
 	data?: T;
 	tickable?: boolean;

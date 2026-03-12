@@ -1,12 +1,10 @@
 import { System } from "$/common/ecs/mod.ts";
 import { Velocity } from "$/common/components/velocity.ts";
 import { InputManager } from "../input_manager.ts";
-import { AnimatedSprite } from "../components/sprite.ts";
 import { ClientWorld } from "../client_world.ts";
 import { PlayerControls } from "../components/player_controls.ts";
 import { Camera } from "../components/camera.ts";
 import { Position } from "../../common/components/position.ts";
-import { canvas } from "../renderer/mod.ts";
 import { PlayerComponent } from "../player.ts";
 import { GuiPlayerInventory } from "../gui/gui_player_inventory.ts";
 
@@ -20,38 +18,49 @@ export class PlayerControlsSystem extends System {
 		const velocity = player.get(Velocity)!;
 		const controls = player.get(PlayerControls)!;
 		const player_component = player.get(PlayerComponent)!;
+		const position = player.get(Position)!;
+		const camera = player.get(Camera)!;
+
+		let input_x = 0;
+		let input_z = 0;
 
 		if (InputManager.is_key_down(controls.move_left)) {
-			velocity.vx = -controls.move_speed;
-		} else if (InputManager.is_key_down(controls.move_right)) {
-			velocity.vx = controls.move_speed;
-		} else {
-			velocity.vx = 0;
+			input_x -= 1;
+		}
+		if (InputManager.is_key_down(controls.move_right)) {
+			input_x += 1;
+		}
+		if (InputManager.is_key_down(controls.move_forward)) {
+			input_z -= 1;
+		}
+		if (InputManager.is_key_down(controls.move_backwards)) {
+			input_z += 1;
 		}
 
-		if (InputManager.is_key_down(controls.move_up)) {
-			velocity.vy = -controls.move_speed;
-		} else if (InputManager.is_key_down(controls.move_down)) {
-			velocity.vy = controls.move_speed;
+		const size = Math.hypot(input_x, input_z);
+		if (size > 0) {
+			input_x /= size;
+			input_z /= size;
+		}
+
+		const sin = Math.sin(camera.yaw);
+		const cos = Math.cos(camera.yaw);
+
+		const forwardX = sin;
+		const forwardZ = cos;
+
+		const rightX = cos;
+		const rightZ = -sin;
+
+		velocity.vx = (forwardX * input_z + rightX * input_x) * controls.move_speed;
+		velocity.vz = (forwardZ * input_z + rightZ * input_x) * controls.move_speed;
+
+		if (InputManager.is_key_down("Space")) {
+			velocity.vy += controls.move_speed / 10;
+		} else if (InputManager.is_key_down("ShiftLeft")) {
+			velocity.vy -= controls.move_speed / 10;
 		} else {
 			velocity.vy = 0;
-		}
-
-		const animated_sprite = player.get(AnimatedSprite)!;
-
-		if (
-			InputManager.is_key_down(controls.move_up) || InputManager.is_key_down(controls.move_down) ||
-			InputManager.is_key_down(controls.move_left) || InputManager.is_key_down(controls.move_right)
-		) {
-			animated_sprite.set_state("running");
-		} else {
-			animated_sprite.set_state("idle");
-		}
-
-		if (InputManager.is_key_down(controls.move_left)) {
-			animated_sprite.flip_x = false;
-		} else if (InputManager.is_key_down(controls.move_right)) {
-			animated_sprite.flip_x = true;
 		}
 
 		if (InputManager.is_key_pressed(controls.open_inventory)) {
@@ -66,13 +75,24 @@ export class PlayerControlsSystem extends System {
 			world.debugging = !world.debugging;
 		}
 
-		const position = player.get(Position)!;
-		const camera = player.get(Camera)!;
+		if (InputManager.is_key_pressed("F11")) {
+			InputManager.toggle_fullscreen();
+		}
 
-		camera.x = Math.round(position.x);
-		camera.y = Math.round(position.y);
-		camera.offset_x = Math.floor(canvas.width / 2);
-		camera.offset_y = Math.floor(canvas.height / 2);
+		camera.x = position.x;
+		camera.y = position.y + 1.79;
+		camera.z = position.z;
+
+		if (InputManager.is_mouse_grabbed()) {
+			const mouse_delta = InputManager.get_mouse_delta();
+			camera.yaw += -mouse_delta.x * 0.001;
+			camera.pitch += -mouse_delta.y * 0.001;
+
+			const limit = Math.PI / 2 - 0.01;
+			camera.pitch = Math.max(-limit, Math.min(limit, camera.pitch));
+		}
+
+		InputManager.set_mouse_grabbed(player_component.screens.length === 0);
 
 		if (player_component.screens.length === 0) {
 			const player_inventory = player_component.player_inventory;
