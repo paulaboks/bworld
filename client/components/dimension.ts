@@ -73,7 +73,7 @@ export class Dimension extends Component {
 		);
 
 		if (!chunk) {
-			return 0;
+			return -1;
 		}
 
 		const lx = x - chunk_x * CHUNK_SIZE;
@@ -113,6 +113,20 @@ export class Dimension extends Component {
 		if (chunk) {
 			chunk.generated = true;
 			chunk.dirty = true;
+		}
+
+		const neighbors = [
+			[cx - 1, cz],
+			[cx + 1, cz],
+			[cx, cz - 1],
+			[cx, cz + 1],
+		];
+
+		for (const [nx, nz] of neighbors) {
+			const neighbor = this.chunks.find((c) => c.x === nx && c.z === nz);
+			if (neighbor && neighbor.generated) {
+				neighbor.dirty = true;
+			}
 		}
 	}
 

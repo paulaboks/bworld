@@ -82,6 +82,9 @@ function make_chunk_mesh(chunk: Chunk, dimension: Dimension, camera: Camera) {
 
 		const show_face = (x: number, y: number, z: number) => {
 			const block = dimension.get_block(x, y, z);
+			if (block === -1) {
+				return false;
+			}
 			if (block === 0) {
 				return true;
 			}
