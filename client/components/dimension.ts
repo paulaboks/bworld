@@ -24,6 +24,8 @@ export interface Chunk {
 	vertexBuffer?: WebGLBuffer;
 	vertexCount?: number;
 	dirty: boolean;
+	vertexTransparentBuffer?: WebGLBuffer;
+	vertexTransparentCount?: number;
 }
 
 export class Dimension extends Component {

@@ -30,7 +30,7 @@ export class RenderSystem extends System {
 			const dimension = entity.get(Dimension);
 
 			if (dimension) {
-				render_dimension(dimension /*, camera*/);
+				render_dimension(dimension, camera);
 			}
 		}
 

@@ -35,7 +35,7 @@ export function generate(
 
 				// simple terrain layers
 				if (y === terrain_height) {
-					id = "bworld:grass";
+					id = "bworld:leaves";
 				} else if (y > terrain_height - 4) {
 					id = "bworld:dirt";
 				}

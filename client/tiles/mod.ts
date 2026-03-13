@@ -6,3 +6,4 @@ import "./water.ts";
 import "./chest.ts";
 import "./furnace.ts";
 import "./stone.ts";
+import "./log.ts";

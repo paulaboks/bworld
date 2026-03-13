@@ -53,6 +53,7 @@ export class EverythingRegistry {
 export interface TileRegistry<T = unknown | undefined> {
 	texture_id: string | ((tile: Block<T>) => string);
 	has_collision: boolean;
+	transparent?: boolean;
 
 	on_create?(world: ClientWorld, tile: Block<T>): void;
 	on_click?(world: ClientWorld, tile: Block<T>): void;

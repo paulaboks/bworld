@@ -36,3 +36,10 @@ export function distance_point_rectangle(px: number, py: number, sqx: number, sq
 
 	return Math.sqrt(dx * dx + dy * dy);
 }
+
+export function distance_point_point(ax: number, ay: number, az: number, bx: number, by: number, bz: number) {
+	const dx = ax - bx;
+	const dy = ay - by;
+	const dz = az - bz;
+	return dx * dx + dy * dy + dz * dz;
+}
