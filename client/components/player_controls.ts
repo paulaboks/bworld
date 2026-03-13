@@ -2,7 +2,7 @@ import { Component } from "$/common/ecs/mod.ts";
 import { KeyCode } from "$/client/input_manager.ts";
 
 export class PlayerControls extends Component {
-	move_speed: number = 5;
+	move_speed: number = 50;
 
 	// Keys
 	move_forward: KeyCode = "KeyW";

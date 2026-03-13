@@ -1,5 +1,5 @@
 import { distance_point_point, get_sprite_region } from "$/common/utils.ts";
-import { Chunk, CHUNK_SIDE_SIZE, Dimension } from "$/client/components/dimension.ts";
+import { Chunk, CHUNK_SIZE, Dimension } from "$/client/components/dimension.ts";
 import { TEXTURE_SIZE } from "$/common/constants.ts";
 import { EverythingRegistry, TileRegistry } from "$/common/everything_registry.ts";
 import { flush_buffer, gl, push_cube_to_mesh, set_current_texture } from "$/client/renderer/mod.ts";
@@ -9,10 +9,7 @@ export function render_dimension(dimension: Dimension, camera: Camera) {
 	set_current_texture(dimension.image.tex);
 	for (const chunk of dimension.chunks) {
 		if (chunk.dirty) {
-			if (chunk.vertexBuffer && chunk.vertexTransparentBuffer) {
-				gl.deleteBuffer(chunk.vertexBuffer);
-				gl.deleteBuffer(chunk.vertexTransparentBuffer);
-			}
+			dimension.delete_chunk_mesh(chunk);
 			chunk.dirty = false;
 			make_chunk_mesh(chunk, dimension, camera);
 		}
@@ -80,8 +77,8 @@ function make_chunk_mesh(chunk: Chunk, dimension: Dimension, camera: Camera) {
 
 		const [x, y, z] = dimension.index_to_xyz(i);
 
-		const wx = chunk.x * CHUNK_SIDE_SIZE + x;
-		const wz = chunk.z * CHUNK_SIDE_SIZE + z;
+		const wx = chunk.x * CHUNK_SIZE + x;
+		const wz = chunk.z * CHUNK_SIZE + z;
 
 		const show_face = (x: number, y: number, z: number) => {
 			const block = dimension.get_block(x, y, z);

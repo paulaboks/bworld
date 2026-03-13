@@ -7,3 +7,5 @@ import "./chest.ts";
 import "./furnace.ts";
 import "./stone.ts";
 import "./log.ts";
+import "./sand.ts";
+import "./snow.ts";

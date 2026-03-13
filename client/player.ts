@@ -10,6 +10,7 @@ import { GuiScreen } from "./gui/gui_screen.ts";
 export class PlayerComponent extends Component {
 	player_inventory = new PlayerInventory("");
 	screens: GuiScreen[] = [];
+	render_distance = 6;
 
 	pop_screen() {
 		const screen = this.screens.pop();
