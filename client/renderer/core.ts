@@ -133,22 +133,6 @@ function update_2d_mvp() {
 	mat4.ortho(ortho, l, r, b, t, n, f);
 }
 
-//export function begin_mode_2d(new_camera: Camera) {
-//	mode3d = false;
-//
-//	gl.disable(gl.DEPTH_TEST);
-//
-//	vert_index = 0;
-//
-//	update_2d_mvp();
-//	gl.uniformMatrix4fv(mvp_loc, false, ortho_matrix);
-//}
-
-// export function end_mode_2d() {
-// 	flush_batch();
-// 	// camera = default_camera;
-// }
-
 export function begin_clip(x: number, y: number, width: number, height: number) {
 	gl.enable(gl.SCISSOR_TEST);
 
