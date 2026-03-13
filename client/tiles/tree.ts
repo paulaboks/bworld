@@ -2,7 +2,7 @@ import { EverythingRegistry, TileRegistry } from "$/common/everything_registry.t
 import { ItemStack } from "../inventory.ts";
 import { PlayerComponent } from "../player.ts";
 
-EverythingRegistry.register<TileRegistry>("tiles", "bworld:tree", {
+EverythingRegistry.register<TileRegistry>("blocks", "bworld:tree", {
 	texture_id: "bworld:tree",
 	has_collision: false,
 

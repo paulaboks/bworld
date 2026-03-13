@@ -125,22 +125,22 @@ function create_crop_tile(crop_id: string) {
 }
 
 EverythingRegistry.register<TileRegistry<TileCropData>>(
-	"tiles",
+	"blocks",
 	"bworld:tomato_crop",
 	create_crop_tile("bworld:tomato"),
 );
 EverythingRegistry.register<TileRegistry<TileCropData>>(
-	"tiles",
+	"blocks",
 	"bworld:carrot_crop",
 	create_crop_tile("bworld:carrot"),
 );
 EverythingRegistry.register<TileRegistry<TileCropData>>(
-	"tiles",
+	"blocks",
 	"bworld:potato_crop",
 	create_crop_tile("bworld:potato"),
 );
 EverythingRegistry.register<TileRegistry<TileCropData>>(
-	"tiles",
+	"blocks",
 	"bworld:pumpkin_crop",
 	create_crop_tile("bworld:pumpkin"),
 );

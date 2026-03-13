@@ -7,7 +7,7 @@ interface TileChestData {
 	inventory: Inventory;
 }
 
-EverythingRegistry.register<TileRegistry<TileChestData>>("tiles", "bworld:chest", {
+EverythingRegistry.register<TileRegistry<TileChestData>>("blocks", "bworld:chest", {
 	texture_id: "bworld:chest",
 	has_collision: false,
 

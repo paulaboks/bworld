@@ -66,7 +66,7 @@ interface TileChestData {
 	fuel: number;
 }
 
-EverythingRegistry.register<TileRegistry<TileChestData>>("tiles", "bworld:furnace", {
+EverythingRegistry.register<TileRegistry<TileChestData>>("blocks", "bworld:furnace", {
 	texture_id: "bworld:furnace",
 	has_collision: false,
 

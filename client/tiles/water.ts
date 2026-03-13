@@ -2,7 +2,7 @@ import { EverythingRegistry, TileRegistry } from "$/common/everything_registry.t
 import { WateringCanData } from "../items/watering_can.ts";
 import { PlayerComponent } from "../player.ts";
 
-EverythingRegistry.register<TileRegistry>("tiles", "bworld:water", {
+EverythingRegistry.register<TileRegistry>("blocks", "bworld:water", {
 	texture_id: "bworld:water",
 	has_collision: true,
 

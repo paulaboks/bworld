@@ -1,7 +1,7 @@
 import { EverythingRegistry, TileRegistry } from "$/common/everything_registry.ts";
 import { PlayerComponent } from "../player.ts";
 
-EverythingRegistry.register<TileRegistry>("tiles", "bworld:grass", {
+EverythingRegistry.register<TileRegistry>("blocks", "bworld:grass", {
 	texture_id: "bworld:grass",
 	has_collision: false,
 
@@ -12,9 +12,9 @@ EverythingRegistry.register<TileRegistry>("tiles", "bworld:grass", {
 		if (item?.type_id === "bworld:hoe") {
 			tile.id = "bworld:hoed_dirt";
 		} else if (item?.type_id === "bworld:chest") {
-			world.dimension.add_tile(world, { x: tile.x, y: tile.y, id: "bworld:chest" });
+			// world.dimension.add_block(world, { x: tile.x, y: tile.y, id: "bworld:chest" });
 		} else if (item?.type_id === "bworld:furnace") {
-			world.dimension.add_tile(world, { x: tile.x, y: tile.y, id: "bworld:furnace", tickable: true });
+			// world.dimension.add_block(world, { x: tile.x, y: tile.y, id: "bworld:furnace", tickable: true });
 		}
 	},
 });

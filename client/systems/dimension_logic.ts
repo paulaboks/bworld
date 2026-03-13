@@ -44,7 +44,7 @@ export class DimensionLogicSystem extends System {
 		const tile = dimension.tiles.findLast((tile) => tile.x === tile_x && tile.y === tile_y);
 
 		if (tile) {
-			const tile_info = EverythingRegistry.get<TileRegistry>("tiles", tile.id);
+			const tile_info = EverythingRegistry.get<TileRegistry>("blocks", tile.id);
 
 			if (!tile_info) {
 				return;
@@ -75,9 +75,9 @@ export class DimensionLogicSystem extends System {
 		}*/
 	}
 	handle_second(world: ClientWorld, dimension: Dimension) {
-		const tickables = dimension.tiles.filter((t) => t.tickable);
+		const tickables = dimension.blocks.filter((t) => t.tickable);
 		for (const tickable of tickables) {
-			const tile_info = EverythingRegistry.get<TileRegistry>("tiles", tickable.id);
+			const tile_info = EverythingRegistry.get<TileRegistry>("blocks", tickable.id);
 			if (tile_info && tile_info.on_second) {
 				tile_info.on_second(world, tickable, dimension.second_timer);
 			}
@@ -86,9 +86,9 @@ export class DimensionLogicSystem extends System {
 	}
 
 	handle_tick(world: ClientWorld, dimension: Dimension) {
-		const tickables = dimension.tiles.filter((t) => t.tickable);
+		const tickables = dimension.blocks.filter((t) => t.tickable);
 		for (const tickable of tickables) {
-			const tile_info = EverythingRegistry.get<TileRegistry>("tiles", tickable.id);
+			const tile_info = EverythingRegistry.get<TileRegistry>("blocks", tickable.id);
 			if (tile_info && tile_info.on_tick) {
 				tile_info.on_tick(world, tickable, dimension.tick_timer);
 			}

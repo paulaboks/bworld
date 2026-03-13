@@ -13,10 +13,10 @@ export function start_game(world: ClientWorld) {
 	world.clear_entities();
 
 	const dimension = new Entity("dimension");
-	world.dimension = new Dimension([]);
+	world.dimension = new Dimension();
 	dimension.add(world.dimension);
 	world.add_entity(dimension);
-	generate(dimension.get(Dimension)!, 20, 20);
+	generate(world, dimension.get(Dimension)!, 32, 32);
 
 	create_player(world);
 

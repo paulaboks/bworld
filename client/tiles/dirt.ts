@@ -2,7 +2,7 @@ import { EverythingRegistry, TileRegistry } from "$/common/everything_registry.t
 import { WateringCanData } from "../items/watering_can.ts";
 import { PlayerComponent } from "../player.ts";
 
-EverythingRegistry.register<TileRegistry>("tiles", "bworld:dirt", {
+EverythingRegistry.register<TileRegistry>("blocks", "bworld:dirt", {
 	texture_id: "bworld:dirt",
 	has_collision: false,
 
@@ -16,7 +16,7 @@ EverythingRegistry.register<TileRegistry>("tiles", "bworld:dirt", {
 	},
 });
 
-EverythingRegistry.register<TileRegistry>("tiles", "bworld:hoed_dirt", {
+EverythingRegistry.register<TileRegistry>("blocks", "bworld:hoed_dirt", {
 	texture_id: "bworld:hoed_dirt",
 	has_collision: false,
 
@@ -50,7 +50,7 @@ EverythingRegistry.register<TileRegistry>("tiles", "bworld:hoed_dirt", {
 	},
 });
 
-EverythingRegistry.register<TileRegistry>("tiles", "bworld:hoed_watered_dirt", {
+EverythingRegistry.register<TileRegistry>("blocks", "bworld:hoed_watered_dirt", {
 	texture_id: "bworld:hoed_watered_dirt",
 	has_collision: false,
 
@@ -75,19 +75,19 @@ EverythingRegistry.register<TileRegistry>("tiles", "bworld:hoed_watered_dirt", {
 		}
 
 		if (item.type_id === "bworld:tomato_seeds") {
-			world.dimension.add_tile(world, { x: tile.x, y: tile.y, id: "bworld:tomato_crop", tickable: true });
+			world.dimension.add_block(world, { x: tile.x, y: tile.y, id: "bworld:tomato_crop", tickable: true });
 			item.amount -= 1;
 			player_inventory.container.set_item(player_inventory.hotbar_selected, item);
 		} else if (item.type_id === "bworld:potato_seeds") {
-			world.dimension.add_tile(world, { x: tile.x, y: tile.y, id: "bworld:potato_crop", tickable: true });
+			world.dimension.add_block(world, { x: tile.x, y: tile.y, id: "bworld:potato_crop", tickable: true });
 			item.amount -= 1;
 			player_inventory.container.set_item(player_inventory.hotbar_selected, item);
 		} else if (item.type_id === "bworld:pumpkin_seeds") {
-			world.dimension.add_tile(world, { x: tile.x, y: tile.y, id: "bworld:pumpkin_crop", tickable: true });
+			world.dimension.add_block(world, { x: tile.x, y: tile.y, id: "bworld:pumpkin_crop", tickable: true });
 			item.amount -= 1;
 			player_inventory.container.set_item(player_inventory.hotbar_selected, item);
 		} else if (item.type_id === "bworld:carrot_seeds") {
-			world.dimension.add_tile(world, { x: tile.x, y: tile.y, id: "bworld:carrot_crop", tickable: true });
+			world.dimension.add_block(world, { x: tile.x, y: tile.y, id: "bworld:carrot_crop", tickable: true });
 			item.amount -= 1;
 			player_inventory.container.set_item(player_inventory.hotbar_selected, item);
 		}

@@ -17,6 +17,12 @@ export function push_cube(
 	g = 1,
 	b = 1,
 	a = 1,
+	front = true,
+	back = true,
+	left = true,
+	right = true,
+	top = true,
+	bottom = true,
 ) {
 	if (get_current_texture() !== texture.tex) {
 		flush_batch();
@@ -32,45 +38,63 @@ export function push_cube(
 	const u1 = (sx + sw) / texture.width;
 	const v1 = (sy + sh) / texture.height;
 
-	push_vertex(x, y, z2, u0, v0, r, g, b, a);
-	push_vertex(x2, y, z2, u1, v0, r, g, b, a);
-	push_vertex(x, y2, z2, u0, v1, r, g, b, a);
-	push_vertex(x2, y, z2, u1, v0, r, g, b, a);
-	push_vertex(x2, y2, z2, u1, v1, r, g, b, a);
-	push_vertex(x, y2, z2, u0, v1, r, g, b, a);
+	// front (+z)
+	if (front) {
+		push_vertex(x, y, z2, u0, v0, r, g, b, a);
+		push_vertex(x2, y, z2, u1, v0, r, g, b, a);
+		push_vertex(x, y2, z2, u0, v1, r, g, b, a);
+		push_vertex(x2, y, z2, u1, v0, r, g, b, a);
+		push_vertex(x2, y2, z2, u1, v1, r, g, b, a);
+		push_vertex(x, y2, z2, u0, v1, r, g, b, a);
+	}
 
-	push_vertex(x2, y, z, u0, v0, r, g, b, a);
-	push_vertex(x, y, z, u1, v0, r, g, b, a);
-	push_vertex(x2, y2, z, u0, v1, r, g, b, a);
-	push_vertex(x, y, z, u1, v0, r, g, b, a);
-	push_vertex(x, y2, z, u1, v1, r, g, b, a);
-	push_vertex(x2, y2, z, u0, v1, r, g, b, a);
+	// back (-z)
+	if (back) {
+		push_vertex(x2, y, z, u0, v0, r, g, b, a);
+		push_vertex(x, y, z, u1, v0, r, g, b, a);
+		push_vertex(x2, y2, z, u0, v1, r, g, b, a);
+		push_vertex(x, y, z, u1, v0, r, g, b, a);
+		push_vertex(x, y2, z, u1, v1, r, g, b, a);
+		push_vertex(x2, y2, z, u0, v1, r, g, b, a);
+	}
 
-	push_vertex(x, y, z, u0, v0, r, g, b, a);
-	push_vertex(x, y, z2, u1, v0, r, g, b, a);
-	push_vertex(x, y2, z, u0, v1, r, g, b, a);
-	push_vertex(x, y, z2, u1, v0, r, g, b, a);
-	push_vertex(x, y2, z2, u1, v1, r, g, b, a);
-	push_vertex(x, y2, z, u0, v1, r, g, b, a);
+	// left (-x)
+	if (left) {
+		push_vertex(x, y, z, u0, v0, r, g, b, a);
+		push_vertex(x, y, z2, u1, v0, r, g, b, a);
+		push_vertex(x, y2, z, u0, v1, r, g, b, a);
+		push_vertex(x, y, z2, u1, v0, r, g, b, a);
+		push_vertex(x, y2, z2, u1, v1, r, g, b, a);
+		push_vertex(x, y2, z, u0, v1, r, g, b, a);
+	}
 
-	push_vertex(x2, y, z2, u0, v0, r, g, b, a);
-	push_vertex(x2, y, z, u1, v0, r, g, b, a);
-	push_vertex(x2, y2, z2, u0, v1, r, g, b, a);
-	push_vertex(x2, y, z, u1, v0, r, g, b, a);
-	push_vertex(x2, y2, z, u1, v1, r, g, b, a);
-	push_vertex(x2, y2, z2, u0, v1, r, g, b, a);
+	// right (+x)
+	if (right) {
+		push_vertex(x2, y, z2, u0, v0, r, g, b, a);
+		push_vertex(x2, y, z, u1, v0, r, g, b, a);
+		push_vertex(x2, y2, z2, u0, v1, r, g, b, a);
+		push_vertex(x2, y, z, u1, v0, r, g, b, a);
+		push_vertex(x2, y2, z, u1, v1, r, g, b, a);
+		push_vertex(x2, y2, z2, u0, v1, r, g, b, a);
+	}
 
-	push_vertex(x, y2, z2, u0, v0, r, g, b, a);
-	push_vertex(x2, y2, z2, u1, v0, r, g, b, a);
-	push_vertex(x, y2, z, u0, v1, r, g, b, a);
-	push_vertex(x2, y2, z2, u1, v0, r, g, b, a);
-	push_vertex(x2, y2, z, u1, v1, r, g, b, a);
-	push_vertex(x, y2, z, u0, v1, r, g, b, a);
+	// top (+y)
+	if (top) {
+		push_vertex(x, y2, z2, u0, v0, r, g, b, a);
+		push_vertex(x2, y2, z2, u1, v0, r, g, b, a);
+		push_vertex(x, y2, z, u0, v1, r, g, b, a);
+		push_vertex(x2, y2, z2, u1, v0, r, g, b, a);
+		push_vertex(x2, y2, z, u1, v1, r, g, b, a);
+		push_vertex(x, y2, z, u0, v1, r, g, b, a);
+	}
 
-	push_vertex(x, y, z, u0, v0, r, g, b, a);
-	push_vertex(x2, y, z, u1, v0, r, g, b, a);
-	push_vertex(x, y, z2, u0, v1, r, g, b, a);
-	push_vertex(x2, y, z, u1, v0, r, g, b, a);
-	push_vertex(x2, y, z2, u1, v1, r, g, b, a);
-	push_vertex(x, y, z2, u0, v1, r, g, b, a);
+	// bottom (-y)
+	if (bottom) {
+		push_vertex(x, y, z, u0, v0, r, g, b, a);
+		push_vertex(x2, y, z, u1, v0, r, g, b, a);
+		push_vertex(x, y, z2, u0, v1, r, g, b, a);
+		push_vertex(x2, y, z, u1, v0, r, g, b, a);
+		push_vertex(x2, y, z2, u1, v1, r, g, b, a);
+		push_vertex(x, y, z2, u0, v1, r, g, b, a);
+	}
 }

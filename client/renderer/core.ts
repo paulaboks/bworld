@@ -4,7 +4,7 @@ import { mat4 } from "gl-matrix";
 export let gl: WebGLRenderingContext;
 export let canvas: HTMLCanvasElement;
 
-const MAX_SPRITES = 10000;
+const MAX_SPRITES = 100000;
 const VERTS_PER_SPRITE = 6;
 const FLOATS_PER_VERT = 9;
 
@@ -101,6 +101,9 @@ export function init_window(canvas_element: HTMLCanvasElement) {
 	gl.enable(gl.BLEND);
 	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
+	gl.cullFace(gl.BACK);
+	gl.frontFace(gl.CCW);
+
 	create_white_texture();
 }
 
@@ -165,6 +168,7 @@ export function begin_mode_3d(new_camera: Camera) {
 	camera = new_camera;
 
 	gl.enable(gl.DEPTH_TEST);
+	gl.enable(gl.CULL_FACE);
 
 	update_camera();
 }
@@ -178,6 +182,7 @@ export function end_mode_3d() {
 
 	mode3d = false;
 	gl.disable(gl.DEPTH_TEST);
+	gl.disable(gl.CULL_FACE);
 }
 
 export function clear_background(r: number, g: number, b: number, a = 1) {
