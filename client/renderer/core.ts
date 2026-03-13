@@ -9,13 +9,14 @@ const VERTS_PER_SPRITE = 6;
 const FLOATS_PER_VERT = 9;
 
 let program: WebGLProgram;
-let buffer: WebGLBuffer;
+let main_buffer: WebGLBuffer;
 
 const vertex_data = new Float32Array(MAX_SPRITES * VERTS_PER_SPRITE * FLOATS_PER_VERT);
 let vert_index = 0;
 
 let pos_loc: GLint;
 let uv_loc: GLint;
+let color_loc: GLint;
 let texture_loc: WebGLUniformLocation | null;
 let mvp_loc: WebGLUniformLocation | null;
 let col_diffuse_loc: WebGLUniformLocation | null;
@@ -75,8 +76,8 @@ export function init_window(canvas_element: HTMLCanvasElement) {
 
 	program = create_program(vertex_src, fragment_src);
 
-	buffer = gl.createBuffer()!;
-	gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+	main_buffer = gl.createBuffer()!;
+	gl.bindBuffer(gl.ARRAY_BUFFER, main_buffer);
 
 	const stride = FLOATS_PER_VERT * 4;
 
@@ -88,7 +89,7 @@ export function init_window(canvas_element: HTMLCanvasElement) {
 	gl.enableVertexAttribArray(uv_loc);
 	gl.vertexAttribPointer(uv_loc, 2, gl.FLOAT, false, stride, 12);
 
-	const color_loc = gl.getAttribLocation(program, "vertexColor");
+	color_loc = gl.getAttribLocation(program, "vertexColor");
 	gl.enableVertexAttribArray(color_loc);
 	gl.vertexAttribPointer(color_loc, 4, gl.FLOAT, false, stride, 20);
 
@@ -153,6 +154,9 @@ export function begin_mode_3d(new_camera: Camera) {
 
 	gl.enable(gl.DEPTH_TEST);
 	gl.enable(gl.CULL_FACE);
+	gl.depthMask(true);
+	gl.enable(gl.POLYGON_OFFSET_FILL);
+	gl.polygonOffset(1, 1);
 
 	update_camera();
 }
@@ -167,6 +171,8 @@ export function end_mode_3d() {
 	mode3d = false;
 	gl.disable(gl.DEPTH_TEST);
 	gl.disable(gl.CULL_FACE);
+	gl.depthMask(false);
+	gl.disable(gl.POLYGON_OFFSET_FILL);
 }
 
 export function clear_background(r: number, g: number, b: number, a = 1) {
@@ -179,7 +185,7 @@ export function flush_batch() {
 		return;
 	}
 
-	gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+	gl.bindBuffer(gl.ARRAY_BUFFER, main_buffer);
 	gl.bufferData(gl.ARRAY_BUFFER, vertex_data.subarray(0, vert_index), gl.STREAM_DRAW);
 
 	if (mode3d) {
@@ -187,6 +193,11 @@ export function flush_batch() {
 	} else {
 		gl.uniformMatrix4fv(mvp_loc, false, ortho);
 	}
+
+	const stride = FLOATS_PER_VERT * 4;
+	gl.vertexAttribPointer(pos_loc, 3, gl.FLOAT, false, stride, 0);
+	gl.vertexAttribPointer(uv_loc, 2, gl.FLOAT, false, stride, 12);
+	gl.vertexAttribPointer(color_loc, 4, gl.FLOAT, false, stride, 20);
 
 	gl.uniform4f(col_diffuse_loc, 1, 1, 1, 1);
 
@@ -197,6 +208,29 @@ export function flush_batch() {
 	gl.drawArrays(gl.TRIANGLES, 0, vert_index / FLOATS_PER_VERT);
 
 	vert_index = 0;
+}
+
+export function flush_buffer(buffer: WebGLBuffer, draw_count: number) {
+	gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+
+	if (mode3d) {
+		gl.uniformMatrix4fv(mvp_loc, false, mvp);
+	} else {
+		gl.uniformMatrix4fv(mvp_loc, false, ortho);
+	}
+
+	const stride = FLOATS_PER_VERT * 4;
+	gl.vertexAttribPointer(pos_loc, 3, gl.FLOAT, false, stride, 0);
+	gl.vertexAttribPointer(uv_loc, 2, gl.FLOAT, false, stride, 12);
+	gl.vertexAttribPointer(color_loc, 4, gl.FLOAT, false, stride, 20);
+
+	gl.uniform4f(col_diffuse_loc, 1, 1, 1, 1);
+
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, current_texture);
+	gl.uniform1i(texture_loc, 0);
+
+	gl.drawArrays(gl.TRIANGLES, 0, draw_count);
 }
 
 export function resize_canvas() {

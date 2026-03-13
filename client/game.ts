@@ -16,7 +16,7 @@ export function start_game(world: ClientWorld) {
 	world.dimension = new Dimension();
 	dimension.add(world.dimension);
 	world.add_entity(dimension);
-	generate(world, dimension.get(Dimension)!, 32, 32);
+	generate(world, dimension.get(Dimension)!, 16 * 8, 16 * 8);
 
 	create_player(world);
 

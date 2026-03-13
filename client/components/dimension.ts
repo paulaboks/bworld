@@ -21,6 +21,9 @@ export interface Chunk {
 	x: number;
 	z: number;
 	blocks: Int32Array;
+	vertexBuffer?: WebGLBuffer;
+	vertexCount?: number;
+	dirty: boolean;
 }
 
 export class Dimension extends Component {
@@ -30,7 +33,7 @@ export class Dimension extends Component {
 	tick_timer = 0;
 
 	add_chunk(x: number, z: number) {
-		const chunk = { x, z, blocks: new Int32Array(CHUNK_AREA * CHUNK_HEIGHT) };
+		const chunk = { x, z, blocks: new Int32Array(CHUNK_AREA * CHUNK_HEIGHT), dirty: true };
 		this.chunks.push(chunk);
 		return chunk;
 	}
