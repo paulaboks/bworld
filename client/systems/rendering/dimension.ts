@@ -2,7 +2,17 @@ import { get_sprite_region } from "$/common/utils.ts";
 import { Chunk, CHUNK_AREA, CHUNK_SIZE, Dimension } from "$/client/components/dimension.ts";
 import { TEXTURE_SIZE } from "$/common/constants.ts";
 import { BlockRegistry, EverythingRegistry } from "$/common/everything_registry.ts";
-import { flush_buffer, gl, push_cube_to_mesh, set_current_texture } from "$/client/renderer/mod.ts";
+import {
+	flush_buffer,
+	gl,
+	pushBackFace,
+	pushBottomFace,
+	pushFrontFace,
+	pushLeftFace,
+	pushRightFace,
+	pushTopFace,
+	set_current_texture,
+} from "$/client/renderer/mod.ts";
 import { Camera } from "$/client/components/camera.ts";
 
 export function render_dimension(dimension: Dimension, camera: Camera) {
@@ -28,6 +38,15 @@ function render_chunk_opaque(chunk: Chunk) {
 
 	flush_buffer(chunk.vertex_buffer, chunk.vertex_count);
 }
+
+const FACE_PUSHING_FUNCTIONS = {
+	top: pushTopFace,
+	bottom: pushBottomFace,
+	front: pushFrontFace,
+	back: pushBackFace,
+	left: pushLeftFace,
+	right: pushRightFace,
+} as const;
 
 function make_chunk_mesh(chunk: Chunk, dimension: Dimension, camera: Camera) {
 	let vertices = new Float32Array(CHUNK_AREA * 24 * 6 * 9);
@@ -57,13 +76,41 @@ function make_chunk_mesh(chunk: Chunk, dimension: Dimension, camera: Camera) {
 
 		const block_info = blocks_registry[block_nid];
 
-		let texture_id = "bworld:missing";
-		if (block_info?.texture_id) {
-			if (typeof block_info.texture_id === "string") {
-				texture_id = block_info.texture_id;
-			} else {
-				// texture_id = block_info.texture_id(block);
-			}
+		const texture_ids = {
+			top: "bworld:missing",
+			bottom: "bworld:missing",
+			front: "bworld:missing",
+			back: "bworld:missing",
+			left: "bworld:missing",
+			right: "bworld:missing",
+		};
+
+		const textures = block_info.textures;
+		if (!textures) {
+			throw new Error(`no textures for ${block_nid}`);
+		}
+
+		if (typeof textures === "string") {
+			texture_ids.top = textures;
+			texture_ids.bottom = textures;
+			texture_ids.front = textures;
+			texture_ids.back = textures;
+			texture_ids.left = textures;
+			texture_ids.right = textures;
+		} else if ("top" in textures && "bottom" in textures && "side" in textures) {
+			texture_ids.top = textures.top;
+			texture_ids.bottom = textures.bottom;
+			texture_ids.front = textures.side;
+			texture_ids.back = textures.side;
+			texture_ids.left = textures.side;
+			texture_ids.right = textures.side;
+		} else if ("front" in textures && "side" in textures) {
+			texture_ids.top = textures.side;
+			texture_ids.bottom = textures.side;
+			texture_ids.front = textures.front;
+			texture_ids.back = textures.side;
+			texture_ids.left = textures.side;
+			texture_ids.right = textures.side;
 		}
 
 		const [x, y, z] = dimension.index_to_xyz(i);
@@ -71,41 +118,41 @@ function make_chunk_mesh(chunk: Chunk, dimension: Dimension, camera: Camera) {
 		const wx = chunk.x * CHUNK_SIZE + x;
 		const wz = chunk.z * CHUNK_SIZE + z;
 
-		const front = show_face(wx, y, wz + 1);
-		const back = show_face(wx, y, wz - 1);
-		const left = show_face(wx - 1, y, wz);
-		const right = show_face(wx + 1, y, wz);
-		const top = show_face(wx, y + 1, wz);
-		const bottom = show_face(wx, y - 1, wz);
+		const faces = {
+			front: show_face(wx, y, wz + 1),
+			back: show_face(wx, y, wz - 1),
+			left: show_face(wx - 1, y, wz),
+			right: show_face(wx + 1, y, wz),
+			top: show_face(wx, y + 1, wz),
+			bottom: show_face(wx, y - 1, wz),
+		} as const;
 
-		const region = get_sprite_region(texture_id);
+		for (const side of ["front", "back", "left", "right", "top", "bottom"] as const) {
+			if (faces[side]) {
+				const region = get_sprite_region(texture_ids[side]);
 
-		vertices = ensure_capacity(vertices, count + (6 * 6 * 9));
-		count = push_cube_to_mesh(
-			vertices,
-			count,
-			dimension.image,
-			wx,
-			y,
-			wz,
-			1,
-			1,
-			1,
-			region.x * TEXTURE_SIZE,
-			region.y * TEXTURE_SIZE,
-			TEXTURE_SIZE,
-			TEXTURE_SIZE,
-			1,
-			1,
-			1,
-			1,
-			front,
-			back,
-			left,
-			right,
-			top,
-			bottom,
-		);
+				vertices = ensure_capacity(vertices, count + (6 * 6 * 9));
+				count = FACE_PUSHING_FUNCTIONS[side](
+					vertices,
+					count,
+					dimension.image,
+					wx,
+					y,
+					wz,
+					1,
+					1,
+					1,
+					region.x * TEXTURE_SIZE,
+					region.y * TEXTURE_SIZE,
+					TEXTURE_SIZE,
+					TEXTURE_SIZE,
+					1,
+					1,
+					1,
+					1,
+				);
+			}
+		}
 	}
 
 	chunk.vertex_buffer = gl.createBuffer();

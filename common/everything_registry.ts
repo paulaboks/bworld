@@ -49,8 +49,19 @@ export class EverythingRegistry {
 	}
 }
 
+interface TextureSideTopBottom {
+	top: string;
+	bottom: string;
+	side: string;
+}
+
+interface TextureFront {
+	front: string;
+	side: string;
+}
+
 export interface BlockRegistry<T = unknown | undefined> {
-	texture_id: string | ((block: Block<T>) => string);
+	textures: string | TextureSideTopBottom | TextureFront;
 	has_collision: boolean;
 	transparent?: boolean;
 

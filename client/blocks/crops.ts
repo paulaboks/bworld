@@ -67,7 +67,7 @@ interface TileCropData {
 	current_stage: number;
 	growth_time: number;
 }
-
+/*
 function create_crop_tile(crop_id: string) {
 	const crop_info = EverythingRegistry.get<CropsRegistry>("crops", crop_id);
 
@@ -144,3 +144,4 @@ EverythingRegistry.register<BlockRegistry<TileCropData>>(
 	"bworld:pumpkin_crop",
 	create_crop_tile("bworld:pumpkin"),
 );
+*/

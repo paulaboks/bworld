@@ -3,7 +3,7 @@ import { WateringCanData } from "../items/watering_can.ts";
 import { PlayerComponent } from "../player.ts";
 
 EverythingRegistry.register<BlockRegistry>("blocks", "bworld:dirt", {
-	texture_id: "bworld:dirt",
+	textures: "bworld:dirt",
 	has_collision: false,
 
 	on_interact(world, tile) {
@@ -17,7 +17,7 @@ EverythingRegistry.register<BlockRegistry>("blocks", "bworld:dirt", {
 });
 
 EverythingRegistry.register<BlockRegistry>("blocks", "bworld:hoed_dirt", {
-	texture_id: "bworld:hoed_dirt",
+	textures: "bworld:hoed_dirt",
 	has_collision: false,
 
 	on_click(world, tile) {
@@ -51,7 +51,7 @@ EverythingRegistry.register<BlockRegistry>("blocks", "bworld:hoed_dirt", {
 });
 
 EverythingRegistry.register<BlockRegistry>("blocks", "bworld:hoed_watered_dirt", {
-	texture_id: "bworld:hoed_watered_dirt",
+	textures: "bworld:hoed_watered_dirt",
 	has_collision: false,
 
 	on_click(world, tile) {

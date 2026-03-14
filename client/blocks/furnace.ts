@@ -67,7 +67,7 @@ interface TileChestData {
 }
 
 EverythingRegistry.register<BlockRegistry<TileChestData>>("blocks", "bworld:furnace", {
-	texture_id: "bworld:furnace",
+	textures: "bworld:furnace",
 	has_collision: false,
 
 	on_interact(world, tile) {

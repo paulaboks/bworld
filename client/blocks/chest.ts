@@ -8,7 +8,7 @@ interface TileChestData {
 }
 
 EverythingRegistry.register<BlockRegistry<TileChestData>>("blocks", "bworld:chest", {
-	texture_id: "bworld:chest",
+	textures: "bworld:chest",
 	has_collision: false,
 
 	on_interact(world, tile) {

@@ -2,7 +2,7 @@ import { BlockRegistry, EverythingRegistry } from "$/common/everything_registry.
 import { PlayerComponent } from "../player.ts";
 
 EverythingRegistry.register<BlockRegistry>("blocks", "bworld:grass", {
-	texture_id: "bworld:grass",
+	textures: { top: "bworld:grass_top", bottom: "bworld:dirt", "side": "bworld:grass_side" },
 	has_collision: false,
 
 	on_interact(world, tile) {
