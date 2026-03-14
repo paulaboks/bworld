@@ -41,7 +41,7 @@ export function create_player(world: ClientWorld) {
 	// player_inventory.container.add_item(new ItemStack("bworld:carrot_seeds", 64));
 	player_inventory.container.add_item(new ItemStack("bworld:furnace", 1));
 	player.add(new Camera());
-	player.add(new CollisionCuboid(0.5, 1.79, 0.5));
+	player.add(new CollisionCuboid(0.55, 1.79, 0.55));
 
 	world.add_entity(player);
 

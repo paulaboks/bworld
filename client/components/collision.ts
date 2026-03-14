@@ -10,7 +10,7 @@ export class CollisionCuboid extends Component {
 	colliding_y: number = 0;
 	colliding_z: number = 0;
 
-	constructor(width: number, height: number, depth: number, gravity = -9.8) {
+	constructor(width: number, height: number, depth: number, gravity = -15.8) {
 		super();
 		this.width = width;
 		this.height = height;

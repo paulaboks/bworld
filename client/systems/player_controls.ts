@@ -53,13 +53,15 @@ export class PlayerControlsSystem extends System {
 		const rightX = cos;
 		const rightZ = -sin;
 
-		velocity.vx = (forwardX * input_z + rightX * input_x) * controls.move_speed;
-		velocity.vz = (forwardZ * input_z + rightZ * input_x) * controls.move_speed;
+		const speed_modifier = InputManager.is_key_down(controls.sprint_key) ? 1.75 : 1;
+
+		velocity.vx = (forwardX * input_z + rightX * input_x) * controls.move_speed * speed_modifier;
+		velocity.vz = (forwardZ * input_z + rightZ * input_x) * controls.move_speed * speed_modifier;
 
 		const cuboid = player.get(CollisionCuboid);
 
-		if (InputManager.is_key_pressed("Space") && cuboid?.colliding_y === 1) {
-			velocity.vy += controls.move_speed;
+		if (InputManager.is_key_down("Space") && cuboid?.colliding_y === 1) {
+			velocity.vy += controls.jump_force;
 		}
 
 		if (InputManager.is_key_pressed(controls.open_inventory)) {
@@ -79,7 +81,7 @@ export class PlayerControlsSystem extends System {
 		}
 
 		camera.x = position.x;
-		camera.y = position.y + 1.79;
+		camera.y = position.y + 1.69;
 		camera.z = position.z;
 
 		if (InputManager.is_mouse_grabbed()) {
