@@ -1,7 +1,7 @@
 import { get_sprite_region } from "$/common/utils.ts";
 import { Chunk, CHUNK_AREA, CHUNK_SIZE, Dimension } from "$/client/components/dimension.ts";
 import { TEXTURE_SIZE } from "$/common/constants.ts";
-import { EverythingRegistry, TileRegistry } from "$/common/everything_registry.ts";
+import { BlockRegistry, EverythingRegistry } from "$/common/everything_registry.ts";
 import { flush_buffer, gl, push_cube_to_mesh, set_current_texture } from "$/client/renderer/mod.ts";
 import { Camera } from "$/client/components/camera.ts";
 
@@ -32,7 +32,7 @@ function render_chunk_opaque(chunk: Chunk) {
 function make_chunk_mesh(chunk: Chunk, dimension: Dimension, camera: Camera) {
 	let vertices = new Float32Array(CHUNK_AREA * 24 * 6 * 9);
 	let count = 0;
-	const blocks_registry = EverythingRegistry.get_registry<TileRegistry>("blocks");
+	const blocks_registry = EverythingRegistry.get_registry<BlockRegistry>("blocks");
 
 	const show_face = (x: number, y: number, z: number) => {
 		const block = dimension.get_block(x, y, z);
@@ -55,14 +55,14 @@ function make_chunk_mesh(chunk: Chunk, dimension: Dimension, camera: Camera) {
 			continue;
 		}
 
-		const tile_info = blocks_registry[block_nid];
+		const block_info = blocks_registry[block_nid];
 
 		let texture_id = "bworld:missing";
-		if (tile_info?.texture_id) {
-			if (typeof tile_info.texture_id === "string") {
-				texture_id = tile_info.texture_id;
+		if (block_info?.texture_id) {
+			if (typeof block_info.texture_id === "string") {
+				texture_id = block_info.texture_id;
 			} else {
-				// texture_id = tile_info.texture_id(tile);
+				// texture_id = block_info.texture_id(block);
 			}
 		}
 

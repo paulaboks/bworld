@@ -49,16 +49,16 @@ export class EverythingRegistry {
 	}
 }
 
-export interface TileRegistry<T = unknown | undefined> {
-	texture_id: string | ((tile: Block<T>) => string);
+export interface BlockRegistry<T = unknown | undefined> {
+	texture_id: string | ((block: Block<T>) => string);
 	has_collision: boolean;
 	transparent?: boolean;
 
-	on_create?(dimension: Dimension, tile: Block<T>): void;
-	on_click?(dimension: Dimension, tile: Block<T>): void;
-	on_interact?(dimension: Dimension, tile: Block<T>): void;
-	on_tick?(dimension: Dimension, tile: Block<T>, tick_delta: number): void;
-	on_second?(dimension: Dimension, tile: Block<T>, second_delta: number): void;
+	on_create?(dimension: Dimension, block: Block<T>): void;
+	on_click?(dimension: Dimension, block: Block<T>): void;
+	on_interact?(dimension: Dimension, block: Block<T>): void;
+	on_tick?(dimension: Dimension, block: Block<T>, tick_delta: number): void;
+	on_second?(dimension: Dimension, block: Block<T>, second_delta: number): void;
 }
 
 export interface ItemRegistry<T = unknown | undefined> {

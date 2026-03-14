@@ -1,7 +1,7 @@
-import { EverythingRegistry, TileRegistry } from "$/common/everything_registry.ts";
+import { BlockRegistry, EverythingRegistry } from "$/common/everything_registry.ts";
 import { PlayerComponent } from "../player.ts";
 
-EverythingRegistry.register<TileRegistry>("blocks", "bworld:grass", {
+EverythingRegistry.register<BlockRegistry>("blocks", "bworld:grass", {
 	texture_id: "bworld:grass",
 	has_collision: false,
 

@@ -3,7 +3,7 @@ import { ClientWorld } from "./client_world.ts";
 import { InputManager } from "./input_manager.ts";
 import { begin_drawing, end_drawing, init_font, init_window } from "./renderer/mod.ts";
 
-await import("./tiles/mod.ts");
+await import("./blocks/mod.ts");
 await import("./items/mod.ts");
 
 export class ClientLoop {

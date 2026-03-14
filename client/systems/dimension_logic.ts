@@ -5,7 +5,7 @@ import { Camera, screen_to_world } from "../components/camera.ts";
 import { InputManager } from "../input_manager.ts";
 import { canvas } from "../renderer/mod.ts";
 import { TICK_DELTA, TILE_SIZE } from "$/common/constants.ts";
-import { EverythingRegistry, TileRegistry } from "$/common/everything_registry.ts";
+import { BlockRegistry, EverythingRegistry } from "$/common/everything_registry.ts";
 import { Position } from "$/common/components/position.ts";
 import { distance_point_rectangle } from "../../common/utils.ts";
 
@@ -77,7 +77,7 @@ export class DimensionLogicSystem extends System {
 	handle_second(world: ClientWorld, dimension: Dimension) {
 		const tickables = dimension.blocks.filter((t) => t.tickable);
 		for (const tickable of tickables) {
-			const tile_info = EverythingRegistry.get<TileRegistry>("blocks", tickable.id);
+			const tile_info = EverythingRegistry.get<BlockRegistry>("blocks", tickable.id);
 			if (tile_info && tile_info.on_second) {
 				tile_info.on_second(world, tickable, dimension.second_timer);
 			}
@@ -88,7 +88,7 @@ export class DimensionLogicSystem extends System {
 	handle_tick(world: ClientWorld, dimension: Dimension) {
 		const tickables = dimension.blocks.filter((t) => t.tickable);
 		for (const tickable of tickables) {
-			const tile_info = EverythingRegistry.get<TileRegistry>("blocks", tickable.id);
+			const tile_info = EverythingRegistry.get<BlockRegistry>("blocks", tickable.id);
 			if (tile_info && tile_info.on_tick) {
 				tile_info.on_tick(world, tickable, dimension.tick_timer);
 			}

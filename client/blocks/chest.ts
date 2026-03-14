@@ -1,4 +1,4 @@
-import { EverythingRegistry, TileRegistry } from "$/common/everything_registry.ts";
+import { BlockRegistry, EverythingRegistry } from "$/common/everything_registry.ts";
 import { Container, Inventory } from "../inventory.ts";
 import { PlayerComponent } from "../player.ts";
 import { GuiChest } from "$/client/gui/gui_chest.ts";
@@ -7,7 +7,7 @@ interface TileChestData {
 	inventory: Inventory;
 }
 
-EverythingRegistry.register<TileRegistry<TileChestData>>("blocks", "bworld:chest", {
+EverythingRegistry.register<BlockRegistry<TileChestData>>("blocks", "bworld:chest", {
 	texture_id: "bworld:chest",
 	has_collision: false,
 

@@ -1,4 +1,4 @@
-import { EverythingRegistry, TileRegistry } from "$/common/everything_registry.ts";
+import { BlockRegistry, EverythingRegistry } from "$/common/everything_registry.ts";
 import { Container, Inventory, ItemStack } from "../inventory.ts";
 import { PlayerComponent } from "../player.ts";
 import { GuiFurnace } from "$/client/gui/gui_furnace.ts";
@@ -66,7 +66,7 @@ interface TileChestData {
 	fuel: number;
 }
 
-EverythingRegistry.register<TileRegistry<TileChestData>>("blocks", "bworld:furnace", {
+EverythingRegistry.register<BlockRegistry<TileChestData>>("blocks", "bworld:furnace", {
 	texture_id: "bworld:furnace",
 	has_collision: false,
 

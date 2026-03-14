@@ -1,4 +1,4 @@
-import { EverythingRegistry, TileRegistry } from "$/common/everything_registry.ts";
+import { BlockRegistry, EverythingRegistry } from "$/common/everything_registry.ts";
 import { ItemStack } from "../inventory.ts";
 import { PlayerComponent } from "../player.ts";
 
@@ -121,25 +121,25 @@ function create_crop_tile(crop_id: string) {
 				crop.growth_time = 0;
 			}
 		},
-	} as TileRegistry<TileCropData>;
+	} as BlockRegistry<TileCropData>;
 }
 
-EverythingRegistry.register<TileRegistry<TileCropData>>(
+EverythingRegistry.register<BlockRegistry<TileCropData>>(
 	"blocks",
 	"bworld:tomato_crop",
 	create_crop_tile("bworld:tomato"),
 );
-EverythingRegistry.register<TileRegistry<TileCropData>>(
+EverythingRegistry.register<BlockRegistry<TileCropData>>(
 	"blocks",
 	"bworld:carrot_crop",
 	create_crop_tile("bworld:carrot"),
 );
-EverythingRegistry.register<TileRegistry<TileCropData>>(
+EverythingRegistry.register<BlockRegistry<TileCropData>>(
 	"blocks",
 	"bworld:potato_crop",
 	create_crop_tile("bworld:potato"),
 );
-EverythingRegistry.register<TileRegistry<TileCropData>>(
+EverythingRegistry.register<BlockRegistry<TileCropData>>(
 	"blocks",
 	"bworld:pumpkin_crop",
 	create_crop_tile("bworld:pumpkin"),

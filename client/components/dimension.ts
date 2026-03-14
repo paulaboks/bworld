@@ -1,5 +1,5 @@
 import { Component } from "$/common/ecs/mod.ts";
-import { EverythingRegistry, TileRegistry } from "$/common/everything_registry.ts";
+import { BlockRegistry, EverythingRegistry } from "$/common/everything_registry.ts";
 import { Faces } from "../../common/constants.ts";
 import { AssetManager } from "../assets.ts";
 import { generate_chunk } from "../generation.ts";
@@ -53,7 +53,7 @@ export class Dimension extends Component {
 			chunk = this.add_chunk(block_chunk_x, block_chunk_z);
 		}
 
-		const [nid, block_info] = EverythingRegistry.get_full<TileRegistry>("blocks", block.id)!;
+		const [nid, block_info] = EverythingRegistry.get_full<BlockRegistry>("blocks", block.id)!;
 
 		const lx = block.x - block_chunk_x * CHUNK_SIZE;
 		const lz = block.z - block_chunk_z * CHUNK_SIZE;
