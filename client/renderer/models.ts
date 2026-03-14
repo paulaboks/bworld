@@ -1,5 +1,7 @@
 import { Texture } from "./types.ts";
 
+const pad = 0.5;
+
 function push_vertex(
 	vertices: Float32Array,
 	i: number,
@@ -46,10 +48,10 @@ export function push_front_face(
 	const y2 = y + 1;
 	const z2 = z + 1;
 
-	const u0 = sx / texture.width;
-	const v0 = sy / texture.height;
-	const u1 = (sx + sw) / texture.width;
-	const v1 = (sy + sh) / texture.height;
+	const u0 = (sx + pad) / texture.width;
+	const v0 = (sy + pad) / texture.height;
+	const u1 = (sx + sw - pad) / texture.width;
+	const v1 = (sy + sh - pad) / texture.height;
 
 	i = push_vertex(vertices, i, x, y, z2, u0, v1, r, g, b, a);
 	i = push_vertex(vertices, i, x2, y, z2, u1, v1, r, g, b, a);
@@ -81,10 +83,10 @@ export function push_back_face(
 	const x2 = x + 1;
 	const y2 = y + 1;
 
-	const u0 = sx / texture.width;
-	const v0 = sy / texture.height;
-	const u1 = (sx + sw) / texture.width;
-	const v1 = (sy + sh) / texture.height;
+	const u0 = (sx + pad) / texture.width;
+	const v0 = (sy + pad) / texture.height;
+	const u1 = (sx + sw - pad) / texture.width;
+	const v1 = (sy + sh - pad) / texture.height;
 
 	i = push_vertex(vertices, i, x2, y, z, u0, v1, r, g, b, a);
 	i = push_vertex(vertices, i, x, y, z, u1, v1, r, g, b, a);
@@ -116,10 +118,10 @@ export function push_left_face(
 	const y2 = y + 1;
 	const z2 = z + 1;
 
-	const u0 = sx / texture.width;
-	const v0 = sy / texture.height;
-	const u1 = (sx + sw) / texture.width;
-	const v1 = (sy + sh) / texture.height;
+	const u0 = (sx + pad) / texture.width;
+	const v0 = (sy + pad) / texture.height;
+	const u1 = (sx + sw - pad) / texture.width;
+	const v1 = (sy + sh - pad) / texture.height;
 
 	i = push_vertex(vertices, i, x, y, z, u0, v1, r, g, b, a);
 	i = push_vertex(vertices, i, x, y, z2, u1, v1, r, g, b, a);
@@ -152,10 +154,10 @@ export function push_right_face(
 	const y2 = y + 1;
 	const z2 = z + 1;
 
-	const u0 = sx / texture.width;
-	const v0 = sy / texture.height;
-	const u1 = (sx + sw) / texture.width;
-	const v1 = (sy + sh) / texture.height;
+	const u0 = (sx + pad) / texture.width;
+	const v0 = (sy + pad) / texture.height;
+	const u1 = (sx + sw - pad) / texture.width;
+	const v1 = (sy + sh - pad) / texture.height;
 
 	i = push_vertex(vertices, i, x2, y, z2, u0, v1, r, g, b, a);
 	i = push_vertex(vertices, i, x2, y, z, u1, v1, r, g, b, a);
@@ -188,10 +190,10 @@ export function push_top_face(
 	const z2 = z + 1;
 	const y2 = y + 1;
 
-	const u0 = sx / texture.width;
-	const v0 = sy / texture.height;
-	const u1 = (sx + sw) / texture.width;
-	const v1 = (sy + sh) / texture.height;
+	const u0 = (sx + pad) / texture.width;
+	const v0 = (sy + pad) / texture.height;
+	const u1 = (sx + sw - pad) / texture.width;
+	const v1 = (sy + sh - pad) / texture.height;
 
 	i = push_vertex(vertices, i, x, y2, z2, u0, v1, r, g, b, a);
 	i = push_vertex(vertices, i, x2, y2, z2, u1, v1, r, g, b, a);
@@ -223,10 +225,10 @@ export function push_bottom_face(
 	const x2 = x + 1;
 	const z2 = z + 1;
 
-	const u0 = sx / texture.width;
-	const v0 = sy / texture.height;
-	const u1 = (sx + sw) / texture.width;
-	const v1 = (sy + sh) / texture.height;
+	const u0 = (sx + pad) / texture.width;
+	const v0 = (sy + pad) / texture.height;
+	const u1 = (sx + sw - pad) / texture.width;
+	const v1 = (sy + sh - pad) / texture.height;
 
 	i = push_vertex(vertices, i, x, y, z, u0, v1, r, g, b, a);
 	i = push_vertex(vertices, i, x2, y, z, u1, v1, r, g, b, a);
