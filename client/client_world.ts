@@ -12,6 +12,7 @@ import { DimensionLogicSystem } from "./systems/dimension_logic.ts";
 import { Dimension } from "./components/dimension.ts";
 import { GuiRenderSystem, GuiTickSystem } from "./gui/gui_systems.ts";
 import { WorldGenerationSystem } from "./systems/world_generation_system.ts";
+import { CollisionSystem } from "./systems/collision_system.ts";
 
 export class ClientWorld extends World {
 	paused = false;
@@ -40,9 +41,10 @@ export class ClientWorld extends World {
 		this.add_system(new UIInteractionSystem(), "paused");
 		this.add_system(new GuiTickSystem(), "game");
 		this.add_system(new PlayerControlsSystem(), "game");
-		this.add_system(new MovementSystem(), "game");
 		this.add_system(new WorldGenerationSystem(), "game");
 		this.add_system(new DimensionLogicSystem(), "game");
+		this.add_system(new CollisionSystem(), "game");
+		this.add_system(new MovementSystem(), "game");
 
 		// render systems
 		this.add_system(new RenderSystem(), "game");

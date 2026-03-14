@@ -11,4 +11,8 @@ export class Position extends Component {
 		this.y = y;
 		this.z = z;
 	}
+
+	clone() {
+		return new Position(this.x, this.y, this.z);
+	}
 }

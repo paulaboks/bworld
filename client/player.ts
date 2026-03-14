@@ -6,6 +6,7 @@ import { ItemStack, PlayerInventory } from "./inventory.ts";
 import { PlayerControls } from "$/client/components/player_controls.ts";
 import { ClientWorld } from "./client_world.ts";
 import { GuiScreen } from "./gui/gui_screen.ts";
+import { CollisionCuboid } from "./components/collision.ts";
 
 export class PlayerComponent extends Component {
 	player_inventory = new PlayerInventory("");
@@ -22,8 +23,8 @@ export class PlayerComponent extends Component {
 
 export function create_player(world: ClientWorld) {
 	const player = new Entity("player");
-	player.add(new Position(0, 0));
-	player.add(new Velocity(0, 0));
+	player.add(new Position(0, 100, 0));
+	player.add(new Velocity(0, 0, 0));
 	player.add(new PlayerControls());
 
 	player.add(new PlayerComponent());
@@ -40,6 +41,7 @@ export function create_player(world: ClientWorld) {
 	// player_inventory.container.add_item(new ItemStack("bworld:carrot_seeds", 64));
 	player_inventory.container.add_item(new ItemStack("bworld:furnace", 1));
 	player.add(new Camera());
+	player.add(new CollisionCuboid(0.5, 1.79, 0.5));
 
 	world.add_entity(player);
 

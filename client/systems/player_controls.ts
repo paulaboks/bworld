@@ -7,6 +7,7 @@ import { Camera } from "../components/camera.ts";
 import { Position } from "../../common/components/position.ts";
 import { PlayerComponent } from "../player.ts";
 import { GuiPlayerInventory } from "../gui/gui_player_inventory.ts";
+import { CollisionCuboid } from "../components/collision.ts";
 
 export class PlayerControlsSystem extends System {
 	constructor() {
@@ -55,12 +56,10 @@ export class PlayerControlsSystem extends System {
 		velocity.vx = (forwardX * input_z + rightX * input_x) * controls.move_speed;
 		velocity.vz = (forwardZ * input_z + rightZ * input_x) * controls.move_speed;
 
-		if (InputManager.is_key_down("Space")) {
-			velocity.vy += controls.move_speed / 10;
-		} else if (InputManager.is_key_down("ShiftLeft")) {
-			velocity.vy -= controls.move_speed / 10;
-		} else {
-			velocity.vy = 0;
+		const cuboid = player.get(CollisionCuboid);
+
+		if (InputManager.is_key_pressed("Space") && cuboid?.colliding_y === 1) {
+			velocity.vy += controls.move_speed;
 		}
 
 		if (InputManager.is_key_pressed(controls.open_inventory)) {
