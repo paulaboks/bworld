@@ -35,6 +35,7 @@ export class WorldGenerationSystem extends System {
 				if (!maybe_chunk || !maybe_chunk.generated) {
 					console.log("loading chunk", i, j);
 					dimension.load_chunk(i, j);
+					// only generate one chunk per frame
 					return;
 				}
 			}

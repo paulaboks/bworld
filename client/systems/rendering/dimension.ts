@@ -1,5 +1,5 @@
-import { distance_point_point, get_sprite_region } from "$/common/utils.ts";
-import { Chunk, CHUNK_SIZE, Dimension } from "$/client/components/dimension.ts";
+import { get_sprite_region } from "$/common/utils.ts";
+import { Chunk, CHUNK_AREA, CHUNK_SIZE, Dimension } from "$/client/components/dimension.ts";
 import { TEXTURE_SIZE } from "$/common/constants.ts";
 import { EverythingRegistry, TileRegistry } from "$/common/everything_registry.ts";
 import { flush_buffer, gl, push_cube_to_mesh, set_current_texture } from "$/client/renderer/mod.ts";
@@ -12,52 +12,43 @@ export function render_dimension(dimension: Dimension, camera: Camera) {
 			dimension.delete_chunk_mesh(chunk);
 			chunk.dirty = false;
 			make_chunk_mesh(chunk, dimension, camera);
+			// only generate one mesh per frame
+			break;
 		}
-		render_chunk_opaque(chunk);
 	}
-	gl.enable(gl.BLEND);
-	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-	gl.depthMask(false);
 	for (const chunk of dimension.chunks) {
-		render_chunk_transparent(chunk);
+		render_chunk_opaque(chunk);
 	}
 }
 
 function render_chunk_opaque(chunk: Chunk) {
-	if (!chunk.vertexBuffer || !chunk.vertexCount) {
+	if (!chunk.vertex_buffer || !chunk.vertex_count) {
 		return;
 	}
 
-	flush_buffer(chunk.vertexBuffer, chunk.vertexCount);
-}
-
-function render_chunk_transparent(chunk: Chunk) {
-	if (!chunk.vertexTransparentBuffer || !chunk.vertexTransparentCount) {
-		return;
-	}
-
-	flush_buffer(chunk.vertexTransparentBuffer, chunk.vertexTransparentCount);
+	flush_buffer(chunk.vertex_buffer, chunk.vertex_count);
 }
 
 function make_chunk_mesh(chunk: Chunk, dimension: Dimension, camera: Camera) {
-	const vertices: number[] = [];
-	const transparent_vertices: number[] = [];
+	let vertices = new Float32Array(CHUNK_AREA * 24 * 6 * 9);
 	let count = 0;
-	let transparent_count = 0;
-	const transparent_blocks: [
-		number,
-		number,
-		number,
-		number,
-		number,
-		boolean,
-		boolean,
-		boolean,
-		boolean,
-		boolean,
-		boolean,
-	][] = [];
 	const blocks_registry = EverythingRegistry.get_registry<TileRegistry>("blocks");
+
+	const show_face = (x: number, y: number, z: number) => {
+		const block = dimension.get_block(x, y, z);
+		if (block === -1) {
+			return false;
+		}
+		if (block === 0) {
+			return true;
+		}
+		const block_info = blocks_registry[block];
+		if (block_info?.transparent) {
+			return true;
+		}
+		return false;
+	};
+
 	for (let i = 0; i < chunk.blocks.length; i += 1) {
 		const block_nid = chunk.blocks[i];
 		if (block_nid === 0) {
@@ -80,20 +71,6 @@ function make_chunk_mesh(chunk: Chunk, dimension: Dimension, camera: Camera) {
 		const wx = chunk.x * CHUNK_SIZE + x;
 		const wz = chunk.z * CHUNK_SIZE + z;
 
-		const show_face = (x: number, y: number, z: number) => {
-			const block = dimension.get_block(x, y, z);
-			if (block === -1) {
-				return false;
-			}
-			if (block === 0) {
-				return true;
-			}
-			const block_info = blocks_registry[block];
-			if (block_info?.transparent) {
-				return true;
-			}
-			return false;
-		};
 		const front = show_face(wx, y, wz + 1);
 		const back = show_face(wx, y, wz - 1);
 		const left = show_face(wx - 1, y, wz);
@@ -103,101 +80,57 @@ function make_chunk_mesh(chunk: Chunk, dimension: Dimension, camera: Camera) {
 
 		const region = get_sprite_region(texture_id);
 
-		if (tile_info.transparent) {
-			transparent_blocks.push([
-				wx,
-				y,
-				wz,
-				region.x * TEXTURE_SIZE,
-				region.y * TEXTURE_SIZE,
-				front,
-				back,
-				left,
-				right,
-				top,
-				bottom,
-			]);
-		} else {
-			count = push_cube_to_mesh(
-				vertices,
-				count,
-				dimension.image,
-				wx,
-				y,
-				wz,
-				1,
-				1,
-				1,
-				region.x * TEXTURE_SIZE,
-				region.y * TEXTURE_SIZE,
-				TEXTURE_SIZE,
-				TEXTURE_SIZE,
-				1,
-				1,
-				1,
-				1,
-				front,
-				back,
-				left,
-				right,
-				top,
-				bottom,
-			);
-		}
-	}
-
-	transparent_blocks.sort((a, b) => {
-		const da = distance_point_point(a[0], a[1], a[2], camera.x, camera.y, camera.z);
-		const db = distance_point_point(b[0], b[1], b[2], camera.x, camera.y, camera.z);
-
-		return da - db;
-	});
-
-	for (const block of transparent_blocks) {
-		transparent_count = push_cube_to_mesh(
-			transparent_vertices,
-			transparent_count,
+		vertices = ensure_capacity(vertices, count + (6 * 6 * 9));
+		count = push_cube_to_mesh(
+			vertices,
+			count,
 			dimension.image,
-			block[0],
-			block[1],
-			block[2],
+			wx,
+			y,
+			wz,
 			1,
 			1,
 			1,
-			block[3],
-			block[4],
+			region.x * TEXTURE_SIZE,
+			region.y * TEXTURE_SIZE,
 			TEXTURE_SIZE,
 			TEXTURE_SIZE,
 			1,
 			1,
 			1,
 			1,
-			block[5],
-			block[6],
-			block[7],
-			block[8],
-			block[9],
-			block[10],
+			front,
+			back,
+			left,
+			right,
+			top,
+			bottom,
 		);
 	}
 
-	chunk.vertexBuffer = gl.createBuffer();
-	chunk.vertexCount = count / 9;
+	chunk.vertex_buffer = gl.createBuffer();
+	chunk.vertex_count = count / 9;
 
-	gl.bindBuffer(gl.ARRAY_BUFFER, chunk.vertexBuffer);
+	gl.bindBuffer(gl.ARRAY_BUFFER, chunk.vertex_buffer);
 	gl.bufferData(
 		gl.ARRAY_BUFFER,
-		new Float32Array(vertices),
+		vertices.subarray(0, count),
 		gl.STATIC_DRAW,
 	);
+}
 
-	chunk.vertexTransparentBuffer = gl.createBuffer();
-	chunk.vertexTransparentCount = transparent_count / 9;
+function ensure_capacity(
+	buffer: Float32Array<ArrayBuffer>,
+	required: number,
+) {
+	if (required <= buffer.length) return buffer;
 
-	gl.bindBuffer(gl.ARRAY_BUFFER, chunk.vertexTransparentBuffer);
-	gl.bufferData(
-		gl.ARRAY_BUFFER,
-		new Float32Array(transparent_vertices),
-		gl.STATIC_DRAW,
-	);
+	let new_length = buffer.length;
+	while (new_length < required) {
+		new_length *= 2;
+	}
+
+	const new_buffer = new Float32Array(new_length);
+	new_buffer.set(buffer);
+	return new_buffer;
 }

@@ -2,7 +2,7 @@ import { SLOT_SIZE } from "$/common/constants.ts";
 import { AssetManager } from "$/client/assets.ts";
 import { PlayerInventory } from "../../inventory.ts";
 import { draw_item, draw_nine_slice } from "./render_utils.ts";
-import { canvas, Texture } from "$/client/renderer/mod.ts";
+import { canvas, draw_rect_stroke, Texture } from "$/client/renderer/mod.ts";
 
 const PADDING = 10;
 
@@ -55,4 +55,15 @@ export function render_player_hotbar(player_inventory: PlayerInventory) {
 			draw_item(item, x + PADDING + index * SLOT_SIZE, y + PADDING);
 		}
 	}
+}
+
+export function render_player_crosshair() {
+	const CROSSHAIR_SIZE = 8;
+	draw_rect_stroke(
+		(canvas.width - CROSSHAIR_SIZE) / 2,
+		(canvas.height - CROSSHAIR_SIZE) / 2,
+		CROSSHAIR_SIZE,
+		CROSSHAIR_SIZE,
+		[0, 0, 0, 0.6],
+	);
 }

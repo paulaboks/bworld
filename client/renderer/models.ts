@@ -1,7 +1,7 @@
 import { Texture } from "./types.ts";
 
 export function push_cube_to_mesh(
-	vertices: number[],
+	vertices: Float32Array,
 	vertex_count: number,
 	texture: Texture,
 	x: number,

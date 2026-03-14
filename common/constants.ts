@@ -10,3 +10,6 @@ export interface SpriteRegion {
 	x: number;
 	y: number;
 }
+
+export const faces = ["west", "east", "bottom", "top", "north", "south"] as const;
+export type Faces = typeof faces[number];

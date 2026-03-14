@@ -94,6 +94,29 @@ export class PlayerControlsSystem extends System {
 
 		InputManager.set_mouse_grabbed(player_component.screens.length === 0);
 
+		const block = world.dimension.get_looked_block(world.dimension, camera);
+		if (block) {
+			if (InputManager.is_mouse_pressed(0)) {
+				world.dimension.break_block(block.x, block.y, block.z);
+			} else if (InputManager.is_mouse_pressed(2)) {
+				const FACE_OFFSETS = {
+					top: { x: 0, y: 1, z: 0 },
+					bottom: { x: 0, y: -1, z: 0 },
+					north: { x: 0, y: 0, z: -1 },
+					south: { x: 0, y: 0, z: 1 },
+					west: { x: -1, y: 0, z: 0 },
+					east: { x: 1, y: 0, z: 0 },
+				};
+				const offset = FACE_OFFSETS[block.face];
+				world.dimension.add_block({
+					x: block.x + offset.x,
+					y: block.y + offset.y,
+					z: block.z + offset.z,
+					id: "bworld:dirt",
+				});
+			}
+		}
+
 		if (player_component.screens.length === 0) {
 			const player_inventory = player_component.player_inventory;
 			const scroll = InputManager.get_wheel_delta();

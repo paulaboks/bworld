@@ -1,9 +1,10 @@
 import { Component } from "$/common/ecs/mod.ts";
 import { EverythingRegistry, TileRegistry } from "$/common/everything_registry.ts";
+import { Faces } from "../../common/constants.ts";
 import { AssetManager } from "../assets.ts";
-import { ClientWorld } from "../client_world.ts";
 import { generate_chunk } from "../generation.ts";
 import { gl, Texture } from "../renderer/mod.ts";
+import { Camera } from "./camera.ts";
 
 export interface Block<T = unknown> {
 	x: number;
@@ -21,13 +22,11 @@ export const CHUNK_AREA = CHUNK_SIZE * CHUNK_SIZE;
 export interface Chunk {
 	x: number;
 	z: number;
-	blocks: Int32Array;
+	blocks: Int16Array;
 	generated: boolean;
 	dirty: boolean;
-	vertexBuffer?: WebGLBuffer;
-	vertexCount?: number;
-	vertexTransparentBuffer?: WebGLBuffer;
-	vertexTransparentCount?: number;
+	vertex_buffer?: WebGLBuffer;
+	vertex_count?: number;
 }
 
 export class Dimension extends Component {
@@ -37,15 +36,19 @@ export class Dimension extends Component {
 	tick_timer = 0;
 
 	add_chunk(x: number, z: number) {
-		const chunk = { x, z, blocks: new Int32Array(CHUNK_AREA * CHUNK_HEIGHT), dirty: true, generated: false };
+		const chunk = { x, z, blocks: new Int16Array(CHUNK_AREA * CHUNK_HEIGHT), dirty: true, generated: false };
 		this.chunks.push(chunk);
 		return chunk;
+	}
+
+	get_chunk(x: number, z: number) {
+		return this.chunks.find((chunk) => chunk.x === x && chunk.z === z);
 	}
 
 	add_block(block: Block) {
 		const block_chunk_x = Math.floor(block.x / CHUNK_SIZE);
 		const block_chunk_z = Math.floor(block.z / CHUNK_SIZE);
-		let chunk = this.chunks.find((chunk) => chunk.x === block_chunk_x && chunk.z === block_chunk_z);
+		let chunk = this.get_chunk(block_chunk_x, block_chunk_z);
 		if (!chunk) {
 			chunk = this.add_chunk(block_chunk_x, block_chunk_z);
 		}
@@ -59,6 +62,7 @@ export class Dimension extends Component {
 		const index = ly * CHUNK_SIZE * CHUNK_SIZE + lz * CHUNK_SIZE + lx;
 
 		chunk.blocks[index] = nid;
+		chunk.dirty = true;
 		if (block_info?.on_create) {
 			block_info?.on_create(this, block);
 		}
@@ -68,9 +72,7 @@ export class Dimension extends Component {
 		const chunk_x = Math.floor(x / CHUNK_SIZE);
 		const chunk_z = Math.floor(z / CHUNK_SIZE);
 
-		const chunk = this.chunks.find(
-			(c) => c.x === chunk_x && c.z === chunk_z,
-		);
+		const chunk = this.get_chunk(chunk_x, chunk_z);
 
 		if (!chunk) {
 			return -1;
@@ -85,15 +87,49 @@ export class Dimension extends Component {
 		return chunk.blocks[index];
 	}
 
-	delete_tile(_world: ClientWorld, _block: Block) {
-		// const index = this.blocks.indexOf(tile);
-		// if (index !== -1) {
-		// 	this.blocks.splice(index, 1);
-		// }
+	break_block(x: number, y: number, z: number) {
+		const block_chunk_x = Math.floor(x / CHUNK_SIZE);
+		const block_chunk_z = Math.floor(z / CHUNK_SIZE);
+		let chunk = this.get_chunk(block_chunk_x, block_chunk_z);
+		if (!chunk) {
+			chunk = this.add_chunk(block_chunk_x, block_chunk_z);
+		}
 
-		// const tile_info = EverythingRegistry.get<TileRegistry>("blocks", tile.id);
-		// if (tile_info?.on_delete) {
-		// 	tile_info?.on_delete(world, tile);
+		// const [nid, block_info] = EverythingRegistry.get_full<TileRegistry>("blocks", block.id)!;
+
+		const lx = x - block_chunk_x * CHUNK_SIZE;
+		const lz = z - block_chunk_z * CHUNK_SIZE;
+		const ly = y;
+
+		const index = ly * CHUNK_SIZE * CHUNK_SIZE + lz * CHUNK_SIZE + lx;
+		chunk.blocks[index] = 0;
+		chunk.dirty = true;
+
+		if (lx === 0) {
+			const n = this.get_chunk(block_chunk_x - 1, block_chunk_z);
+			if (n) {
+				n.dirty = true;
+			}
+		} else if (lx === CHUNK_SIZE - 1) {
+			const n = this.get_chunk(block_chunk_x + 1, block_chunk_z);
+			if (n) {
+				n.dirty = true;
+			}
+		}
+		if (lz === 0) {
+			const n = this.get_chunk(block_chunk_x, block_chunk_z - 1);
+			if (n) {
+				n.dirty = true;
+			}
+		} else if (lz === CHUNK_SIZE - 1) {
+			const n = this.get_chunk(block_chunk_x, block_chunk_z + 1);
+			if (n) {
+				n.dirty = true;
+			}
+		}
+
+		// if (block_info?.on_create) {
+		// 	block_info?.on_create(this, block);
 		// }
 	}
 
@@ -109,7 +145,7 @@ export class Dimension extends Component {
 
 	load_chunk(cx: number, cz: number) {
 		generate_chunk(this, cx, cz);
-		const chunk = this.chunks.find((c) => c.x === cx && c.z === cz);
+		const chunk = this.get_chunk(cx, cz);
 		if (chunk) {
 			chunk.generated = true;
 			chunk.dirty = true;
@@ -133,7 +169,7 @@ export class Dimension extends Component {
 	unload_chunk(cx: number, cz: number) {
 		const chunk_i = this.chunks.findIndex((c) => c.x === cx && c.z === cz);
 		if (chunk_i === -1) {
-			console.warn("Tried unloading a chunk that doesn't exist dumbass");
+			console.warn("Tried unloading a chunk that doesn't exist");
 			return;
 		}
 
@@ -142,11 +178,76 @@ export class Dimension extends Component {
 	}
 
 	delete_chunk_mesh(chunk: Chunk) {
-		if (chunk.vertexBuffer) {
-			gl.deleteBuffer(chunk.vertexBuffer);
+		if (chunk.vertex_buffer) {
+			gl.deleteBuffer(chunk.vertex_buffer);
 		}
-		if (chunk.vertexTransparentBuffer) {
-			gl.deleteBuffer(chunk.vertexTransparentBuffer);
+	}
+
+	get_looked_block(
+		dimension: Dimension,
+		camera: Camera,
+		max_distance = 6,
+		step = 0.05,
+	): { x: number; y: number; z: number; block: number; face: Faces } | undefined {
+		const yaw = camera.yaw;
+		const pitch = camera.pitch;
+
+		const cos_pitch = Math.cos(pitch);
+		const dx = -Math.sin(yaw) * cos_pitch;
+		const dy = Math.sin(pitch);
+		const dz = -Math.cos(yaw) * cos_pitch;
+
+		let x = camera.x;
+		let y = camera.y;
+		let z = camera.z;
+
+		let prev_bx = Math.floor(x);
+		let prev_by = Math.floor(y);
+		let prev_bz = Math.floor(z);
+
+		let dist = 0;
+
+		while (dist <= max_distance) {
+			x += dx * step;
+			y += dy * step;
+			z += dz * step;
+			dist += step;
+
+			const bx = Math.floor(x);
+			const by = Math.floor(y);
+			const bz = Math.floor(z);
+
+			if (bx === prev_bx && by === prev_by && bz === prev_bz) {
+				continue;
+			}
+
+			const block = dimension.get_block(bx, by, bz);
+
+			if (block && block !== 0) {
+				let face: Faces;
+
+				if (bx > prev_bx) {
+					face = "west";
+				} else if (bx < prev_bx) {
+					face = "east";
+				} else if (by > prev_by) {
+					face = "bottom";
+				} else if (by < prev_by) {
+					face = "top";
+				} else if (bz > prev_bz) {
+					face = "north";
+				} else {
+					face = "south";
+				}
+
+				return { x: bx, y: by, z: bz, face, block };
+			}
+
+			prev_bx = bx;
+			prev_by = by;
+			prev_bz = bz;
 		}
+
+		return undefined;
 	}
 }
