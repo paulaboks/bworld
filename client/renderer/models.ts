@@ -26,16 +26,13 @@ function push_vertex(
 	return i;
 }
 
-export function pushFrontFace(
+export function push_front_face(
 	vertices: Float32Array,
 	i: number,
 	texture: Texture,
 	x: number,
 	y: number,
 	z: number,
-	w: number,
-	h: number,
-	d: number,
 	sx: number,
 	sy: number,
 	sw: number,
@@ -45,9 +42,9 @@ export function pushFrontFace(
 	b = 1,
 	a = 1,
 ) {
-	const x2 = x + w;
-	const y2 = y + h;
-	const z2 = z + d;
+	const x2 = x + 1;
+	const y2 = y + 1;
+	const z2 = z + 1;
 
 	const u0 = sx / texture.width;
 	const v0 = sy / texture.height;
@@ -65,16 +62,13 @@ export function pushFrontFace(
 	return i;
 }
 
-export function pushBackFace(
+export function push_back_face(
 	vertices: Float32Array,
 	i: number,
 	texture: Texture,
 	x: number,
 	y: number,
 	z: number,
-	w: number,
-	h: number,
-	d: number,
 	sx: number,
 	sy: number,
 	sw: number,
@@ -84,7 +78,8 @@ export function pushBackFace(
 	b = 1,
 	a = 1,
 ) {
-	const x2 = x + w, y2 = y + h;
+	const x2 = x + 1;
+	const y2 = y + 1;
 
 	const u0 = sx / texture.width;
 	const v0 = sy / texture.height;
@@ -102,16 +97,13 @@ export function pushBackFace(
 	return i;
 }
 
-export function pushLeftFace(
+export function push_left_face(
 	vertices: Float32Array,
 	i: number,
 	texture: Texture,
 	x: number,
 	y: number,
 	z: number,
-	w: number,
-	h: number,
-	d: number,
 	sx: number,
 	sy: number,
 	sw: number,
@@ -121,8 +113,8 @@ export function pushLeftFace(
 	b = 1,
 	a = 1,
 ) {
-	const y2 = y + h;
-	const z2 = z + d;
+	const y2 = y + 1;
+	const z2 = z + 1;
 
 	const u0 = sx / texture.width;
 	const v0 = sy / texture.height;
@@ -140,16 +132,13 @@ export function pushLeftFace(
 	return i;
 }
 
-export function pushRightFace(
+export function push_right_face(
 	vertices: Float32Array,
 	i: number,
 	texture: Texture,
 	x: number,
 	y: number,
 	z: number,
-	w: number,
-	h: number,
-	d: number,
 	sx: number,
 	sy: number,
 	sw: number,
@@ -159,34 +148,33 @@ export function pushRightFace(
 	b = 1,
 	a = 1,
 ) {
-	const x2 = x + w, y2 = y + h;
+	const x2 = x + 1;
+	const y2 = y + 1;
+	const z2 = z + 1;
 
 	const u0 = sx / texture.width;
 	const v0 = sy / texture.height;
 	const u1 = (sx + sw) / texture.width;
 	const v1 = (sy + sh) / texture.height;
 
-	i = push_vertex(vertices, i, x2, y, z + d, u0, v1, r, g, b, a);
+	i = push_vertex(vertices, i, x2, y, z2, u0, v1, r, g, b, a);
 	i = push_vertex(vertices, i, x2, y, z, u1, v1, r, g, b, a);
 	i = push_vertex(vertices, i, x2, y2, z, u1, v0, r, g, b, a);
 
-	i = push_vertex(vertices, i, x2, y, z + d, u0, v1, r, g, b, a);
+	i = push_vertex(vertices, i, x2, y, z2, u0, v1, r, g, b, a);
 	i = push_vertex(vertices, i, x2, y2, z, u1, v0, r, g, b, a);
-	i = push_vertex(vertices, i, x2, y2, z + d, u0, v0, r, g, b, a);
+	i = push_vertex(vertices, i, x2, y2, z2, u0, v0, r, g, b, a);
 
 	return i;
 }
 
-export function pushTopFace(
+export function push_top_face(
 	vertices: Float32Array,
 	i: number,
 	texture: Texture,
 	x: number,
 	y: number,
 	z: number,
-	w: number,
-	h: number,
-	d: number,
 	sx: number,
 	sy: number,
 	sw: number,
@@ -196,7 +184,9 @@ export function pushTopFace(
 	b = 1,
 	a = 1,
 ) {
-	const x2 = x + w, z2 = z + d, y2 = y + h;
+	const x2 = x + 1;
+	const z2 = z + 1;
+	const y2 = y + 1;
 
 	const u0 = sx / texture.width;
 	const v0 = sy / texture.height;
@@ -214,16 +204,13 @@ export function pushTopFace(
 	return i;
 }
 
-export function pushBottomFace(
+export function push_bottom_face(
 	vertices: Float32Array,
 	i: number,
 	texture: Texture,
 	x: number,
 	y: number,
 	z: number,
-	w: number,
-	h: number,
-	d: number,
 	sx: number,
 	sy: number,
 	sw: number,
@@ -233,7 +220,8 @@ export function pushBottomFace(
 	b = 1,
 	a = 1,
 ) {
-	const x2 = x + w, z2 = z + d;
+	const x2 = x + 1;
+	const z2 = z + 1;
 
 	const u0 = sx / texture.width;
 	const v0 = sy / texture.height;

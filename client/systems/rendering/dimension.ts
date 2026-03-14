@@ -5,12 +5,12 @@ import { BlockRegistry, EverythingRegistry } from "$/common/everything_registry.
 import {
 	flush_buffer,
 	gl,
-	pushBackFace,
-	pushBottomFace,
-	pushFrontFace,
-	pushLeftFace,
-	pushRightFace,
-	pushTopFace,
+	push_back_face,
+	push_bottom_face,
+	push_front_face,
+	push_left_face,
+	push_right_face,
+	push_top_face,
 	set_current_texture,
 } from "$/client/renderer/mod.ts";
 import { Camera } from "$/client/components/camera.ts";
@@ -40,12 +40,12 @@ function render_chunk_opaque(chunk: Chunk) {
 }
 
 const FACE_PUSHING_FUNCTIONS = {
-	top: pushTopFace,
-	bottom: pushBottomFace,
-	front: pushFrontFace,
-	back: pushBackFace,
-	left: pushLeftFace,
-	right: pushRightFace,
+	top: push_top_face,
+	bottom: push_bottom_face,
+	front: push_front_face,
+	back: push_back_face,
+	left: push_left_face,
+	right: push_right_face,
 } as const;
 
 function make_chunk_mesh(chunk: Chunk, dimension: Dimension, camera: Camera) {
@@ -139,9 +139,6 @@ function make_chunk_mesh(chunk: Chunk, dimension: Dimension, camera: Camera) {
 					wx,
 					y,
 					wz,
-					1,
-					1,
-					1,
 					region.x * TEXTURE_SIZE,
 					region.y * TEXTURE_SIZE,
 					TEXTURE_SIZE,
