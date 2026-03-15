@@ -250,4 +250,37 @@ export class Dimension extends Component {
 
 		return undefined;
 	}
+
+	create_padded_chunk(chunk: Chunk) {
+		const cx = chunk.x;
+		const cz = chunk.z;
+
+		const size = CHUNK_SIZE + 2;
+		const padded = new Int16Array(size * size * CHUNK_HEIGHT);
+
+		for (let y = 0; y < CHUNK_HEIGHT; y++) {
+			for (let z = -1; z <= CHUNK_SIZE; z++) {
+				for (let x = -1; x <= CHUNK_SIZE; x++) {
+					let block: number;
+
+					if (x >= 0 && x < CHUNK_SIZE && z >= 0 && z < CHUNK_SIZE) {
+						const index = y * CHUNK_SIZE * CHUNK_SIZE + z * CHUNK_SIZE + x;
+						block = chunk.blocks[index];
+					} else {
+						const wx = cx * CHUNK_SIZE + x;
+						const wz = cz * CHUNK_SIZE + z;
+						block = this.get_block(wx, y, wz) ?? 0;
+					}
+
+					const px = x + 1;
+					const pz = z + 1;
+					const pindex = y * size * size + pz * size + px;
+
+					padded[pindex] = block;
+				}
+			}
+		}
+
+		return padded;
+	}
 }

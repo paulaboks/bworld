@@ -14,16 +14,74 @@ import {
 	set_current_texture,
 } from "$/client/renderer/mod.ts";
 import { Camera } from "$/client/components/camera.ts";
+import { AssetManager } from "../../assets.ts";
+
+let gdimension: Dimension;
+
+const worker = new Worker(new URL("./systems/rendering/chunk_mesh_worker-AYRYRGPW.js", import.meta.url), {
+	type: "module",
+});
+
+worker.onmessage = (event) => {
+	const { vertices, count, chunk_x, chunk_z } = event.data;
+	const chunk = gdimension.get_chunk(chunk_x, chunk_z);
+	if (!chunk) {
+		console.error("bad");
+		return;
+	}
+	gdimension.delete_chunk_mesh(chunk);
+	chunk.dirty = false;
+	chunk.vertex_buffer = gl.createBuffer();
+	chunk.vertex_count = count / 9;
+
+	gl.bindBuffer(gl.ARRAY_BUFFER, chunk.vertex_buffer);
+	gl.bufferData(
+		gl.ARRAY_BUFFER,
+		vertices.subarray(0, count),
+		gl.STATIC_DRAW,
+	);
+	//make_chunk_mesh(chunk, dimension, camera);
+};
+
+function strip_functions<T extends Record<string, any>>(obj: T) {
+	const out: any = {};
+
+	for (const k in obj) {
+		const v = obj[k];
+
+		if (typeof v === "function") continue;
+
+		if (v && typeof v === "object") {
+			out[k] = strip_functions(v);
+		} else {
+			out[k] = v;
+		}
+	}
+
+	return out;
+}
 
 export function render_dimension(dimension: Dimension, camera: Camera) {
+	gdimension = dimension;
+
 	set_current_texture(dimension.image.tex);
+
 	for (const chunk of dimension.chunks) {
 		if (chunk.dirty) {
-			dimension.delete_chunk_mesh(chunk);
+			worker.postMessage({
+				chunk_x: chunk.x,
+				chunk_z: chunk.z,
+				padded_chunk: dimension.create_padded_chunk(chunk),
+				blocks_registry: strip_functions(EverythingRegistry.get_registry("blocks")),
+				textures_info: AssetManager.instance.get("bworld:textures_info"),
+				image: { width: dimension.image.width, height: dimension.image.height },
+			});
 			chunk.dirty = false;
-			make_chunk_mesh(chunk, dimension, camera);
+			// dimension.delete_chunk_mesh(chunk);
+
+			// make_chunk_mesh(chunk, dimension, camera);
 			// only generate one mesh per frame
-			break;
+			// break;
 		}
 	}
 	for (const chunk of dimension.chunks) {

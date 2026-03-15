@@ -6,7 +6,7 @@
 	"compilerOptions": {
 		"lib": ["dom", "dom.asynciterable", "dom.iterable", "deno.ns", "deno.unstable"]
 	},
-	"unstable": ["bundle"],
+	"unstable": ["bundle", "raw-imports"],
 	"fmt": {
 		"useTabs": true,
 		"indentWidth": 4,

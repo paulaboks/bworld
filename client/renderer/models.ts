@@ -1,4 +1,4 @@
-import { Texture } from "./types.ts";
+import type { Texture } from "./types.ts";
 
 const pad = 0.5;
 
