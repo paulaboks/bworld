@@ -1,7 +1,7 @@
 import { AssetManager } from "./assets.ts";
 import { ClientWorld } from "./client_world.ts";
 import { InputManager } from "./input_manager.ts";
-import { begin_drawing, end_drawing, init_font, init_window } from "./renderer/mod.ts";
+import { begin_drawing, clear_background, end_drawing, init_font, init_window } from "./renderer/mod.ts";
 
 await import("./blocks/mod.ts");
 await import("./items/mod.ts");
@@ -39,6 +39,7 @@ export class ClientLoop {
 		const delta = (time - this.last_time) / 1000;
 
 		begin_drawing();
+		clear_background(0.69, 0.8, 1, 1.0);
 		this.world.update(delta);
 		end_drawing();
 

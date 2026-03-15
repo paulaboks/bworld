@@ -67,7 +67,7 @@ export function init_window(canvas_element: HTMLCanvasElement) {
 	canvas.width = 1800;
 	canvas.height = 900;
 
-	const ctx = canvas.getContext("webgl2");
+	const ctx = canvas.getContext("webgl2", { antialias: true, alpha: false });
 	if (!ctx) {
 		throw new Error("WebGL2 not supported");
 	}
