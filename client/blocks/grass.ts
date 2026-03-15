@@ -4,6 +4,7 @@ import { PlayerComponent } from "../player.ts";
 EverythingRegistry.register<BlockRegistry>("blocks", "bworld:grass", {
 	textures: { top: "bworld:grass_top", bottom: "bworld:dirt", "side": "bworld:grass_side" },
 	has_collision: false,
+	drop_table: "bworld:dirt",
 
 	on_interact(world, tile) {
 		const [player] = world.get_tag("player")!;

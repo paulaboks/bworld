@@ -2,7 +2,10 @@ import { Component } from "$/common/ecs/mod.ts";
 import { BlockRegistry, EverythingRegistry } from "$/common/everything_registry.ts";
 import { Faces } from "../../common/constants.ts";
 import { AssetManager } from "../assets.ts";
+import { ClientWorld } from "../client_world.ts";
 import { generate_chunk } from "../generation.ts";
+import { ItemStack } from "../inventory.ts";
+import { PlayerComponent } from "../player.ts";
 import { gl, Texture } from "../renderer/mod.ts";
 import { Camera } from "./camera.ts";
 
@@ -30,10 +33,16 @@ export interface Chunk {
 }
 
 export class Dimension extends Component {
+	world: ClientWorld;
 	image: Texture = AssetManager.instance.get("bworld:textures");
 	chunks: Chunk[] = [];
 	second_timer = 0;
 	tick_timer = 0;
+
+	constructor(world: ClientWorld) {
+		super();
+		this.world = world;
+	}
 
 	add_chunk(x: number, z: number) {
 		const chunk = { x, z, blocks: new Int16Array(CHUNK_AREA * CHUNK_HEIGHT), dirty: true, generated: false };
@@ -90,12 +99,18 @@ export class Dimension extends Component {
 	break_block(x: number, y: number, z: number) {
 		const block_chunk_x = Math.floor(x / CHUNK_SIZE);
 		const block_chunk_z = Math.floor(z / CHUNK_SIZE);
-		let chunk = this.get_chunk(block_chunk_x, block_chunk_z);
+		const chunk = this.get_chunk(block_chunk_x, block_chunk_z);
 		if (!chunk) {
-			chunk = this.add_chunk(block_chunk_x, block_chunk_z);
+			return;
 		}
 
-		// const [nid, block_info] = EverythingRegistry.get_full<TileRegistry>("blocks", block.id)!;
+		const block_info = EverythingRegistry.get_by_id<BlockRegistry>("blocks", this.get_block(x, y, z))!;
+
+		if (block_info.drop_table) {
+			const [player] = this.world.get_tag("player")!;
+			const player_component = player.get(PlayerComponent)!;
+			player_component.player_inventory.container.add_item(new ItemStack(block_info.drop_table));
+		}
 
 		const lx = x - block_chunk_x * CHUNK_SIZE;
 		const lz = z - block_chunk_z * CHUNK_SIZE;
@@ -223,7 +238,7 @@ export class Dimension extends Component {
 
 			const block = dimension.get_block(bx, by, bz);
 
-			if (block && block !== 0) {
+			if (block && block !== 0 && block !== -1) {
 				let face: Faces;
 
 				if (bx > prev_bx) {

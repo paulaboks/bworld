@@ -3,6 +3,7 @@ import { BlockRegistry, EverythingRegistry } from "$/common/everything_registry.
 EverythingRegistry.register<BlockRegistry>("blocks", "bworld:log", {
 	textures: { side: "bworld:log_side", top: "bworld:log_top", bottom: "bworld:log_top" },
 	has_collision: true,
+	drop_table: "bworld:log",
 });
 
 EverythingRegistry.register<BlockRegistry>("blocks", "bworld:leaves", {

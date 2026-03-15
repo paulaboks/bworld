@@ -64,6 +64,7 @@ export interface BlockRegistry<T = unknown | undefined> {
 	textures: string | TextureSideTopBottom | TextureFront;
 	has_collision: boolean;
 	transparent?: boolean;
+	drop_table?: string;
 
 	on_create?(dimension: Dimension, block: Block<T>): void;
 	on_click?(dimension: Dimension, block: Block<T>): void;

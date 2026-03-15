@@ -12,7 +12,7 @@ export function start_game(world: ClientWorld) {
 	world.clear_entities();
 
 	const dimension = new Entity("dimension");
-	world.dimension = new Dimension();
+	world.dimension = new Dimension(world);
 	dimension.add(world.dimension);
 	world.add_entity(dimension);
 

@@ -5,20 +5,22 @@ import { PlayerComponent } from "../player.ts";
 EverythingRegistry.register<BlockRegistry>("blocks", "bworld:dirt", {
 	textures: "bworld:dirt",
 	has_collision: false,
+	drop_table: "bworld:dirt",
 
-	on_interact(world, tile) {
-		const [player] = world.get_tag("player")!;
+	on_interact(dimension, block) {
+		const [player] = dimension.world.get_tag("player")!;
 		const player_inventory = player.get(PlayerComponent)!.player_inventory;
 		const maybe_item = player_inventory.container.get_item(player_inventory.hotbar_selected);
 		if (maybe_item && maybe_item.type_id === "bworld:hoe") {
-			tile.id = "bworld:hoed_dirt";
+			dimension.add_block({ x: block.x, y: block.y, z: block.z, id: "bworld:hoed_dirt" });
 		}
 	},
 });
 
 EverythingRegistry.register<BlockRegistry>("blocks", "bworld:hoed_dirt", {
-	textures: "bworld:hoed_dirt",
+	textures: { side: "bworld:dirt", top: "bworld:hoed_dirt", bottom: "bworld:dirt" },
 	has_collision: false,
+	drop_table: "bworld:dirt",
 
 	on_click(world, tile) {
 		const [player] = world.get_tag("player")!;
@@ -53,6 +55,7 @@ EverythingRegistry.register<BlockRegistry>("blocks", "bworld:hoed_dirt", {
 EverythingRegistry.register<BlockRegistry>("blocks", "bworld:hoed_watered_dirt", {
 	textures: "bworld:hoed_watered_dirt",
 	has_collision: false,
+	drop_table: "bworld:dirt",
 
 	on_click(world, tile) {
 		const [player] = world.get_tag("player")!;

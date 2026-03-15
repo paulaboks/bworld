@@ -19,6 +19,12 @@ export class ClientLoop {
 	}
 
 	start() {
+		document.addEventListener("visibilitychange", () => {
+			if (!document.hidden) {
+				this.last_time = performance.now();
+			}
+		});
+
 		this.running = true;
 		const now = performance.now();
 		this.last_time = now;
