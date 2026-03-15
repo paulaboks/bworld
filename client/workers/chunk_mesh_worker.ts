@@ -1,3 +1,5 @@
+/// <reference lib="webworker" />
+
 import type { BlockRegistry } from "$/common/everything_registry.ts";
 import type { SpriteRegion } from "$/common/constants.ts";
 import {
@@ -7,8 +9,8 @@ import {
 	push_left_face,
 	push_right_face,
 	push_top_face,
-} from "../../renderer/models.ts";
-import type { Texture } from "../../renderer/types.ts";
+} from "../renderer/models.ts";
+import type { Texture } from "../renderer/types.ts";
 
 type TexturesInfo = Record<string, SpriteRegion>;
 
@@ -28,7 +30,7 @@ const FACE_PUSHING_FUNCTIONS = {
 self.onmessage = (event) => {
 	const { chunk_x, chunk_z, padded_chunk, blocks_registry, textures_info, image } = event.data;
 	const [vertices, count] = make_chunk_mesh(chunk_x, chunk_z, padded_chunk, blocks_registry, textures_info, image);
-	self.postMessage({ vertices, count, chunk_x, chunk_z });
+	self.postMessage({ vertices, count, chunk_x, chunk_z }, [vertices.buffer]);
 };
 
 function make_chunk_mesh(
@@ -38,7 +40,7 @@ function make_chunk_mesh(
 	blocks_registry: BlockRegistry[],
 	textures_info: TexturesInfo,
 	image: Texture,
-) {
+): [Float32Array, number] {
 	let vertices = new Float32Array(2048);
 	let count = 0;
 

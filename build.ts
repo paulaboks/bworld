@@ -118,7 +118,7 @@ async function build_assets() {
 
 async function build_client() {
 	const _result = await Deno.bundle({
-		entrypoints: ["./client/main.ts", "./client/systems/rendering/chunk_mesh_worker.ts"],
+		entrypoints: ["./client/main.ts", "./client/workers/chunk_mesh_worker.ts"],
 		outputDir: `${BUILD_FOLDER}/client`,
 		platform: "browser",
 		minify: false,
