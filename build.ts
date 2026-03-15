@@ -5,7 +5,7 @@ const BUILD_FOLDER = "build";
 
 function clear_folder() {
 	Deno.removeSync(BUILD_FOLDER, { recursive: true });
-	Deno.mkdir(BUILD_FOLDER);
+	Deno.mkdirSync(BUILD_FOLDER);
 }
 
 async function build_fonts() {
@@ -37,9 +37,9 @@ async function build_fonts() {
 	}
 	ctx.putImageData(image_data, 0, 0);
 
-	Deno.mkdir(`${BUILD_FOLDER}/assets/fonts`);
+	Deno.mkdirSync(`${BUILD_FOLDER}/assets/fonts`);
 	Deno.writeFileSync(`${BUILD_FOLDER}/assets/fonts/m6x11.png`, canvas.toBuffer());
-	copy("assets/fonts/m6x11.fnt", `${BUILD_FOLDER}/assets/fonts/m6x11.fnt`);
+	await copy("assets/fonts/m6x11.fnt", `${BUILD_FOLDER}/assets/fonts/m6x11.fnt`);
 }
 
 function next_power_of_two(value: number): number {
@@ -100,7 +100,7 @@ async function build_atlas_from_folder(folder: string) {
 async function build_sprites() {
 	for (const entry of Deno.readDirSync("assets/sprites")) {
 		if (entry.name.endsWith(".png")) {
-			copy(`assets/sprites/${entry.name}`, `${BUILD_FOLDER}/assets/sprites/${entry.name}`);
+			await copy(`assets/sprites/${entry.name}`, `${BUILD_FOLDER}/assets/sprites/${entry.name}`);
 		} else if (entry.isDirectory) {
 			await build_atlas_from_folder(`assets/sprites/${entry.name}`);
 		}
@@ -108,21 +108,23 @@ async function build_sprites() {
 }
 
 async function build_assets() {
-	Deno.mkdir(`${BUILD_FOLDER}/assets`, { recursive: true });
-	copy("assets/ASSETS.md", `${BUILD_FOLDER}/assets/ASSETS.md`);
+	Deno.mkdirSync(`${BUILD_FOLDER}/assets`, { recursive: true });
+	await copy("assets/ASSETS.md", `${BUILD_FOLDER}/assets/ASSETS.md`);
 
 	build_fonts();
-	Deno.mkdir(`${BUILD_FOLDER}/assets/sprites`, { recursive: true });
+	Deno.mkdirSync(`${BUILD_FOLDER}/assets/sprites`, { recursive: true });
 	await build_sprites();
 }
 
 async function build_client() {
 	const _result = await Deno.bundle({
-		entrypoints: ["./client/index.html", "./client/systems/rendering/chunk_mesh_worker.ts"],
+		entrypoints: ["./client/main.ts", "./client/systems/rendering/chunk_mesh_worker.ts"],
 		outputDir: `${BUILD_FOLDER}/client`,
 		platform: "browser",
 		minify: false,
+		keepNames: true,
 	});
+	await copy("./client/index.html", `${BUILD_FOLDER}/client/index.html`);
 }
 
 async function build() {

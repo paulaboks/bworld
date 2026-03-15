@@ -18,7 +18,7 @@ import { AssetManager } from "../../assets.ts";
 
 let gdimension: Dimension;
 
-const worker = new Worker(new URL("./systems/rendering/chunk_mesh_worker-AYRYRGPW.js", import.meta.url), {
+const worker = new Worker(new URL("./systems/rendering/chunk_mesh_worker.js", import.meta.url), {
 	type: "module",
 });
 
