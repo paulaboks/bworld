@@ -8,3 +8,4 @@ import "./stone.ts";
 import "./log.ts";
 import "./sand.ts";
 import "./snow.ts";
+import "./glass.ts";

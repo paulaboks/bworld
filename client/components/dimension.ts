@@ -28,8 +28,10 @@ export interface Chunk {
 	blocks: Int16Array;
 	generated: boolean;
 	dirty: boolean;
-	vertex_buffer?: WebGLBuffer;
-	vertex_count?: number;
+	opaque_vertex_buffer?: WebGLBuffer;
+	opaque_vertex_count?: number;
+	transparent_vertex_buffer?: WebGLBuffer;
+	transparent_vertex_count?: number;
 }
 
 export class Dimension extends Component {
@@ -193,8 +195,11 @@ export class Dimension extends Component {
 	}
 
 	delete_chunk_mesh(chunk: Chunk) {
-		if (chunk.vertex_buffer) {
-			gl.deleteBuffer(chunk.vertex_buffer);
+		if (chunk.opaque_vertex_buffer) {
+			gl.deleteBuffer(chunk.opaque_vertex_buffer);
+		}
+		if (chunk.transparent_vertex_buffer) {
+			gl.deleteBuffer(chunk.transparent_vertex_buffer);
 		}
 	}
 

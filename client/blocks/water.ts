@@ -3,4 +3,6 @@ import { BlockRegistry, EverythingRegistry } from "$/common/everything_registry.
 EverythingRegistry.register<BlockRegistry>("blocks", "bworld:water", {
 	textures: "bworld:water",
 	has_collision: false,
+	transparent: true,
+	alpha: 0.8,
 });

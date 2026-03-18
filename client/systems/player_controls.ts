@@ -116,7 +116,7 @@ export class PlayerControlsSystem extends System {
 						x: block.x + offset.x,
 						y: block.y + offset.y,
 						z: block.z + offset.z,
-						id: "bworld:dirt",
+						id: "bworld:glass",
 					});
 				}
 			}

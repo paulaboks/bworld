@@ -29,8 +29,18 @@ const FACE_PUSHING_FUNCTIONS = {
 
 self.onmessage = (event) => {
 	const { chunk_x, chunk_z, padded_chunk, blocks_registry, textures_info, image } = event.data;
-	const [vertices, count] = make_chunk_mesh(chunk_x, chunk_z, padded_chunk, blocks_registry, textures_info, image);
-	self.postMessage({ vertices, count, chunk_x, chunk_z }, [vertices.buffer]);
+	const [opaque_vertices, opaque_count, transparent_vertices, transparent_count] = make_chunk_mesh(
+		chunk_x,
+		chunk_z,
+		padded_chunk,
+		blocks_registry,
+		textures_info,
+		image,
+	);
+	self.postMessage(
+		{ opaque_vertices, opaque_count, transparent_vertices, transparent_count, chunk_x, chunk_z },
+		[opaque_vertices.buffer, transparent_vertices.buffer],
+	);
 };
 
 function make_chunk_mesh(
@@ -40,9 +50,11 @@ function make_chunk_mesh(
 	blocks_registry: BlockRegistry[],
 	textures_info: TexturesInfo,
 	image: Texture,
-): [Float32Array, number] {
-	let vertices = new Float32Array(2048);
-	let count = 0;
+): [Float32Array, number, Float32Array, number] {
+	let opaque_vertices = new Float32Array(2048);
+	let opaque_count = 0;
+	let transparent_vertices = new Float32Array(2048);
+	let transparent_count = 0;
 
 	const size = CHUNK_SIZE + 2;
 	const layer = size * size;
@@ -119,30 +131,53 @@ function make_chunk_mesh(
 					if (faces[side]) {
 						const region = textures_info[texture_ids[side]];
 
-						vertices = ensure_capacity(vertices, count + (6 * 6 * 9));
-						count = FACE_PUSHING_FUNCTIONS[side](
-							vertices,
-							count,
-							image,
-							wx,
-							y,
-							wz,
-							region.x * TEXTURE_SIZE,
-							region.y * TEXTURE_SIZE,
-							TEXTURE_SIZE,
-							TEXTURE_SIZE,
-							1,
-							1,
-							1,
-							1,
-						);
+						if (block_info.transparent) {
+							transparent_vertices = ensure_capacity(
+								transparent_vertices,
+								transparent_count + (6 * 6 * 9),
+							);
+							transparent_count = FACE_PUSHING_FUNCTIONS[side](
+								transparent_vertices,
+								transparent_count,
+								image,
+								wx,
+								y,
+								wz,
+								region.x * TEXTURE_SIZE,
+								region.y * TEXTURE_SIZE,
+								TEXTURE_SIZE,
+								TEXTURE_SIZE,
+								1,
+								1,
+								1,
+								block_info.alpha ?? 1,
+							);
+						} else {
+							opaque_vertices = ensure_capacity(opaque_vertices, opaque_count + (6 * 6 * 9));
+							opaque_count = FACE_PUSHING_FUNCTIONS[side](
+								opaque_vertices,
+								opaque_count,
+								image,
+								wx,
+								y,
+								wz,
+								region.x * TEXTURE_SIZE,
+								region.y * TEXTURE_SIZE,
+								TEXTURE_SIZE,
+								TEXTURE_SIZE,
+								1,
+								1,
+								1,
+								1,
+							);
+						}
 					}
 				}
 			}
 		}
 	}
 
-	return [vertices, count];
+	return [opaque_vertices, opaque_count, transparent_vertices, transparent_count];
 }
 
 function ensure_capacity(
