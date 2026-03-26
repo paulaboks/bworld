@@ -1,5 +1,6 @@
 import { AssetManager } from "../client/assets.ts";
 import { SpriteRegion } from "./constants.ts";
+import { BlockRegistry, EverythingRegistry, ItemRegistry } from "./everything_registry.ts";
 
 export function point_inside_rec(
 	point_x: number,
@@ -42,4 +43,14 @@ export function distance_point_point(ax: number, ay: number, az: number, bx: num
 	const dy = ay - by;
 	const dz = az - bz;
 	return dx * dx + dy * dy + dz * dz;
+}
+
+export function register_block_item(block: BlockRegistry) {
+	let texture_id = "bworld:missing";
+	if (typeof block.textures === "string") {
+		texture_id = block.textures;
+	}
+	EverythingRegistry.register<ItemRegistry>("items", block.id, {
+		texture_id,
+	});
 }

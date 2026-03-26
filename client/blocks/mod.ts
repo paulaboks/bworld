@@ -9,3 +9,5 @@ import "./log.ts";
 import "./sand.ts";
 import "./snow.ts";
 import "./glass.ts";
+import "./hoed_dirt.ts";
+import "./leaves.ts";

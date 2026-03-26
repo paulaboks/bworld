@@ -1,13 +1,11 @@
 import { BlockRegistry, EverythingRegistry } from "$/common/everything_registry.ts";
+import { register_block_item } from "$/common/utils.ts";
 
-EverythingRegistry.register<BlockRegistry>("blocks", "bworld:log", {
+const block = EverythingRegistry.register<BlockRegistry>("blocks", "bworld:log", {
+	id: "bworld:log",
 	textures: { side: "bworld:log_side", top: "bworld:log_top", bottom: "bworld:log_top" },
 	has_collision: true,
 	drop_table: "bworld:log",
 });
 
-EverythingRegistry.register<BlockRegistry>("blocks", "bworld:leaves", {
-	textures: "bworld:leaves",
-	has_collision: true,
-	transparent: true,
-});
+register_block_item(block);

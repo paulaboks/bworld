@@ -5,7 +5,7 @@ export class EverythingRegistry {
 	static #key_to_id = new Map<string, Map<string, number>>();
 	static #id_to_value = new Map<string, unknown[]>();
 
-	static register<T>(registry: string, key: string, value: T) {
+	static register<T>(registry: string, key: string, value: T): T {
 		if (!this.#key_to_id.has(registry)) {
 			this.#key_to_id.set(registry, new Map());
 			this.#id_to_value.set(registry, []);
@@ -18,6 +18,8 @@ export class EverythingRegistry {
 
 		key_map.set(key, id);
 		values[id] = value;
+
+		return value;
 	}
 
 	static get<T>(registry: string, key: string): T | undefined {
@@ -61,6 +63,7 @@ interface TextureFront {
 }
 
 export interface BlockRegistry<T = unknown | undefined> {
+	id: string;
 	textures: string | TextureSideTopBottom | TextureFront;
 	transparent?: boolean;
 	alpha?: number;

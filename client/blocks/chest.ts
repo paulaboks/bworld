@@ -8,11 +8,12 @@ interface TileChestData {
 }
 
 EverythingRegistry.register<BlockRegistry<TileChestData>>("blocks", "bworld:chest", {
+	id: "bworld:chest",
 	textures: "bworld:chest",
 	has_collision: false,
 
-	on_interact(world, tile) {
-		const [player] = world.get_tag("player")!;
+	on_interact(dimension, tile) {
+		const [player] = dimension.world.get_tag("player")!;
 		const player_component = player.get(PlayerComponent)!;
 		if (tile.data && tile.data.inventory) {
 			player_component.screens.push(new GuiChest(tile.data.inventory, player_component.player_inventory));
