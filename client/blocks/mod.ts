@@ -16,3 +16,4 @@ import "./copper_ore.ts";
 import "./iron_ore.ts";
 import "./tin_ore.ts";
 import "./gold_ore.ts";
+import "./planks.ts";

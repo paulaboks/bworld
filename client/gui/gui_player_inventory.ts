@@ -17,15 +17,15 @@ const recipes: CraftingRecipe[] = [
 		width: 3,
 		height: 3,
 		pattern: [
-			"bworld:log",
-			"bworld:log",
-			"bworld:log",
-			"bworld:log",
+			"bworld:planks",
+			"bworld:planks",
+			"bworld:planks",
+			"bworld:planks",
 			undefined,
-			"bworld:log",
-			"bworld:log",
-			"bworld:log",
-			"bworld:log",
+			"bworld:planks",
+			"bworld:planks",
+			"bworld:planks",
+			"bworld:planks",
 		],
 		result: new ItemStack("bworld:chest", 1),
 	},
@@ -44,6 +44,14 @@ const recipes: CraftingRecipe[] = [
 			"bworld:stone",
 		],
 		result: new ItemStack("bworld:furnace", 1),
+	},
+	{
+		width: 1,
+		height: 1,
+		pattern: [
+			"bworld:log",
+		],
+		result: new ItemStack("bworld:planks", 2),
 	},
 ];
 
