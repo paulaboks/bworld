@@ -9,13 +9,19 @@ import { PlayerComponent } from "../player.ts";
 import { gl, Texture } from "../renderer/mod.ts";
 import { Camera } from "./camera.ts";
 
-export interface Block<T = unknown> {
+export interface BlockData<T = unknown> {
+	id: string;
 	x: number;
 	y: number;
 	z: number;
+	data: T;
+}
+
+export interface Block {
 	id: string;
-	data?: T;
-	tickable?: boolean;
+	x: number;
+	y: number;
+	z: number;
 }
 
 export const CHUNK_SIZE = 16;
@@ -26,6 +32,7 @@ export interface Chunk {
 	x: number;
 	z: number;
 	blocks: Int16Array;
+	blocks_data: BlockData[];
 	generated: boolean;
 	dirty: boolean;
 	opaque_vertex_buffer?: WebGLBuffer;
@@ -47,7 +54,14 @@ export class Dimension extends Component {
 	}
 
 	add_chunk(x: number, z: number) {
-		const chunk = { x, z, blocks: new Int16Array(CHUNK_AREA * CHUNK_HEIGHT), dirty: true, generated: false };
+		const chunk = {
+			x,
+			z,
+			blocks: new Int16Array(CHUNK_AREA * CHUNK_HEIGHT),
+			blocks_data: [],
+			dirty: true,
+			generated: false,
+		};
 		this.chunks.push(chunk);
 		return chunk;
 	}
@@ -98,6 +112,32 @@ export class Dimension extends Component {
 		return chunk.blocks[index];
 	}
 
+	add_block_data(block_data: BlockData) {
+		const block_chunk_x = Math.floor(block_data.x / CHUNK_SIZE);
+		const block_chunk_z = Math.floor(block_data.z / CHUNK_SIZE);
+		let chunk = this.get_chunk(block_chunk_x, block_chunk_z);
+		if (!chunk) {
+			chunk = this.add_chunk(block_chunk_x, block_chunk_z);
+		}
+
+		chunk.blocks_data.push(block_data);
+	}
+
+	get_block_data<T>(x: number, y: number, z: number) {
+		const chunk_x = Math.floor(x / CHUNK_SIZE);
+		const chunk_z = Math.floor(z / CHUNK_SIZE);
+
+		const chunk = this.get_chunk(chunk_x, chunk_z);
+
+		if (!chunk) {
+			return undefined;
+		}
+
+		return chunk.blocks_data.find((block_data) =>
+			block_data.x === x && block_data.y === y && block_data.z === z
+		) as BlockData<T>;
+	}
+
 	break_block(x: number, y: number, z: number) {
 		const block_chunk_x = Math.floor(x / CHUNK_SIZE);
 		const block_chunk_z = Math.floor(z / CHUNK_SIZE);
@@ -145,9 +185,9 @@ export class Dimension extends Component {
 			}
 		}
 
-		// if (block_info?.on_create) {
-		// 	block_info?.on_create(this, block);
-		// }
+		if (block_info?.on_break) {
+			block_info.on_break(this, { x, y, z, id: block_info.id });
+		}
 	}
 
 	index_to_xyz(index: number) {

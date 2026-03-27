@@ -62,7 +62,7 @@ interface TextureFront {
 	side: string;
 }
 
-export interface BlockRegistry<T = unknown | undefined> {
+export interface BlockRegistry {
 	id: string;
 	textures: string | TextureSideTopBottom | TextureFront;
 	transparent?: boolean;
@@ -71,15 +71,21 @@ export interface BlockRegistry<T = unknown | undefined> {
 	has_collision: boolean;
 	drop_table?: string;
 
-	on_create?(dimension: Dimension, block: Block<T>): void;
-	on_click?(dimension: Dimension, block: Block<T>): void;
-	on_interact?(dimension: Dimension, block: Block<T>): void;
-	on_tick?(dimension: Dimension, block: Block<T>, tick_delta: number): void;
-	on_second?(dimension: Dimension, block: Block<T>, second_delta: number): void;
+	on_create?(dimension: Dimension, block: Block): void;
+	on_break?(dimension: Dimension, block: Block): void;
+	on_click?(dimension: Dimension, block: Block): void;
+	on_interact?(dimension: Dimension, block: Block): void;
+	on_tick?(dimension: Dimension, block: Block, tick_delta: number): void;
+	on_second?(dimension: Dimension, block: Block, second_delta: number): void;
 }
 
 export interface ItemRegistry<T = unknown | undefined> {
 	texture_id: string | ((item: ItemStack<T>) => string);
+	block_id?: string;
+
+	place?(dimension: Dimension, block: Block): void;
+
 	on_create?(item: ItemStack<T>): void;
+
 	get_lore?(item: ItemStack<T>): string;
 }

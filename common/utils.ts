@@ -46,11 +46,13 @@ export function distance_point_point(ax: number, ay: number, az: number, bx: num
 }
 
 export function register_block_item(block: BlockRegistry) {
+	// TODO: handle block textures
 	let texture_id = "bworld:missing";
 	if (typeof block.textures === "string") {
 		texture_id = block.textures;
 	}
 	EverythingRegistry.register<ItemRegistry>("items", block.id, {
 		texture_id,
+		block_id: block.id,
 	});
 }

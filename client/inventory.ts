@@ -44,7 +44,16 @@ export class ContainerSlot {
 		return this.#item_stack?.type_id;
 	}
 
-	get amount() {
+	set amount(new_amount: number) {
+		if (this.#item_stack) {
+			this.#item_stack.amount = new_amount;
+			if (this.#item_stack.amount <= 0) {
+				this.#item_stack = undefined;
+			}
+		}
+	}
+
+	get amount(): number | undefined {
 		return this.#item_stack?.amount;
 	}
 

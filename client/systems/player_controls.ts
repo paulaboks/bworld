@@ -8,6 +8,7 @@ import { Position } from "../../common/components/position.ts";
 import { PlayerComponent } from "../player.ts";
 import { GuiPlayerInventory } from "../gui/gui_player_inventory.ts";
 import { CollisionCuboid } from "../components/collision.ts";
+import { BlockRegistry, EverythingRegistry, ItemRegistry } from "$/common/everything_registry.ts";
 
 export class PlayerControlsSystem extends System {
 	constructor() {
@@ -96,28 +97,44 @@ export class PlayerControlsSystem extends System {
 		InputManager.set_mouse_grabbed(player_component.screens.length === 0);
 
 		const block = world.dimension.get_looked_block(world.dimension, camera);
-		if (block) {
+		if (block && player_component.screens.length === 0) {
 			if (InputManager.is_mouse_pressed(0)) {
 				world.dimension.break_block(block.x, block.y, block.z);
 			} else if (InputManager.is_mouse_pressed(2)) {
-				const inventory = player_component.player_inventory;
-				const hotbar_slot = inventory.container.get_slot(inventory.hotbar_selected);
-				if (hotbar_slot.has_item()) {
-					const FACE_OFFSETS = {
-						top: { x: 0, y: 1, z: 0 },
-						bottom: { x: 0, y: -1, z: 0 },
-						north: { x: 0, y: 0, z: -1 },
-						south: { x: 0, y: 0, z: 1 },
-						west: { x: -1, y: 0, z: 0 },
-						east: { x: 1, y: 0, z: 0 },
-					};
-					const offset = FACE_OFFSETS[block.face];
-					world.dimension.add_block({
-						x: block.x + offset.x,
-						y: block.y + offset.y,
-						z: block.z + offset.z,
-						id: "bworld:glass",
+				// interact if possible
+				const block_info = EverythingRegistry.get_by_id<BlockRegistry>("blocks", block.block);
+				if (block_info && block_info.on_interact) {
+					block_info.on_interact(world.dimension, {
+						x: block.x,
+						y: block.y,
+						z: block.z,
+						id: block_info.id,
 					});
+				} else {
+					const inventory = player_component.player_inventory;
+					const hotbar_slot = inventory.container.get_slot(inventory.hotbar_selected);
+					if (hotbar_slot && hotbar_slot.has_item()) {
+						const item = hotbar_slot.get_item()!;
+						const item_info = EverythingRegistry.get<ItemRegistry>("items", item.type_id);
+						if (item_info && item_info.block_id) {
+							const FACE_OFFSETS = {
+								top: { x: 0, y: 1, z: 0 },
+								bottom: { x: 0, y: -1, z: 0 },
+								north: { x: 0, y: 0, z: -1 },
+								south: { x: 0, y: 0, z: 1 },
+								west: { x: -1, y: 0, z: 0 },
+								east: { x: 1, y: 0, z: 0 },
+							};
+							const offset = FACE_OFFSETS[block.face];
+							world.dimension.add_block({
+								x: block.x + offset.x,
+								y: block.y + offset.y,
+								z: block.z + offset.z,
+								id: item_info.block_id,
+							});
+							hotbar_slot.amount! -= 1;
+						}
+					}
 				}
 			}
 		}

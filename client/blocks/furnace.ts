@@ -2,6 +2,7 @@ import { BlockRegistry, EverythingRegistry } from "$/common/everything_registry.
 import { Container, Inventory, ItemStack } from "../inventory.ts";
 import { PlayerComponent } from "../player.ts";
 import { GuiFurnace } from "$/client/gui/gui_furnace.ts";
+import { register_block_item } from "../../common/utils.ts";
 
 function can_craft(container: Container) {
 	const input = container.get_item(0);
@@ -66,50 +67,65 @@ interface TileChestData {
 	fuel: number;
 }
 
-EverythingRegistry.register<BlockRegistry<TileChestData>>("blocks", "bworld:furnace", {
-	textures: "bworld:furnace",
-	has_collision: false,
+const block = EverythingRegistry.register<BlockRegistry>("blocks", "bworld:furnace", {
+	id: "bworld:furnace",
+	textures: { front: "bworld:furnace", side: "bworld:stone" },
+	has_collision: true,
+	drop_table: "bworld:furnace",
 
-	on_interact(world, tile) {
-		const [player] = world.get_tag("player")!;
+	on_interact(dimension, block) {
+		const [player] = dimension.world.get_tag("player")!;
 		const player_component = player.get(PlayerComponent)!;
-		if (tile.data && tile.data.inventory) {
-			const gui = new GuiFurnace(tile.data.inventory, player_component.player_inventory, tile.data);
+		const block_data = dimension.get_block_data<TileChestData>(block.x, block.y, block.z);
+		if (block_data && block_data.data.inventory) {
+			const gui = new GuiFurnace(block_data.data.inventory, player_component.player_inventory, block_data.data);
 			player_component.screens.push(gui);
 		}
 	},
-	on_create(_, tile) {
-		tile.data = {
-			inventory: new Inventory(new Container(3)),
-			progress: 0,
-			fuel: 0,
-		};
+	on_create(dimension, block) {
+		dimension.add_block_data({
+			id: block.id,
+			x: block.x,
+			y: block.y,
+			z: block.z,
+			data: {
+				inventory: new Inventory(new Container(3)),
+				progress: 0,
+				fuel: 0,
+			},
+		});
 	},
-	on_tick(_, tile) {
-		if (!tile.data) {
+	on_break() {
+		// TODO: remove block data
+	},
+	on_tick(dimension, block) {
+		const block_data = dimension.get_block_data<TileChestData>(block.x, block.y, block.z);
+		if (!block_data) {
 			return;
 		}
 
-		if (tile.data.fuel > 0) {
-			tile.data.fuel -= 1;
+		if (block_data.data.fuel > 0) {
+			block_data.data.fuel -= 1;
 		}
 
-		const container = tile.data.inventory.container;
+		const container = block_data.data.inventory.container;
 
 		if (can_craft(container)) {
-			if (tile.data.fuel === 0 && has_fuel(container)) {
+			if (block_data.data.fuel === 0 && has_fuel(container)) {
 				consume_fuel(container);
-				tile.data.fuel = 200;
+				block_data.data.fuel = 200;
 			}
 
-			if (tile.data.fuel > 0) {
-				tile.data.progress += 1;
+			if (block_data.data.fuel > 0) {
+				block_data.data.progress += 1;
 
-				if (tile.data.progress >= 100) {
-					tile.data.progress = 0;
+				if (block_data.data.progress >= 100) {
+					block_data.data.progress = 0;
 					craft(container, new ItemStack("bworld:coal"));
 				}
 			}
 		}
 	},
 });
+
+register_block_item(block);
