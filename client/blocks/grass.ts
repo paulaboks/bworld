@@ -14,6 +14,8 @@ EverythingRegistry.register<BlockRegistry>("blocks", "bworld:grass", {
 		if (item?.type_id === "bworld:hoe") {
 			block.id = "bworld:hoed_dirt";
 			dimension.add_block(block);
+			return true;
 		}
+		return false;
 	},
 });

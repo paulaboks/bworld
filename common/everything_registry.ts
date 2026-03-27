@@ -74,7 +74,7 @@ export interface BlockRegistry {
 	on_create?(dimension: Dimension, block: Block): void;
 	on_break?(dimension: Dimension, block: Block): void;
 	on_click?(dimension: Dimension, block: Block): void;
-	on_interact?(dimension: Dimension, block: Block): void;
+	on_interact?(dimension: Dimension, block: Block): boolean;
 	on_tick?(dimension: Dimension, block: Block, tick_delta: number): void;
 	on_second?(dimension: Dimension, block: Block, second_delta: number): void;
 }

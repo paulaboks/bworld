@@ -80,7 +80,9 @@ const block = EverythingRegistry.register<BlockRegistry>("blocks", "bworld:furna
 		if (block_data && block_data.data.inventory) {
 			const gui = new GuiFurnace(block_data.data.inventory, player_component.player_inventory, block_data.data);
 			player_component.screens.push(gui);
+			return true;
 		}
+		return false;
 	},
 	on_create(dimension, block) {
 		dimension.add_block_data({

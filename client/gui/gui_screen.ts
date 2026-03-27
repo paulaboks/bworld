@@ -25,14 +25,22 @@ export class Slot {
 	}
 }
 
-export class GuiScreen<Inv extends Inventory = Inventory, Properties = Record<string, unknown> | undefined> {
+export abstract class GuiScreen {
+	x: number = 0;
+	y: number = 0;
+
+	abstract on_tick(_delta: number): void;
+	abstract on_render(): void;
+	abstract on_close(): void;
+}
+
+export class GuiInventoryScreen<Inv extends Inventory = Inventory, Properties = Record<string, unknown> | undefined>
+	extends GuiScreen {
 	inventory: Inv;
 	player_inventory: PlayerInventory;
 	properties: Properties;
 
 	slots: Slot[] = [];
-	x: number = 0;
-	y: number = 0;
 	inventory_width: number = 500;
 	inventory_height: number = 500;
 
@@ -41,6 +49,7 @@ export class GuiScreen<Inv extends Inventory = Inventory, Properties = Record<st
 		player_inventory: PlayerInventory,
 		properties: Properties,
 	) {
+		super();
 		this.inventory = inventory;
 		this.player_inventory = player_inventory;
 		this.properties = properties;
@@ -245,7 +254,7 @@ export class GuiScreen<Inv extends Inventory = Inventory, Properties = Record<st
 // generic methods that is often needed
 
 export function add_player_inventory(
-	handler: GuiScreen,
+	handler: GuiInventoryScreen,
 	player_inventory: PlayerInventory,
 	offset_x: number,
 	offset_y: number,
@@ -265,7 +274,7 @@ export function add_player_inventory(
 }
 
 export function add_player_hotbar(
-	handler: GuiScreen,
+	handler: GuiInventoryScreen,
 	player_inventory: PlayerInventory,
 	offset_x: number,
 	offset_y: number,

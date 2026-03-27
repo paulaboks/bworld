@@ -23,6 +23,7 @@ export class PlayerControls extends Component {
 	hotbar_9: KeyCode = "Digit9";
 
 	open_inventory: KeyCode = "KeyE";
+	open_chat: KeyCode = "KeyT";
 
 	open_debug: KeyCode = "F3";
 }

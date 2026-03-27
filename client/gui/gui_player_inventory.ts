@@ -1,5 +1,5 @@
 import { Container, Inventory, ItemStack, PlayerInventory } from "../inventory.ts";
-import { add_player_hotbar, add_player_inventory, GuiScreen, Slot } from "./gui_screen.ts";
+import { add_player_hotbar, add_player_inventory, GuiInventoryScreen, Slot } from "./gui_screen.ts";
 import { canvas, draw_rect, Texture } from "$/client/renderer/mod.ts";
 import { AssetManager } from "../assets.ts";
 import { SLOT_SIZE } from "../../common/constants.ts";
@@ -33,7 +33,7 @@ const recipes: CraftingRecipe[] = [
 
 const PADDING = 10;
 
-export class GuiPlayerInventory extends GuiScreen {
+export class GuiPlayerInventory extends GuiInventoryScreen {
 	override inventory_width = PADDING * 2 + SLOT_SIZE * 9;
 	override inventory_height = PADDING * 2 + SLOT_SIZE * 4 + PADDING + SLOT_SIZE * 3 + PADDING;
 

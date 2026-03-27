@@ -9,6 +9,8 @@ import { PlayerComponent } from "../player.ts";
 import { GuiPlayerInventory } from "../gui/gui_player_inventory.ts";
 import { CollisionCuboid } from "../components/collision.ts";
 import { BlockRegistry, EverythingRegistry, ItemRegistry } from "$/common/everything_registry.ts";
+import { GuiChat } from "../gui/gui_chat.ts";
+import { GuiInventoryScreen } from "../gui/gui_screen.ts";
 
 export class PlayerControlsSystem extends System {
 	constructor() {
@@ -23,54 +25,66 @@ export class PlayerControlsSystem extends System {
 		const position = player.get(Position)!;
 		const camera = player.get(Camera)!;
 
-		let input_x = 0;
-		let input_z = 0;
+		if (player_component.screens.length === 0) {
+			let input_x = 0;
+			let input_z = 0;
 
-		if (InputManager.is_key_down(controls.move_left)) {
-			input_x -= 1;
-		}
-		if (InputManager.is_key_down(controls.move_right)) {
-			input_x += 1;
-		}
-		if (InputManager.is_key_down(controls.move_forward)) {
-			input_z -= 1;
-		}
-		if (InputManager.is_key_down(controls.move_backwards)) {
-			input_z += 1;
-		}
+			if (InputManager.is_key_down(controls.move_left)) {
+				input_x -= 1;
+			}
+			if (InputManager.is_key_down(controls.move_right)) {
+				input_x += 1;
+			}
+			if (InputManager.is_key_down(controls.move_forward)) {
+				input_z -= 1;
+			}
+			if (InputManager.is_key_down(controls.move_backwards)) {
+				input_z += 1;
+			}
 
-		const size = Math.hypot(input_x, input_z);
-		if (size > 0) {
-			input_x /= size;
-			input_z /= size;
-		}
+			const size = Math.hypot(input_x, input_z);
+			if (size > 0) {
+				input_x /= size;
+				input_z /= size;
+			}
 
-		const sin = Math.sin(camera.yaw);
-		const cos = Math.cos(camera.yaw);
+			const sin = Math.sin(camera.yaw);
+			const cos = Math.cos(camera.yaw);
 
-		const forwardX = sin;
-		const forwardZ = cos;
+			const forwardX = sin;
+			const forwardZ = cos;
 
-		const rightX = cos;
-		const rightZ = -sin;
+			const rightX = cos;
+			const rightZ = -sin;
 
-		const speed_modifier = InputManager.is_key_down(controls.sprint_key) ? 1.75 : 1;
+			const speed_modifier = InputManager.is_key_down(controls.sprint_key) ? 1.75 : 1;
 
-		velocity.vx = (forwardX * input_z + rightX * input_x) * controls.move_speed * speed_modifier;
-		velocity.vz = (forwardZ * input_z + rightZ * input_x) * controls.move_speed * speed_modifier;
+			velocity.vx = (forwardX * input_z + rightX * input_x) * controls.move_speed * speed_modifier;
+			velocity.vz = (forwardZ * input_z + rightZ * input_x) * controls.move_speed * speed_modifier;
 
-		const cuboid = player.get(CollisionCuboid);
+			const cuboid = player.get(CollisionCuboid);
 
-		if (InputManager.is_key_down("Space") && cuboid?.colliding_y === 1) {
-			velocity.vy += controls.jump_force;
+			if (InputManager.is_key_down("Space") && cuboid?.colliding_y === 1) {
+				velocity.vy += controls.jump_force;
+			}
 		}
 
 		if (InputManager.is_key_pressed(controls.open_inventory)) {
 			if (player_component.screens.length === 0) {
 				player_component.screens.push(new GuiPlayerInventory(player_component.player_inventory));
-			} else {
+			} else if (player_component.screens.at(-1) instanceof GuiInventoryScreen) {
 				player_component.pop_screen();
 			}
+		}
+
+		if (InputManager.is_key_pressed(controls.open_chat)) {
+			if (player_component.screens.length === 0) {
+				player_component.screens.push(new GuiChat(world));
+			}
+		}
+
+		if (InputManager.is_key_pressed("Escape")) {
+			player_component.pop_screen();
 		}
 
 		if (InputManager.is_key_pressed(controls.open_debug)) {
@@ -103,14 +117,13 @@ export class PlayerControlsSystem extends System {
 			} else if (InputManager.is_mouse_pressed(2)) {
 				// interact if possible
 				const block_info = EverythingRegistry.get_by_id<BlockRegistry>("blocks", block.block);
-				if (block_info && block_info.on_interact) {
-					block_info.on_interact(world.dimension, {
-						x: block.x,
-						y: block.y,
-						z: block.z,
-						id: block_info.id,
-					});
-				} else {
+				const interacted = block_info?.on_interact?.(world.dimension, {
+					x: block.x,
+					y: block.y,
+					z: block.z,
+					id: block_info.id,
+				});
+				if (!interacted) {
 					const inventory = player_component.player_inventory;
 					const hotbar_slot = inventory.container.get_slot(inventory.hotbar_selected);
 					if (hotbar_slot && hotbar_slot.has_item()) {
