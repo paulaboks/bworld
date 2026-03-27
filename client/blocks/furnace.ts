@@ -4,61 +4,110 @@ import { PlayerComponent } from "../player.ts";
 import { GuiFurnace } from "$/client/gui/gui_furnace.ts";
 import { register_block_item } from "../../common/utils.ts";
 
-function can_craft(container: Container) {
-	const input = container.get_item(0);
-	const output = container.get_item(2);
+interface FurnaceRecipe {
+	input: string;
+	output: ItemStack;
+	cook_time: number;
+}
 
+const FURNACE_RECIPES: FurnaceRecipe[] = [
+	{
+		input: "bworld:log",
+		output: new ItemStack("bworld:coal", 1),
+		cook_time: 100,
+	},
+	{
+		input: "bworld:coal_ore",
+		output: new ItemStack("bworld:coal", 1),
+		cook_time: 100,
+	},
+	{
+		input: "bworld:iron_ore",
+		output: new ItemStack("bworld:iron_ingot", 1),
+		cook_time: 200,
+	},
+	{
+		input: "bworld:tin_ore",
+		output: new ItemStack("bworld:tin_ingot", 1),
+		cook_time: 200,
+	},
+	{
+		input: "bworld:copper_ore",
+		output: new ItemStack("bworld:copper_ingot", 1),
+		cook_time: 200,
+	},
+	{
+		input: "bworld:gold_ore",
+		output: new ItemStack("bworld:gold_ingot", 1),
+		cook_time: 200,
+	},
+];
+
+function get_recipe(input?: ItemStack | undefined): FurnaceRecipe | undefined {
 	if (!input) {
+		return;
+	}
+
+	return FURNACE_RECIPES.find((r) => r.input === input.type_id);
+}
+
+function can_craft(container: Container, recipe?: FurnaceRecipe) {
+	if (!recipe) {
 		return false;
 	}
 
-	if (["bworld:log"].includes(input.type_id)) {
-		return true;
-	}
+	const output = container.get_item(2);
 
 	if (!output) {
 		return true;
 	}
 
-	if (output.amount >= output.max_amount) {
+	if (output.type_id !== recipe.output.type_id) {
 		return false;
 	}
 
-	return true;
+	return output.amount < output.max_amount;
+}
+
+const FUEL_VALUES: Record<string, number> = {
+	"bworld:coal": 1000,
+	"bworld:log": 100,
+};
+
+function get_fuel_value(item?: ItemStack | undefined): number {
+	if (!item) {
+		return 0;
+	}
+	return FUEL_VALUES[item.type_id] ?? 0;
 }
 
 function has_fuel(container: Container) {
-	const fuel = container.get_item(1);
-
-	if (!fuel) {
-		return false;
-	}
-
-	if (["bworld:coal", "bworld:log"].includes(fuel.type_id)) {
-		return true;
-	}
-
-	return false;
+	return get_fuel_value(container.get_item(1)) > 0;
 }
 
-function consume_fuel(container: Container) {
-	const fuel = container.get_item(1)!;
-	fuel.amount -= 1;
-	container.set_item(1, fuel);
+function consume_fuel(container: Container): number {
+	const fuel = container.get_slot(1)!;
+	const value = get_fuel_value(fuel.get_item());
+
+	if (fuel.has_item()) {
+		fuel.amount! -= 1;
+	}
+
+	return value;
 }
 
-function craft(container: Container, item: ItemStack) {
+function craft(container: Container, recipe: FurnaceRecipe) {
 	const input = container.get_item(0)!;
 	const output = container.get_item(2);
 
 	if (!output) {
-		container.set_item(2, item);
+		container.set_item(2, recipe.output.clone());
 	} else {
-		output.amount += item.amount;
+		output.amount += recipe.output.amount;
 	}
 
 	input.amount -= 1;
-	container.set_item(0, input);
+	container.set_item(0, input.amount > 0 ? input : undefined);
 }
 
 interface TileChestData {
@@ -106,25 +155,34 @@ const block = EverythingRegistry.register<BlockRegistry>("blocks", "bworld:furna
 			return;
 		}
 
-		if (block_data.data.fuel > 0) {
-			block_data.data.fuel -= 1;
+		const data = block_data.data;
+		const container = data.inventory.container;
+
+		const input = container.get_item(0);
+		const recipe = get_recipe(input);
+
+		// burn fuel
+		if (data.fuel > 0) {
+			data.fuel -= 1;
 		}
 
-		const container = block_data.data.inventory.container;
+		if (!can_craft(container, recipe)) {
+			data.progress = 0;
+			return;
+		}
 
-		if (can_craft(container)) {
-			if (block_data.data.fuel === 0 && has_fuel(container)) {
-				consume_fuel(container);
-				block_data.data.fuel = 200;
-			}
+		// refuel
+		if (data.fuel === 0 && has_fuel(container)) {
+			data.fuel = consume_fuel(container);
+		}
 
-			if (block_data.data.fuel > 0) {
-				block_data.data.progress += 1;
+		// cook
+		if (data.fuel > 0 && recipe) {
+			data.progress += 1;
 
-				if (block_data.data.progress >= 100) {
-					block_data.data.progress = 0;
-					craft(container, new ItemStack("bworld:coal"));
-				}
+			if (data.progress >= recipe.cook_time) {
+				data.progress = 0;
+				craft(container, recipe);
 			}
 		}
 	},

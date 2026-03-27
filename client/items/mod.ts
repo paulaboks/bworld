@@ -1,1 +1,9 @@
 import "./watering_can.ts";
+import "./axe.ts";
+import "./pickaxe.ts";
+import "./hoe.ts";
+import "./coal.ts";
+import "./tin_ingot.ts";
+import "./iron_ingot.ts";
+import "./copper_ingot.ts";
+import "./gold_ingot.ts";

@@ -29,6 +29,22 @@ const recipes: CraftingRecipe[] = [
 		],
 		result: new ItemStack("bworld:chest", 1),
 	},
+	{
+		width: 3,
+		height: 3,
+		pattern: [
+			"bworld:stone",
+			"bworld:stone",
+			"bworld:stone",
+			"bworld:stone",
+			undefined,
+			"bworld:stone",
+			"bworld:stone",
+			"bworld:stone",
+			"bworld:stone",
+		],
+		result: new ItemStack("bworld:furnace", 1),
+	},
 ];
 
 const PADDING = 10;

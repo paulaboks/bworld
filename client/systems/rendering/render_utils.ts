@@ -1,8 +1,9 @@
-import { SLOT_SIZE } from "$/common/constants.ts";
+import { SLOT_SIZE, TEXTURE_SIZE } from "$/common/constants.ts";
 import { get_sprite_region } from "$/common/utils.ts";
+import { BlockRegistry, EverythingRegistry, ItemRegistry } from "$/common/everything_registry.ts";
 import { AssetManager } from "$/client/assets.ts";
 import { ItemStack } from "../../inventory.ts";
-import { draw_text, draw_texture_region, Texture } from "$/client/renderer/mod.ts";
+import { draw_text, draw_texture_region, draw_texture_region_skewed, Texture } from "$/client/renderer/mod.ts";
 
 export function draw_nine_slice(
 	image: Texture,
@@ -199,18 +200,18 @@ export function draw_nine_slice(
 }
 
 export function draw_item(item: ItemStack, x: number, y: number) {
-	const sprite_region = get_sprite_region(item.type_id);
-	draw_texture_region(
-		AssetManager.instance.get("bworld:textures"),
-		sprite_region.x * 16,
-		sprite_region.y * 16,
-		16,
-		16,
-		x + 3,
-		y + 3,
-		SLOT_SIZE - 6,
-		SLOT_SIZE - 6,
-	);
+	const item_info = EverythingRegistry.get<ItemRegistry>("items", item.type_id);
+
+	if (!item_info) {
+		throw Error(`Didn't find item registry for '${item.type_id}'`);
+	}
+
+	if (item_info?.block_id) {
+		draw_item_block(item, item_info, x, y);
+	} else {
+		draw_item_item(item, item_info, x, y);
+	}
+
 	if (item.max_amount !== 1) {
 		draw_text(
 			String(item.amount),
@@ -226,4 +227,108 @@ export function draw_item(item: ItemStack, x: number, y: number) {
 			1,
 		);
 	}
+}
+
+// ey its not a bad name
+function draw_item_item(item: ItemStack, item_info: ItemRegistry, x: number, y: number) {
+	let texture_id = "bworld:missing";
+	if (typeof item_info?.texture_id === "string") {
+		texture_id = item_info.texture_id;
+	} else if (typeof item_info?.texture_id === "function") {
+		texture_id = item_info.texture_id(item);
+	}
+	const sprite_region = get_sprite_region(texture_id);
+	draw_texture_region(
+		AssetManager.instance.get("bworld:textures"),
+		sprite_region.x * 16,
+		sprite_region.y * 16,
+		16,
+		16,
+		x + 3,
+		y + 3,
+		SLOT_SIZE - 6,
+		SLOT_SIZE - 6,
+	);
+}
+
+function draw_item_block(_item: ItemStack, item_info: ItemRegistry, x: number, y: number) {
+	const block_info = EverythingRegistry.get<BlockRegistry>("blocks", item_info.block_id!);
+
+	if (!block_info) throw new Error(`no textures for ${item_info.block_id}`);
+
+	let front_texture = "bworld:missing";
+	let top_texture = "bworld:missing";
+	let left_texture = "bworld:missing";
+
+	const textures = block_info.textures;
+
+	if (typeof textures === "string") {
+		front_texture = textures;
+		top_texture = textures;
+		left_texture = textures;
+	} else if ("top" in textures && "bottom" in textures && "side" in textures) {
+		top_texture = textures.top;
+		front_texture = textures.side;
+		left_texture = textures.side;
+	} else if ("front" in textures && "side" in textures) {
+		top_texture = textures.side;
+		front_texture = textures.front;
+		left_texture = textures.side;
+	}
+
+	const atlas = AssetManager.instance.get<Texture>("bworld:textures");
+
+	const top = get_sprite_region(top_texture);
+	const front = get_sprite_region(front_texture);
+	const left = get_sprite_region(left_texture);
+
+	const padding = 4;
+	const size = (SLOT_SIZE - padding * 2) / 2;
+
+	const cx = x + SLOT_SIZE / 2;
+	const cy = y + SLOT_SIZE / 2 - 10;
+
+	const half_w = size;
+	const half_h = size / 2;
+	const height = size;
+
+	draw_texture_region_skewed(
+		atlas,
+		top.x * TEXTURE_SIZE,
+		top.y * TEXTURE_SIZE,
+		TEXTURE_SIZE,
+		TEXTURE_SIZE,
+		[
+			{ x: cx, y: cy - half_h },
+			{ x: cx + half_w, y: cy },
+			{ x: cx, y: cy + half_h },
+			{ x: cx - half_w, y: cy },
+		],
+	);
+	draw_texture_region_skewed(
+		atlas,
+		left.x * TEXTURE_SIZE,
+		left.y * TEXTURE_SIZE,
+		TEXTURE_SIZE,
+		TEXTURE_SIZE,
+		[
+			{ x: cx - half_w, y: cy },
+			{ x: cx, y: cy + half_h },
+			{ x: cx, y: cy + half_h + height },
+			{ x: cx - half_w, y: cy + height },
+		],
+	);
+	draw_texture_region_skewed(
+		atlas,
+		front.x * TEXTURE_SIZE,
+		front.y * TEXTURE_SIZE,
+		TEXTURE_SIZE,
+		TEXTURE_SIZE,
+		[
+			{ x: cx + half_w, y: cy },
+			{ x: cx, y: cy + half_h },
+			{ x: cx, y: cy + half_h + height },
+			{ x: cx + half_w, y: cy + height },
+		],
+	);
 }

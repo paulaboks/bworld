@@ -11,3 +11,8 @@ import "./snow.ts";
 import "./glass.ts";
 import "./hoed_dirt.ts";
 import "./leaves.ts";
+import "./coal_ore.ts";
+import "./copper_ore.ts";
+import "./iron_ore.ts";
+import "./tin_ore.ts";
+import "./gold_ore.ts";

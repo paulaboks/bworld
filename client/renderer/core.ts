@@ -299,6 +299,35 @@ export function push_quad(
 	push_vertex(dx, y2, 0, u0, v1, r, g, b, a);
 }
 
+export function push_quad_vertices(
+	x0: number,
+	y0: number,
+	x1: number,
+	y1: number,
+	x2: number,
+	y2: number,
+	x3: number,
+	y3: number,
+	u0: number,
+	v0: number,
+	u1: number,
+	v1: number,
+	r = 1,
+	g = 1,
+	b = 1,
+	a = 1,
+) {
+	// triangle 1
+	push_vertex(x0, y0, 0, u0, v0, r, g, b, a);
+	push_vertex(x1, y1, 0, u1, v0, r, g, b, a);
+	push_vertex(x2, y2, 0, u1, v1, r, g, b, a);
+
+	// triangle 2
+	push_vertex(x0, y0, 0, u0, v0, r, g, b, a);
+	push_vertex(x2, y2, 0, u1, v1, r, g, b, a);
+	push_vertex(x3, y3, 0, u0, v1, r, g, b, a);
+}
+
 // internal
 
 function update_camera() {

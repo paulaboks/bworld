@@ -1,4 +1,4 @@
-import { Alea, create_noise_2d, NoiseFunction2D } from "@paulaboks/rng";
+import { Alea, create_noise_2d, create_noise_3d, NoiseFunction2D } from "@paulaboks/rng";
 import { CHUNK_SIZE, Dimension } from "./components/dimension.ts";
 
 type Biome =
@@ -11,6 +11,22 @@ type Biome =
 	| "snow"
 	| "savanna"
 	| "swamp";
+
+type OreDef = {
+	id: string;
+	min_y: number;
+	max_y: number;
+	scale: number;
+	threshold: number;
+};
+
+const ORES: OreDef[] = [
+	{ id: "bworld:coal_ore", min_y: 20, max_y: 120, scale: 0.05, threshold: 0.55 },
+	{ id: "bworld:copper_ore", min_y: 10, max_y: 80, scale: 0.06, threshold: 0.6 },
+	{ id: "bworld:tin_ore", min_y: 5, max_y: 60, scale: 0.06, threshold: 0.62 },
+	{ id: "bworld:iron_ore", min_y: 5, max_y: 50, scale: 0.05, threshold: 0.65 },
+	{ id: "bworld:gold_ore", min_y: 0, max_y: 30, scale: 0.04, threshold: 0.7 },
+];
 
 function get_biome(temp: number, moisture: number): Biome {
 	if (temp > 0.6) {
@@ -118,13 +134,6 @@ function place_tree(dimension: Dimension, x: number, y: number, z: number, biome
 	const trunk_block = "bworld:log";
 	const leaves_block = "bworld:leaves";
 
-	// if (biome === "jungle") {
-	// 	trunkBlock = "bworld:jungle_log";
-	// 	leavesBlock = "bworld:jungle_leaves";
-	// } else if (biome === "taiga") {
-	// 	leavesBlock = "bworld:spruce_leaves";
-	// }
-
 	for (let i = 0; i < height; i++) {
 		dimension.add_block({ x, y: y + i, z, id: trunk_block });
 	}
@@ -167,6 +176,7 @@ export function generate_chunk(dimension: Dimension, cx: number, cz: number, see
 	const temp_noise = create_noise_2d(new Alea(seed + "_temp"));
 	const moisture_noise = create_noise_2d(new Alea(seed + "_moisture"));
 	const feature_noise = create_noise_2d(new Alea(seed + "_feature"));
+	const ore_noises = ORES.map((ore) => create_noise_3d(new Alea(seed + "_" + ore.id)));
 
 	const biome_scale = 0.003;
 	const terrain_scale = 0.01;
@@ -190,6 +200,26 @@ export function generate_chunk(dimension: Dimension, cx: number, cz: number, see
 
 			for (let y = 0; y <= height; y++) {
 				let block = "bworld:stone";
+
+				if (y < height - 3) {
+					for (let i = 0; i < ORES.length; i++) {
+						const ore = ORES[i];
+
+						if (y >= ore.min_y && y <= ore.max_y) {
+							const noise = ore_noises[i](
+								wx * ore.scale,
+								y * ore.scale,
+								wz * ore.scale,
+							);
+
+							if (noise > ore.threshold) {
+								block = ore.id;
+								break;
+							}
+						}
+					}
+				}
+
 				if (y === height) {
 					block = surface_block;
 				} else if (y > height - 4) {
