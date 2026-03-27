@@ -6,6 +6,9 @@ EverythingRegistry.register<BlockRegistry>("blocks", "bworld:grass", {
 	textures: { top: "bworld:grass_top", bottom: "bworld:dirt", "side": "bworld:grass_side" },
 	has_collision: false,
 	drop_table: "bworld:dirt",
+	toughness: 2,
+	requires_tool: false,
+	tool_to_break: "shovel",
 
 	on_interact(dimension, block) {
 		const [player] = dimension.world.get_tag("player")!;

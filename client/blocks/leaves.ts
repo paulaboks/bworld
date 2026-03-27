@@ -6,6 +6,9 @@ const block = EverythingRegistry.register<BlockRegistry>("blocks", "bworld:leave
 	textures: "bworld:leaves",
 	has_collision: true,
 	transparent: true,
+	toughness: 3,
+	requires_tool: false,
+	tool_to_break: "hoe",
 });
 
 register_block_item(block);

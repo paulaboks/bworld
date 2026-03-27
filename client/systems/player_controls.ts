@@ -17,7 +17,7 @@ export class PlayerControlsSystem extends System {
 		super();
 	}
 
-	update(world: ClientWorld, _delta: number): void {
+	update(world: ClientWorld, delta: number): void {
 		const [player] = world.get_tag("player")!;
 		const velocity = player.get(Velocity)!;
 		const controls = player.get(PlayerControls)!;
@@ -110,13 +110,28 @@ export class PlayerControlsSystem extends System {
 
 		InputManager.set_mouse_grabbed(player_component.screens.length === 0);
 
+		if (InputManager.is_mouse_down(0) && player_component.screens.length === 0) {
+			player_component.breaking_block = true;
+		} else {
+			player_component.breaking_block = false;
+			player_component.break_progress_max = 0;
+			player_component.break_progress = 0;
+		}
+
 		const block = world.dimension.get_looked_block(world.dimension, camera);
+
 		if (block && player_component.screens.length === 0) {
-			if (InputManager.is_mouse_pressed(0)) {
-				world.dimension.break_block(block.x, block.y, block.z);
+			const block_info = EverythingRegistry.get_by_id<BlockRegistry>("blocks", block.block)!;
+			if (player_component.breaking_block) {
+				player_component.break_progress_max = block_info.toughness ?? 9999;
+				player_component.break_progress += delta;
+				if (player_component.break_progress >= player_component.break_progress_max) {
+					world.dimension.break_block(block.x, block.y, block.z);
+					player_component.break_progress_max = 0;
+					player_component.break_progress = 0;
+				}
 			} else if (InputManager.is_mouse_pressed(2)) {
 				// interact if possible
-				const block_info = EverythingRegistry.get_by_id<BlockRegistry>("blocks", block.block);
 				const interacted = block_info?.on_interact?.(world.dimension, {
 					x: block.x,
 					y: block.y,

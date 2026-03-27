@@ -6,6 +6,9 @@ const block = EverythingRegistry.register<BlockRegistry>("blocks", "bworld:plank
 	textures: "bworld:planks",
 	has_collision: true,
 	drop_table: "bworld:log",
+	toughness: 3,
+	requires_tool: false,
+	tool_to_break: "axe",
 });
 
 register_block_item(block);

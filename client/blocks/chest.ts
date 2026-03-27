@@ -7,12 +7,15 @@ interface TileChestData {
 	inventory: Inventory;
 }
 
-EverythingRegistry.register<BlockRegistry<TileChestData>>("blocks", "bworld:chest", {
+EverythingRegistry.register<BlockRegistry>("blocks", "bworld:chest", {
 	id: "bworld:chest",
 	textures: "bworld:chest",
-	has_collision: false,
+	toughness: 10,
+	requires_tool: false,
+	tool_to_break: "axe",
 
-	on_interact(dimension, tile) {
+	has_collision: false,
+	/*on_interact(dimension, tile) {
 		const [player] = dimension.world.get_tag("player")!;
 		const player_component = player.get(PlayerComponent)!;
 		if (tile.data && tile.data.inventory) {
@@ -21,5 +24,5 @@ EverythingRegistry.register<BlockRegistry<TileChestData>>("blocks", "bworld:ches
 	},
 	on_create(_, tile) {
 		tile.data = { inventory: new Inventory(new Container(9 * 3)) };
-	},
+	},*/
 });

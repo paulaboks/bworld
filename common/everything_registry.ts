@@ -69,6 +69,9 @@ export interface BlockRegistry {
 	alpha?: number;
 
 	has_collision: boolean;
+	toughness?: number;
+	requires_tool?: boolean;
+	tool_to_break?: string;
 	drop_table?: string;
 
 	on_create?(dimension: Dimension, block: Block): void;

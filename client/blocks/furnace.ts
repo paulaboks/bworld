@@ -123,6 +123,9 @@ const block = EverythingRegistry.register<BlockRegistry>("blocks", "bworld:furna
 	textures: { front: "bworld:furnace", side: "bworld:stone" },
 	has_collision: true,
 	drop_table: "bworld:furnace",
+	toughness: 5,
+	requires_tool: true,
+	tool_to_break: "pickaxe",
 
 	on_interact(dimension, block) {
 		const [player] = dimension.world.get_tag("player")!;

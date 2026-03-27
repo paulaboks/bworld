@@ -7,6 +7,9 @@ const block = EverythingRegistry.register<BlockRegistry>("blocks", "bworld:hoed_
 	textures: { side: "bworld:dirt", top: "bworld:hoed_dirt", bottom: "bworld:dirt" },
 	has_collision: false,
 	drop_table: "bworld:dirt",
+	toughness: 5,
+	requires_tool: false,
+	tool_to_break: "shovel",
 });
 
 register_block_item(block);

@@ -13,6 +13,10 @@ export class PlayerComponent extends Component {
 	screens: GuiScreen[] = [];
 	render_distance = 6;
 
+	breaking_block = false;
+	break_progress = 0;
+	break_progress_max = 0;
+
 	pop_screen() {
 		const screen = this.screens.pop();
 		if (screen) {

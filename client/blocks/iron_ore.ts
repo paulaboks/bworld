@@ -6,6 +6,9 @@ const block = EverythingRegistry.register<BlockRegistry>("blocks", "bworld:iron_
 	textures: "bworld:stone_iron",
 	has_collision: true,
 	drop_table: "bworld:iron_ore",
+	toughness: 5,
+	requires_tool: true,
+	tool_to_break: "pickaxe",
 });
 
 register_block_item(block);

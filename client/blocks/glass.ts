@@ -6,6 +6,9 @@ const block = EverythingRegistry.register<BlockRegistry>("blocks", "bworld:glass
 	textures: "bworld:glass",
 	has_collision: true,
 	transparent: true,
+	toughness: 3,
+	requires_tool: false,
+	tool_to_break: "pickaxe",
 });
 
 register_block_item(block);
