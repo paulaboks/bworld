@@ -1,20 +1,30 @@
 import { Inventory, PlayerInventory } from "../inventory.ts";
 import { add_player_hotbar, add_player_inventory, GuiInventoryScreen, Slot } from "./gui_screen.ts";
-import { canvas, draw_rect, draw_text, Texture } from "$/client/renderer/mod.ts";
+import { canvas, draw_rect, draw_texture_region, Texture } from "$/client/renderer/mod.ts";
 import { AssetManager } from "../assets.ts";
-import { SLOT_SIZE } from "../../common/constants.ts";
+import { SLOT_SIZE, TEXTURE_SIZE } from "$/common/constants.ts";
 import { draw_nine_slice } from "../systems/rendering/render_utils.ts";
+import { get_sprite_region } from "$/common/utils.ts";
 
 const PADDING = 10;
 
-export class GuiFurnace extends GuiInventoryScreen<Inventory, { fuel: number; progress: number }> {
+// crazy this is how i found out interface X {} is diffrent then type X = {}
+type TileChestData = {
+	inventory: Inventory;
+	progress: number;
+	progress_max: number;
+	fuel: number;
+	fuel_max: number;
+};
+
+export class GuiFurnace extends GuiInventoryScreen<Inventory, TileChestData> {
 	override inventory_width = PADDING * 2 + SLOT_SIZE * 9;
 	override inventory_height = PADDING * 4 + SLOT_SIZE * 7;
 
 	constructor(
 		inventory: Inventory,
 		player_inventory: PlayerInventory,
-		properties: { fuel: number; progress: number },
+		properties: TileChestData,
 	) {
 		super(inventory, player_inventory, properties);
 
@@ -70,21 +80,8 @@ export class GuiFurnace extends GuiInventoryScreen<Inventory, { fuel: number; pr
 			this.inventory_height,
 		);
 
-		const furnace_y = PADDING * 3 + SLOT_SIZE * 4;
-		draw_text(
-			String(this.properties.fuel),
-			this.x + this.inventory_width / 2 - SLOT_SIZE,
-			this.y + furnace_y + SLOT_SIZE,
-			1,
-			[0, 0, 0, 1],
-		);
-		draw_text(
-			String(this.properties.progress),
-			this.x + this.inventory_width / 2,
-			this.y + furnace_y + SLOT_SIZE,
-			1,
-			[0, 0, 0, 1],
-		);
+		this.draw_fire();
+		this.draw_arrow();
 
 		super.on_render();
 	}
@@ -125,5 +122,90 @@ export class GuiFurnace extends GuiInventoryScreen<Inventory, { fuel: number; pr
 			this.player_inventory.holding_item = item;
 			this.inventory.container.set_item(2, undefined);
 		}
+	}
+
+	draw_fire() {
+		const atlas = AssetManager.instance.get<Texture>("bworld:textures");
+
+		const fire_empty_region = get_sprite_region("bworld:fire_empty");
+		const fire_full_region = get_sprite_region("bworld:fire_full");
+
+		const fuel_pct = Math.max(0, Math.min(1, this.properties.fuel / this.properties.fuel_max));
+		const full_height = SLOT_SIZE * fuel_pct;
+
+		const furnace_y = PADDING * 3 + SLOT_SIZE * 4;
+
+		draw_texture_region(
+			atlas,
+			fire_empty_region.x * TEXTURE_SIZE,
+			fire_empty_region.y * TEXTURE_SIZE,
+			TEXTURE_SIZE,
+			TEXTURE_SIZE,
+			this.x + this.inventory_width / 2 - SLOT_SIZE,
+			this.y + furnace_y + SLOT_SIZE,
+			SLOT_SIZE,
+			SLOT_SIZE,
+		);
+
+		const fire_draw_x = this.x + this.inventory_width / 2 - SLOT_SIZE;
+		const fire_draw_y = this.y + furnace_y + SLOT_SIZE;
+
+		const fire_src_height = TEXTURE_SIZE * fuel_pct;
+
+		const fire_src_y_offset = TEXTURE_SIZE - fire_src_height;
+		const fire_dst_y_offset = SLOT_SIZE - full_height;
+
+		draw_texture_region(
+			atlas,
+			fire_full_region.x * TEXTURE_SIZE,
+			fire_full_region.y * TEXTURE_SIZE + fire_src_y_offset,
+			TEXTURE_SIZE,
+			fire_src_height,
+			fire_draw_x,
+			fire_draw_y + fire_dst_y_offset,
+			SLOT_SIZE,
+			full_height,
+		);
+	}
+
+	draw_arrow() {
+		const atlas = AssetManager.instance.get<Texture>("bworld:textures");
+
+		const arrow_empty_region = get_sprite_region("bworld:arrow_empty");
+		const arrow_full_region = get_sprite_region("bworld:arrow_full");
+
+		const progress_pct = Math.max(0, Math.min(1, this.properties.progress / this.properties.progress_max));
+		const full_width = SLOT_SIZE * progress_pct;
+
+		const furnace_y = PADDING * 3 + SLOT_SIZE * 4;
+
+		draw_texture_region(
+			atlas,
+			arrow_empty_region.x * TEXTURE_SIZE,
+			arrow_empty_region.y * TEXTURE_SIZE,
+			TEXTURE_SIZE,
+			TEXTURE_SIZE,
+			this.x + this.inventory_width / 2,
+			this.y + furnace_y + SLOT_SIZE,
+			SLOT_SIZE,
+			SLOT_SIZE,
+		);
+
+		const draw_x = this.x + this.inventory_width / 2;
+		const draw_y = this.y + furnace_y + SLOT_SIZE;
+
+		const src_width = TEXTURE_SIZE * progress_pct;
+
+		draw_texture_region(
+			atlas,
+			arrow_full_region.x * TEXTURE_SIZE,
+			arrow_full_region.y * TEXTURE_SIZE,
+			src_width,
+			TEXTURE_SIZE,
+			draw_x,
+			draw_y,
+			full_width,
+			SLOT_SIZE,
+		);
 	}
 }

@@ -113,7 +113,9 @@ function craft(container: Container, recipe: FurnaceRecipe) {
 interface TileChestData {
 	inventory: Inventory;
 	progress: number;
+	progress_max: number;
 	fuel: number;
+	fuel_max: number;
 }
 
 const block = EverythingRegistry.register<BlockRegistry>("blocks", "bworld:furnace", {
@@ -142,7 +144,9 @@ const block = EverythingRegistry.register<BlockRegistry>("blocks", "bworld:furna
 			data: {
 				inventory: new Inventory(new Container(3)),
 				progress: 0,
+				progress_max: 0,
 				fuel: 0,
+				fuel_max: 0,
 			},
 		});
 	},
@@ -174,10 +178,12 @@ const block = EverythingRegistry.register<BlockRegistry>("blocks", "bworld:furna
 		// refuel
 		if (data.fuel === 0 && has_fuel(container)) {
 			data.fuel = consume_fuel(container);
+			data.fuel_max = data.fuel;
 		}
 
 		// cook
 		if (data.fuel > 0 && recipe) {
+			data.progress_max = recipe.cook_time;
 			data.progress += 1;
 
 			if (data.progress >= recipe.cook_time) {
