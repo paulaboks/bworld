@@ -1,5 +1,5 @@
 import { AssetManager } from "../client/assets.ts";
-import { SpriteRegion } from "./constants.ts";
+import { ID_MASK, SpriteRegion, STATE_SHIFT } from "./constants.ts";
 import { BlockRegistry, EverythingRegistry, ItemRegistry } from "./everything_registry.ts";
 
 export function point_inside_rec(
@@ -54,5 +54,55 @@ export function register_block_item(block: BlockRegistry) {
 	EverythingRegistry.register<ItemRegistry>("items", block.id, {
 		texture_id,
 		block_id: block.id,
+	});
+}
+
+export function get_state_value(value: number, block_info: BlockRegistry, name: string) {
+	if (!block_info.states) {
+		return undefined;
+	}
+
+	if (!block_info.compiled_states) {
+		compile_block_states(block_info);
+	}
+
+	const state_bits = value >>> STATE_SHIFT;
+
+	const s = block_info.compiled_states!.find((s) => s.name === name)!;
+	return (state_bits & s.mask) >>> s.shift;
+}
+
+export function set_state_value(value: number, block_info: BlockRegistry, name: string, new_value: number) {
+	if (!block_info.states) {
+		return undefined;
+	}
+
+	if (!block_info.compiled_states) {
+		compile_block_states(block_info);
+	}
+	const id = value & ID_MASK;
+	let state_bits = value >>> 16;
+
+	const s = block_info.compiled_states!.find((s) => s.name === name)!;
+
+	state_bits = (state_bits & ~s.mask) | (new_value << s.shift);
+
+	return (state_bits << 16) | id;
+}
+
+function compile_block_states(block_info: BlockRegistry) {
+	if (!block_info.states) {
+		return;
+	}
+
+	let offset = 0;
+
+	block_info.compiled_states = block_info.states.map((s) => {
+		const shift = offset;
+		const mask = ((1 << s.bits) - 1) << shift;
+
+		offset += s.bits;
+
+		return { name: s.name, mask, shift };
 	});
 }

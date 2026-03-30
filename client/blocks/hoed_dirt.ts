@@ -10,6 +10,9 @@ const block = EverythingRegistry.register<BlockRegistry>("blocks", "bworld:hoed_
 	toughness: 5,
 	requires_tool: false,
 	tool_to_break: "shovel",
+	states: [
+		{ name: "watered", bits: 1, default: 0 },
+	],
 });
 
 register_block_item(block);

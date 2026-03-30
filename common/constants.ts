@@ -12,3 +12,9 @@ export interface SpriteRegion {
 
 export const faces = ["west", "east", "bottom", "top", "north", "south"] as const;
 export type Faces = typeof faces[number];
+
+export const AIR = 0;
+export const VOID = 0xFFFFFFFF;
+
+export const ID_MASK = 0xFFFF;
+export const STATE_SHIFT = 16;

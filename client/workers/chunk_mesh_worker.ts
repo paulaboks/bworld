@@ -279,7 +279,7 @@ self.onmessage = (event) => {
 function make_chunk_mesh(
 	chunk_x: number,
 	chunk_z: number,
-	padded_chunk: Int16Array,
+	padded_chunk: Uint32Array,
 	blocks_registry: BlockRegistry[],
 	textures_info: TexturesInfo,
 	image: Texture,

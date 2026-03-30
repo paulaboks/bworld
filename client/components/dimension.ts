@@ -1,6 +1,6 @@
 import { Component } from "$/common/ecs/mod.ts";
 import { BlockRegistry, EverythingRegistry } from "$/common/everything_registry.ts";
-import { Faces } from "../../common/constants.ts";
+import { AIR, Faces, ID_MASK, VOID } from "../../common/constants.ts";
 import { AssetManager } from "../assets.ts";
 import { ClientWorld } from "../client_world.ts";
 import { generate_chunk } from "../generation.ts";
@@ -31,7 +31,7 @@ export const CHUNK_AREA = CHUNK_SIZE * CHUNK_SIZE;
 export interface Chunk {
 	x: number;
 	z: number;
-	blocks: Int16Array;
+	blocks: Uint32Array;
 	blocks_data: BlockData[];
 	generated: boolean;
 	dirty: boolean;
@@ -57,7 +57,7 @@ export class Dimension extends Component {
 		const chunk = {
 			x,
 			z,
-			blocks: new Int16Array(CHUNK_AREA * CHUNK_HEIGHT),
+			blocks: new Uint32Array(CHUNK_AREA * CHUNK_HEIGHT),
 			blocks_data: [],
 			dirty: true,
 			generated: false,
@@ -100,7 +100,7 @@ export class Dimension extends Component {
 		const chunk = this.get_chunk(chunk_x, chunk_z);
 
 		if (!chunk) {
-			return -1;
+			return VOID;
 		}
 
 		const lx = x - chunk_x * CHUNK_SIZE;
@@ -109,7 +109,7 @@ export class Dimension extends Component {
 
 		const index = ly * CHUNK_SIZE * CHUNK_SIZE + lz * CHUNK_SIZE + lx;
 
-		return chunk.blocks[index];
+		return chunk.blocks[index] & ID_MASK;
 	}
 
 	add_block_data(block_data: BlockData) {
@@ -159,7 +159,7 @@ export class Dimension extends Component {
 		const ly = y;
 
 		const index = ly * CHUNK_SIZE * CHUNK_SIZE + lz * CHUNK_SIZE + lx;
-		chunk.blocks[index] = 0;
+		chunk.blocks[index] = AIR;
 		chunk.dirty = true;
 
 		if (lx === 0) {
@@ -283,7 +283,7 @@ export class Dimension extends Component {
 
 			const block = dimension.get_block(bx, by, bz);
 
-			if (block && block !== 0 && block !== -1) {
+			if (block && block !== AIR && block !== VOID) {
 				let face: Faces;
 
 				if (bx > prev_bx) {
@@ -316,7 +316,7 @@ export class Dimension extends Component {
 		const cz = chunk.z;
 
 		const size = CHUNK_SIZE + 2;
-		const padded = new Int16Array(size * size * CHUNK_HEIGHT);
+		const padded = new Uint32Array(size * size * CHUNK_HEIGHT);
 
 		for (let y = 0; y < CHUNK_HEIGHT; y++) {
 			for (let z = -1; z <= CHUNK_SIZE; z++) {
@@ -325,11 +325,11 @@ export class Dimension extends Component {
 
 					if (x >= 0 && x < CHUNK_SIZE && z >= 0 && z < CHUNK_SIZE) {
 						const index = y * CHUNK_SIZE * CHUNK_SIZE + z * CHUNK_SIZE + x;
-						block = chunk.blocks[index];
+						block = chunk.blocks[index] & ID_MASK;
 					} else {
 						const wx = cx * CHUNK_SIZE + x;
 						const wz = cz * CHUNK_SIZE + z;
-						block = this.get_block(wx, y, wz) ?? 0;
+						block = this.get_block(wx, y, wz) ?? AIR;
 					}
 
 					const px = x + 1;

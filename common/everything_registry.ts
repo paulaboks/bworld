@@ -62,6 +62,23 @@ interface TextureFront {
 	side: string;
 }
 
+export interface BlockStateDefinition {
+	name: string;
+	bits: number;
+	default: number;
+}
+
+interface CompiledStateDefinition {
+	name: string;
+	mask: number;
+	shift: number;
+}
+
+interface BlockStateVariant {
+	model: string;
+	y: number;
+}
+
 export interface BlockRegistry {
 	id: string;
 	textures: string | TextureSideTopBottom | TextureFront;
@@ -74,12 +91,17 @@ export interface BlockRegistry {
 	tool_to_break?: string;
 	drop_table?: string;
 
+	states?: BlockStateDefinition[];
+	variants?: Record<string, BlockStateVariant>;
+
 	on_create?(dimension: Dimension, block: Block): void;
 	on_break?(dimension: Dimension, block: Block): void;
 	on_click?(dimension: Dimension, block: Block): void;
 	on_interact?(dimension: Dimension, block: Block): boolean;
 	on_tick?(dimension: Dimension, block: Block, tick_delta: number): void;
 	on_second?(dimension: Dimension, block: Block, second_delta: number): void;
+
+	compiled_states?: CompiledStateDefinition[];
 }
 
 export interface ItemRegistry<T = unknown | undefined> {
