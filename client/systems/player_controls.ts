@@ -111,9 +111,9 @@ export class PlayerControlsSystem extends System {
 		InputManager.set_mouse_grabbed(player_component.screens.length === 0);
 
 		if (InputManager.is_mouse_down(0) && player_component.screens.length === 0) {
-			player_component.breaking_block = true;
+			player_component.breaking_block = { x: 0, y: 9999, z: 0 };
 		} else {
-			player_component.breaking_block = false;
+			player_component.breaking_block = undefined;
 			player_component.break_progress_max = 0;
 			player_component.break_progress = 0;
 		}
@@ -123,6 +123,7 @@ export class PlayerControlsSystem extends System {
 		if (block && player_component.screens.length === 0) {
 			const block_info = EverythingRegistry.get_by_id<BlockRegistry>("blocks", block.block)!;
 			if (player_component.breaking_block) {
+				player_component.breaking_block = { x: block.x, y: block.y, z: block.z };
 				player_component.break_progress_max = block_info.toughness ?? 9999;
 				player_component.break_progress += delta;
 				if (player_component.break_progress >= player_component.break_progress_max) {

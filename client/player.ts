@@ -13,7 +13,7 @@ export class PlayerComponent extends Component {
 	screens: GuiScreen[] = [];
 	render_distance = 6;
 
-	breaking_block = false;
+	breaking_block?: { x: number; y: number; z: number };
 	break_progress = 0;
 	break_progress_max = 0;
 

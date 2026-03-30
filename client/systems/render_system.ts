@@ -7,7 +7,7 @@ import { Camera } from "$/client/components/camera.ts";
 
 import { render_animated_sprite, render_sprite } from "./rendering/sprites.ts";
 import { render_dimension } from "./rendering/dimension.ts";
-import { render_player_crosshair, render_player_hotbar } from "./rendering/player.ts";
+import { render_player_breaking, render_player_crosshair, render_player_hotbar } from "./rendering/player.ts";
 import { PlayerComponent } from "../player.ts";
 import { begin_mode_3d, end_mode_3d } from "../renderer/core.ts";
 
@@ -31,6 +31,11 @@ export class RenderSystem extends System {
 
 			if (dimension) {
 				render_dimension(dimension, camera);
+			}
+
+			const player_component = entity.get(PlayerComponent);
+			if (player_component) {
+				render_player_breaking(player_component);
 			}
 		}
 

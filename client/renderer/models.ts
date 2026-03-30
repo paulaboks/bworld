@@ -1,36 +1,9 @@
+import { push_vertex } from "./core.ts";
 import type { Texture } from "./types.ts";
 
 const pad = 0.5;
 
-function push_vertex(
-	vertices: Float32Array,
-	i: number,
-	px: number,
-	py: number,
-	pz: number,
-	u: number,
-	v: number,
-	r: number,
-	g: number,
-	b: number,
-	a: number,
-) {
-	vertices[i++] = px;
-	vertices[i++] = py;
-	vertices[i++] = pz;
-	vertices[i++] = u;
-	vertices[i++] = v;
-	vertices[i++] = r;
-	vertices[i++] = g;
-	vertices[i++] = b;
-	vertices[i++] = a;
-
-	return i;
-}
-
 export function push_front_face(
-	vertices: Float32Array,
-	i: number,
 	texture: Texture,
 	x: number,
 	y: number,
@@ -53,20 +26,16 @@ export function push_front_face(
 	const u1 = (sx + sw - pad) / texture.width;
 	const v1 = (sy + sh - pad) / texture.height;
 
-	i = push_vertex(vertices, i, x, y, z2, u0, v1, r, g, b, a);
-	i = push_vertex(vertices, i, x2, y, z2, u1, v1, r, g, b, a);
-	i = push_vertex(vertices, i, x2, y2, z2, u1, v0, r, g, b, a);
+	push_vertex(x, y, z2, u0, v1, r, g, b, a);
+	push_vertex(x2, y, z2, u1, v1, r, g, b, a);
+	push_vertex(x2, y2, z2, u1, v0, r, g, b, a);
 
-	i = push_vertex(vertices, i, x, y, z2, u0, v1, r, g, b, a);
-	i = push_vertex(vertices, i, x2, y2, z2, u1, v0, r, g, b, a);
-	i = push_vertex(vertices, i, x, y2, z2, u0, v0, r, g, b, a);
-
-	return i;
+	push_vertex(x, y, z2, u0, v1, r, g, b, a);
+	push_vertex(x2, y2, z2, u1, v0, r, g, b, a);
+	push_vertex(x, y2, z2, u0, v0, r, g, b, a);
 }
 
 export function push_back_face(
-	vertices: Float32Array,
-	i: number,
 	texture: Texture,
 	x: number,
 	y: number,
@@ -88,20 +57,16 @@ export function push_back_face(
 	const u1 = (sx + sw - pad) / texture.width;
 	const v1 = (sy + sh - pad) / texture.height;
 
-	i = push_vertex(vertices, i, x2, y, z, u0, v1, r, g, b, a);
-	i = push_vertex(vertices, i, x, y, z, u1, v1, r, g, b, a);
-	i = push_vertex(vertices, i, x, y2, z, u1, v0, r, g, b, a);
+	push_vertex(x2, y, z, u0, v1, r, g, b, a);
+	push_vertex(x, y, z, u1, v1, r, g, b, a);
+	push_vertex(x, y2, z, u1, v0, r, g, b, a);
 
-	i = push_vertex(vertices, i, x2, y, z, u0, v1, r, g, b, a);
-	i = push_vertex(vertices, i, x, y2, z, u1, v0, r, g, b, a);
-	i = push_vertex(vertices, i, x2, y2, z, u0, v0, r, g, b, a);
-
-	return i;
+	push_vertex(x2, y, z, u0, v1, r, g, b, a);
+	push_vertex(x, y2, z, u1, v0, r, g, b, a);
+	push_vertex(x2, y2, z, u0, v0, r, g, b, a);
 }
 
 export function push_left_face(
-	vertices: Float32Array,
-	i: number,
 	texture: Texture,
 	x: number,
 	y: number,
@@ -123,20 +88,16 @@ export function push_left_face(
 	const u1 = (sx + sw - pad) / texture.width;
 	const v1 = (sy + sh - pad) / texture.height;
 
-	i = push_vertex(vertices, i, x, y, z, u0, v1, r, g, b, a);
-	i = push_vertex(vertices, i, x, y, z2, u1, v1, r, g, b, a);
-	i = push_vertex(vertices, i, x, y2, z2, u1, v0, r, g, b, a);
+	push_vertex(x, y, z, u0, v1, r, g, b, a);
+	push_vertex(x, y, z2, u1, v1, r, g, b, a);
+	push_vertex(x, y2, z2, u1, v0, r, g, b, a);
 
-	i = push_vertex(vertices, i, x, y, z, u0, v1, r, g, b, a);
-	i = push_vertex(vertices, i, x, y2, z2, u1, v0, r, g, b, a);
-	i = push_vertex(vertices, i, x, y2, z, u0, v0, r, g, b, a);
-
-	return i;
+	push_vertex(x, y, z, u0, v1, r, g, b, a);
+	push_vertex(x, y2, z2, u1, v0, r, g, b, a);
+	push_vertex(x, y2, z, u0, v0, r, g, b, a);
 }
 
 export function push_right_face(
-	vertices: Float32Array,
-	i: number,
 	texture: Texture,
 	x: number,
 	y: number,
@@ -159,20 +120,16 @@ export function push_right_face(
 	const u1 = (sx + sw - pad) / texture.width;
 	const v1 = (sy + sh - pad) / texture.height;
 
-	i = push_vertex(vertices, i, x2, y, z2, u0, v1, r, g, b, a);
-	i = push_vertex(vertices, i, x2, y, z, u1, v1, r, g, b, a);
-	i = push_vertex(vertices, i, x2, y2, z, u1, v0, r, g, b, a);
+	push_vertex(x2, y, z2, u0, v1, r, g, b, a);
+	push_vertex(x2, y, z, u1, v1, r, g, b, a);
+	push_vertex(x2, y2, z, u1, v0, r, g, b, a);
 
-	i = push_vertex(vertices, i, x2, y, z2, u0, v1, r, g, b, a);
-	i = push_vertex(vertices, i, x2, y2, z, u1, v0, r, g, b, a);
-	i = push_vertex(vertices, i, x2, y2, z2, u0, v0, r, g, b, a);
-
-	return i;
+	push_vertex(x2, y, z2, u0, v1, r, g, b, a);
+	push_vertex(x2, y2, z, u1, v0, r, g, b, a);
+	push_vertex(x2, y2, z2, u0, v0, r, g, b, a);
 }
 
 export function push_top_face(
-	vertices: Float32Array,
-	i: number,
 	texture: Texture,
 	x: number,
 	y: number,
@@ -195,20 +152,16 @@ export function push_top_face(
 	const u1 = (sx + sw - pad) / texture.width;
 	const v1 = (sy + sh - pad) / texture.height;
 
-	i = push_vertex(vertices, i, x, y2, z2, u0, v1, r, g, b, a);
-	i = push_vertex(vertices, i, x2, y2, z2, u1, v1, r, g, b, a);
-	i = push_vertex(vertices, i, x2, y2, z, u1, v0, r, g, b, a);
+	push_vertex(x, y2, z2, u0, v1, r, g, b, a);
+	push_vertex(x2, y2, z2, u1, v1, r, g, b, a);
+	push_vertex(x2, y2, z, u1, v0, r, g, b, a);
 
-	i = push_vertex(vertices, i, x, y2, z2, u0, v1, r, g, b, a);
-	i = push_vertex(vertices, i, x2, y2, z, u1, v0, r, g, b, a);
-	i = push_vertex(vertices, i, x, y2, z, u0, v0, r, g, b, a);
-
-	return i;
+	push_vertex(x, y2, z2, u0, v1, r, g, b, a);
+	push_vertex(x2, y2, z, u1, v0, r, g, b, a);
+	push_vertex(x, y2, z, u0, v0, r, g, b, a);
 }
 
 export function push_bottom_face(
-	vertices: Float32Array,
-	i: number,
 	texture: Texture,
 	x: number,
 	y: number,
@@ -230,13 +183,11 @@ export function push_bottom_face(
 	const u1 = (sx + sw - pad) / texture.width;
 	const v1 = (sy + sh - pad) / texture.height;
 
-	i = push_vertex(vertices, i, x, y, z, u0, v1, r, g, b, a);
-	i = push_vertex(vertices, i, x2, y, z, u1, v1, r, g, b, a);
-	i = push_vertex(vertices, i, x2, y, z2, u1, v0, r, g, b, a);
+	push_vertex(x, y, z, u0, v1, r, g, b, a);
+	push_vertex(x2, y, z, u1, v1, r, g, b, a);
+	push_vertex(x2, y, z2, u1, v0, r, g, b, a);
 
-	i = push_vertex(vertices, i, x, y, z, u0, v1, r, g, b, a);
-	i = push_vertex(vertices, i, x2, y, z2, u1, v0, r, g, b, a);
-	i = push_vertex(vertices, i, x, y, z2, u0, v0, r, g, b, a);
-
-	return i;
+	push_vertex(x, y, z, u0, v1, r, g, b, a);
+	push_vertex(x2, y, z2, u1, v0, r, g, b, a);
+	push_vertex(x, y, z2, u0, v0, r, g, b, a);
 }
