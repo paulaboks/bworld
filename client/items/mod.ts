@@ -7,3 +7,5 @@ import "./tin_ingot.ts";
 import "./iron_ingot.ts";
 import "./copper_ingot.ts";
 import "./gold_ingot.ts";
+import "./stick.ts";
+import "./wood_pickaxe.ts";

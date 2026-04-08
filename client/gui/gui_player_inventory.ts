@@ -53,6 +53,31 @@ const recipes: CraftingRecipe[] = [
 		],
 		result: new ItemStack("bworld:planks", 2),
 	},
+	{
+		width: 1,
+		height: 2,
+		pattern: [
+			"bworld:planks",
+			"bworld:planks",
+		],
+		result: new ItemStack("bworld:stick", 2),
+	},
+	{
+		width: 3,
+		height: 3,
+		pattern: [
+			"bworld:planks",
+			"bworld:planks",
+			"bworld:planks",
+			undefined,
+			"bworld:stick",
+			undefined,
+			undefined,
+			"bworld:stick",
+			undefined,
+		],
+		result: new ItemStack("bworld:wood_pickaxe", 1),
+	},
 ];
 
 const PADDING = 10;
@@ -73,7 +98,7 @@ export class GuiPlayerInventory extends GuiInventoryScreen {
 		for (let i = 0; i < 3; i += 1) {
 			for (let j = 0; j < 3; j += 1) {
 				this.slots.push(
-					new Slot(this.inventory, i * 3 + j, crafting_x + i * SLOT_SIZE, crafting_y + j * SLOT_SIZE),
+					new Slot(this.inventory, j * 3 + i, crafting_x + i * SLOT_SIZE, crafting_y + j * SLOT_SIZE),
 				);
 			}
 		}
@@ -138,16 +163,32 @@ export class GuiPlayerInventory extends GuiInventoryScreen {
 			for (let x = 0; x <= 3 - recipe.width; x++) {
 				let match = true;
 
-				for (let ry = 0; ry < recipe.height; ry++) {
-					for (let rx = 0; rx < recipe.width; rx++) {
-						const grid_index = (y + ry) * 3 + (x + rx);
-						const recipe_index = ry * recipe.width + rx;
+				for (let gy = 0; gy < 3; gy++) {
+					for (let gx = 0; gx < 3; gx++) {
+						const grid_index = gy * 3 + gx;
 
-						if (grid[grid_index] !== recipe.pattern[recipe_index]) {
-							match = false;
-							break;
+						if (
+							gx >= x &&
+							gx < x + recipe.width &&
+							gy >= y &&
+							gy < y + recipe.height
+						) {
+							const rx = gx - x;
+							const ry = gy - y;
+							const recipe_index = ry * recipe.width + rx;
+
+							if (grid[grid_index] !== recipe.pattern[recipe_index]) {
+								match = false;
+								break;
+							}
+						} else {
+							if (grid[grid_index] !== undefined) {
+								match = false;
+								break;
+							}
 						}
 					}
+					if (!match) break;
 				}
 
 				if (match) return true;
