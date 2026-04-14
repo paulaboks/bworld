@@ -2,4 +2,5 @@ import { EverythingRegistry, ItemRegistry } from "$/common/everything_registry.t
 
 EverythingRegistry.register<ItemRegistry>("items", "bworld:axe", {
 	texture_id: "bworld:axe",
+	tool_type: "axe",
 });

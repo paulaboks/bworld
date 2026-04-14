@@ -119,15 +119,25 @@ export class PlayerControlsSystem extends System {
 		}
 
 		const block = world.dimension.get_looked_block(world.dimension, camera);
+		const holding_item = player_component.player_inventory.container.get_item(
+			player_component.player_inventory.hotbar_selected,
+		);
+		const holding_item_info = EverythingRegistry.get<ItemRegistry>("items", holding_item?.type_id ?? "");
 
 		if (block && player_component.screens.length === 0) {
 			const block_info = EverythingRegistry.get_by_id<BlockRegistry>("blocks", block.block)!;
 			if (player_component.breaking_block) {
 				player_component.breaking_block = { x: block.x, y: block.y, z: block.z };
 				player_component.break_progress_max = block_info.toughness ?? 9999;
-				player_component.break_progress += delta;
+				let multiplier = 1;
+				if (holding_item_info?.tool_type === block_info.tool_to_break) {
+					multiplier *= 2;
+				}
+				player_component.break_progress += delta * multiplier;
 				if (player_component.break_progress >= player_component.break_progress_max) {
-					world.dimension.break_block(block.x, block.y, block.z);
+					const drop_item = !block_info.requires_tool ||
+						holding_item_info?.tool_type === block_info.tool_to_break;
+					world.dimension.break_block(block.x, block.y, block.z, drop_item);
 					player_component.break_progress_max = 0;
 					player_component.break_progress = 0;
 				}
@@ -166,6 +176,10 @@ export class PlayerControlsSystem extends System {
 					}
 				}
 			}
+		} else {
+			player_component.breaking_block = undefined;
+			player_component.break_progress_max = 0;
+			player_component.break_progress = 0;
 		}
 
 		if (player_component.screens.length === 0) {

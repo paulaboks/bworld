@@ -107,6 +107,7 @@ export interface BlockRegistry {
 export interface ItemRegistry<T = unknown | undefined> {
 	texture_id: string | ((item: ItemStack<T>) => string);
 	block_id?: string;
+	tool_type?: string;
 
 	place?(dimension: Dimension, block: Block): void;
 

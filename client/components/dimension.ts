@@ -138,7 +138,7 @@ export class Dimension extends Component {
 		) as BlockData<T>;
 	}
 
-	break_block(x: number, y: number, z: number) {
+	break_block(x: number, y: number, z: number, drop_item: boolean = true) {
 		const block_chunk_x = Math.floor(x / CHUNK_SIZE);
 		const block_chunk_z = Math.floor(z / CHUNK_SIZE);
 		const chunk = this.get_chunk(block_chunk_x, block_chunk_z);
@@ -148,7 +148,7 @@ export class Dimension extends Component {
 
 		const block_info = EverythingRegistry.get_by_id<BlockRegistry>("blocks", this.get_block(x, y, z))!;
 
-		if (block_info.drop_table) {
+		if (drop_item && block_info.drop_table) {
 			const [player] = this.world.get_tag("player")!;
 			const player_component = player.get(PlayerComponent)!;
 			player_component.player_inventory.container.add_item(new ItemStack(block_info.drop_table));
